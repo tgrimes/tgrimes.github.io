@@ -19,7 +19,7 @@ time, mark, audio, video {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	font-size: 100%;
+	font-size: 18pt;
 	font: inherit;
 	vertical-align: baseline;
 }
@@ -54,7 +54,7 @@ table {
 
 body {
 	font: normal normal 400;
-	font-size: 80%;
+	font-size: 100%;
 	line-height: 1.5em;
 	/* font-family: Verdana, sans-serif; */
 	font-family: "Open sans", sans-serif;
@@ -164,10 +164,10 @@ a:hover {
 #webaddress {
 	margin-top: 0em;
 	position: relative;
-  margin-left: 25%;
+    margin-left: 25%;
 	color: #aaa;
 	font-family: Menlo,monospace,sans-serif;
-	font-size: 80%;
+	font-size: 90%;
 }
 
 #webaddress a {
@@ -184,7 +184,12 @@ strong {
 }
 
 #address {
-	display: none;
+	margin-top: 0em;
+	position: relative;
+    margin-left: 25%;
+	color: #aaa;
+	font-family: Menlo,monospace,sans-serif;
+	font-size: 90%;
 }
 
 .footer {
