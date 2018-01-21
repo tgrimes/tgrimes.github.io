@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Statistics on The Nightly Brew</title>
+    <link>/categories/statistics/</link>
+    <description>Recent content in Statistics on The Nightly Brew</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 21 May 2014 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/statistics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>False conviction rates for death sentences</title>
+      <link>/2014/05/21/false-conviction-rates-for-death-sentences/</link>
+      <pubDate>Wed, 21 May 2014 00:00:00 +0000</pubDate>
+      
+      <guid>/2014/05/21/false-conviction-rates-for-death-sentences/</guid>
+      <description>&lt;p&gt;Imagine standing in a courtroom. You are the innocent defendant in a trial, being prosecuted for a terrible crime. The jury comes out and gives their verdict - your body goes numb. Guilty. You&amp;rsquo;re given a death sentence for a crime you didn&amp;rsquo;t commit. It&amp;rsquo;s a mind-boggling situation. &lt;a href=&#34;http://www.law.umich.edu/special/exoneration/Documents/exonerations_us_1989_2012_full_report.pdf&#34;&gt;But it happens&lt;/a&gt;. We know it happens because we find people being exonerated from death sentences in light of new evidence, being released after half a lifetime in prison.&lt;/p&gt;
+
+&lt;p&gt;The hope is that this is a rare occurrence. But how often &lt;em&gt;does&lt;/em&gt; it happen? &lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
