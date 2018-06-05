@@ -18,8 +18,8 @@ menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
 	margin: 0;
 	padding: 0;
-	font-size: 16pt;
-	font: inherit;
+	font-size: 10pt;
+	font-family:'Times New Roman', sans-serif;
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -54,7 +54,7 @@ table {
 /* end of reset */
 
 /* faux Wikipedia logo font */
-@font-face { font-family: 'Linux Libertine'; font-style: normal; font-weight: 400; src: local('Linux Libertine'),url(//brick.a.ssl.fastly.net/fonts/linuxlibertine/400.woff) format('woff'); } .fa-wikipedia:before { font-family: 'Linux Libertine', 'Times New Roman', Times, serif; font-weight: 400; content: "W"; }
+@font-face { font-family: 'Linux Libertine'; font-style: normal; font-weight: 400; src: local('Linux Libertine'),url(//brick.a.ssl.fastly.net/fonts/linuxlibertine/400.woff) format('woff'); } .fa-wikipedia:before { font-family: 'Times New Roman', Times, serif; font-weight: 400; content: "W"; }
 
 html {
 	margin: 0mm;
@@ -62,15 +62,15 @@ html {
 
 body {
 	font: normal normal 400;
-	font-size: 85%;
+	font-size: 100%;
 	line-height: 1.5em;
 	/* font-family: Verdana, sans-serif; */
-	font-family: "Open sans", sans-serif;
+	font-family:'Times New Roman', sans-serif;
 }
 
 p {
 	position: relative;
-	font-size: 80%;
+	font-size: 100%;
 	left: 25%;
 	width: 75%;
 }
@@ -78,6 +78,7 @@ p {
 code {
 	font: normal normal;
 	font-family: Menlo, monospace, sans-serif;
+	font-size: 80%;
 	color: #aaa;
 	margin-right: 100%;
 }
@@ -92,7 +93,7 @@ ul {
 	position: relative;
 	left: 25%;
 	width: 75%;
-  columns: 3;
+  -coumns: 3;
   -webkit-columns: 3;
   -moz-columns: 3;
 }
@@ -109,13 +110,13 @@ li ul {
 
 h1,h2,h3,h4 {
 	font-weight: 400;
-	font-family: Cousine,Verdana,sans-serif;
+	font-family: 'Times New Roman', sans-serif;
 	width: 65%;
 }
 
 h1 {
 	text-align: left;
-	font-size: 18pt;
+	font-size: 200%;
 	position: relative;
 	left: 25%;
 	/* padding: .1rem 1rem; */
@@ -123,27 +124,27 @@ h1 {
 
 h1+p {
 	/*subtitle*/
-	font-size: 100%;
+	font-size: 110%;
 	line-height: 2em;
 }
 
 h2 {
-	font-size: 90%;
-	line-height: 1.5em;
+	font-size: 120%;
+	/*line-height: 2em;*/
 	/* color: #a00; */
 	color: #6C9AC3;
 	position: relative;
-	top: 1.4em;
+	top: 1em;
 	text-align: right;
 	width: 15%;
 }
 
 h3 {
 	color: #E28F41;
-	font-size: 75%;
-	line-height: 1.5em;
+	font-size: 100%;
+	/*line-height: 1.5em;*/
 	position: relative;
-	top: 1.7em;
+	top: 1.25em;
 	text-align: right;
 	width: 15%;
 }
@@ -162,7 +163,7 @@ a:hover {
 	position: relative;
     margin-left: 25%;
 	color: #aaa;
-	font-family: Menlo,monospace,sans-serif;
+	font-family:'Times New Roman', sans-serif;
 	font-size: 90%;
 }
 
@@ -184,7 +185,7 @@ strong {
 	position: relative;
     margin-left: 25%;
 	color: #aaa;
-	font-family: Menlo,monospace,sans-serif;
+	font-family:'Times New Roman', sans-serif;
 	font-size: 90%;
 }
 

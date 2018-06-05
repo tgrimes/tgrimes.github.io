@@ -19,8 +19,8 @@ time, mark, audio, video {
 	margin: 0;
 	padding: 0;
 	border: 0;
-	font-size: 18pt;
-	font: inherit;
+	font-size: 12pt;
+	font-family:'Times New Roman', sans-serif;
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
@@ -50,14 +50,14 @@ table {
 /* end of reset */
 
 /* faux Wikipedia logo font */
-@font-face { font-family: 'Linux Libertine'; font-style: normal; font-weight: 400; src: local('Linux Libertine'),url(//brick.a.ssl.fastly.net/fonts/linuxlibertine/400.woff) format('woff'); } .fa-wikipedia:before { font-family: 'Linux Libertine', 'Times New Roman', Times, serif; font-weight: 400; content: "W"; }
+@font-face { font-family: 'Linux Libertine'; font-style: normal; font-weight: 400; src: local('Linux Libertine'),url(//brick.a.ssl.fastly.net/fonts/linuxlibertine/400.woff) format('woff'); } .fa-wikipedia:before { font-family: 'Times New Roman', Times, serif; font-weight: 400; content: "W"; }
 
 body {
 	font: normal normal 400;
 	font-size: 100%;
 	line-height: 1.5em;
 	/* font-family: Verdana, sans-serif; */
-	font-family: "Open sans", sans-serif;
+	font-family:'Times New Roman', sans-serif;
 	margin-top: 1em;
 	margin-left: 1em;
 }
@@ -72,8 +72,8 @@ p {
 
 code {
 	font: normal normal;
-	font-size: 90%;
-	font-family: Menlo, monospace, sans-serif;
+	font-size: 100%;
+	font-family:'Times New Roman', sans-serif;
 	color: #aaa;
 }
 
@@ -107,14 +107,14 @@ li ul {
 
 h1,h2,h3,h4 {
 	font-weight: 400;
-	font-family: Cousine,Verdana,sans-serif;
+	font-family:'Times New Roman', sans-serif;
 	width: 65%;
 }
 
 h1 {
 	color: #E28F41;
 	text-align: left;
-	font-size: 3em;
+	font-size: 200%;
 	line-height: 1em;
 	position: relative;
 	margin-top: 2em;
@@ -132,22 +132,22 @@ h1+p {
 }
 
 h2 {
-	font-size: 1.1em;
+	font-size: 120%;
 	/* color: #a00; */
 	color: #6C9AC3;
 	margin-top: 2em;
 	position: relative;
-	top: 1.4em;
+	top: 1.25em;
 	text-align: right;
 	width: 15%;
 }
 
 h3 {
 	color: #E28F41;
-	font-size: 1em;
+	font-size: 100%;
 	line-height: 2em;
 	position: relative;
-	top: 1.7em;
+	top: 1.6em;
 	text-align: right;
 	width: 15%;
 }
@@ -166,7 +166,7 @@ a:hover {
 	position: relative;
     margin-left: 25%;
 	color: #aaa;
-	font-family: Menlo,monospace,sans-serif;
+	font-family:'Times New Roman', sans-serif;
 	font-size: 90%;
 }
 
@@ -188,7 +188,7 @@ strong {
 	position: relative;
     margin-left: 25%;
 	color: #aaa;
-	font-family: Menlo,monospace,sans-serif;
+	font-family:'Times New Roman', sans-serif;
 	font-size: 90%;
 }
 
