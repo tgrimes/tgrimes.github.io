@@ -12,7 +12,7 @@ exports: National currency, monthly level
 
 forcasting.csv - Aggregation of datasets.
 
-unemployment_rate.csv - Unemployment Rate: Aged 15-64: All Persons for the United States
+unemployment.csv - Unemployment Rate: Aged 15-64: All Persons for the United States
 unemployment_rate: percent
 - https://fred.stlouisfed.org/series/LRUN64TTUSM156N
 - Organization for Economic Co-operation and Development, Unemployment Rate: Aged 15-64: All Persons for the United States [LRUN64TTUSM156N], retrieved from FRED, Federal Reserve Bank of St. Louis; https://fred.stlouisfed.org/series/LRUN64TTUSM156N, June 4, 2018.
