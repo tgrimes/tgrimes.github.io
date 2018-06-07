@@ -29,7 +29,7 @@ footer, header, hgroup, menu, nav, section {
 }
 
 @page{
-	margin: 25mm 25mm 25mm 10mm;
+	margin: 20mm 25mm 25mm 10mm;
 }
 
 body {
@@ -81,6 +81,7 @@ code {
 	font-size: 80%;
 	color: #aaa;
 	margin-right: 100%;
+	line-height: 1.85em;
 }
 
 p code {
@@ -115,6 +116,7 @@ h1,h2,h3,h4 {
 }
 
 h1 {
+	margin-top: 0em;
 	text-align: left;
 	font-size: 200%;
 	position: relative;
@@ -126,6 +128,7 @@ h1+p {
 	/*subtitle*/
 	font-size: 110%;
 	line-height: 2em;
+	margin-top: 0.2em;
 }
 
 h2 {
@@ -144,7 +147,7 @@ h3 {
 	font-size: 100%;
 	/*line-height: 1.5em;*/
 	position: relative;
-	top: 1.25em;
+	top: 1.315em;
 	text-align: right;
 	width: 15%;
 }
