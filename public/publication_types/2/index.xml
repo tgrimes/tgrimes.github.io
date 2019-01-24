@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>2 on Tyler Grimes</title>
+    <link>/publication_types/2/</link>
+    <description>Recent content in 2 on Tyler Grimes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 30 May 2018 00:00:00 -0400</lastBuildDate>
+    
+	<atom:link href="/publication_types/2/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Predicting survival times for neuroblastoma patients using RNA-seq expression profiles</title>
+      <link>/publication/camda_2017_neuroblastoma/</link>
+      <pubDate>Wed, 30 May 2018 00:00:00 -0400</pubDate>
+      
+      <guid>/publication/camda_2017_neuroblastoma/</guid>
+      <description>More detail can easily be written here using Markdown and $\rm \LaTeX$ math code.</description>
+    </item>
+    
+    <item>
+      <title>Unraveling bacterial fingerprints of city subways from microbiome 16S gene profiles</title>
+      <link>/publication/camda_2017_metasub/</link>
+      <pubDate>Mon, 22 May 2017 00:00:00 -0400</pubDate>
+      
+      <guid>/publication/camda_2017_metasub/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

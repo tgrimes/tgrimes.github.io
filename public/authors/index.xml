@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Authors on Tyler Grimes</title>
+    <link>/authors/</link>
+    <description>Recent content in Authors on Tyler Grimes</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 20 Apr 2016 00:00:00 -0400</lastBuildDate>
+    
+	<atom:link href="/authors/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Admin</title>
+      <link>/authors/admin/</link>
+      <pubDate>Wed, 20 Apr 2016 00:00:00 -0400</pubDate>
+      
+      <guid>/authors/admin/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Alejandro R. Walker</title>
+      <link>/authors/alejandro-r.-walker/</link>
+      <pubDate>Wed, 30 May 2018 00:00:00 -0400</pubDate>
+      
+      <guid>/authors/alejandro-r.-walker/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Somnath Datta</title>
+      <link>/authors/somnath-datta/</link>
+      <pubDate>Wed, 30 May 2018 00:00:00 -0400</pubDate>
+      
+      <guid>/authors/somnath-datta/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Susmita Datta</title>
+      <link>/authors/susmita-datta/</link>
+      <pubDate>Wed, 30 May 2018 00:00:00 -0400</pubDate>
+      
+      <guid>/authors/susmita-datta/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tyler Grimes</title>
+      <link>/authors/tyler-grimes/</link>
+      <pubDate>Wed, 30 May 2018 00:00:00 -0400</pubDate>
+      
+      <guid>/authors/tyler-grimes/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
