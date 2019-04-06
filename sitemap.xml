@@ -4,6 +4,14 @@
     
     <url>
     
+      <loc>/publication/2019_pathways_in_dc/</loc>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/tutorial/example/</loc>
       <lastmod>2018-09-09T00:00:00-04:00</lastmod>
     </url>
@@ -14,6 +22,14 @@
     
       <loc>/tutorial/</loc>
       <lastmod>2018-09-09T00:00:00-04:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/talk/ismb_2018/</loc>
+      <lastmod>2018-07-08T14:20:00-04:00</lastmod>
     </url>
     
   
@@ -38,14 +54,6 @@
     
       <loc>/publication/camda_2017_metasub/</loc>
       <lastmod>2017-05-22T00:00:00-04:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
-      <loc>/talk/example/</loc>
-      <lastmod>2017-01-01T00:00:00-05:00</lastmod>
     </url>
     
   
@@ -116,7 +124,7 @@
     <url>
     
       <loc>/publication_types/2/</loc>
-      <lastmod>2018-05-30T00:00:00-04:00</lastmod>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -194,6 +202,24 @@
     
     <url>
     
+      <loc>/tags/gene-regulatory-networks/</loc>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/tags/permutation-testing/</loc>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/project/</loc>
       <lastmod>2016-04-27T00:00:00-04:00</lastmod>
       <priority>0</priority>
@@ -204,7 +230,7 @@
     <url>
     
       <loc>/publication_types/</loc>
-      <lastmod>2018-05-30T00:00:00-04:00</lastmod>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -213,7 +239,16 @@
     <url>
     
       <loc>/tags/rna-seq/</loc>
-      <lastmod>2018-05-30T00:00:00-04:00</lastmod>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/authors/s.-steven-potter/</loc>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -237,7 +272,7 @@
     <url>
     
       <loc>/authors/somnath-datta/</loc>
-      <lastmod>2018-05-30T00:00:00-04:00</lastmod>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -291,7 +326,7 @@
     <url>
     
       <loc>/authors/tyler-grimes/</loc>
-      <lastmod>2018-05-30T00:00:00-04:00</lastmod>
+      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     

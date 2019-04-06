@@ -12,6 +12,15 @@
     
     
     <item>
+      <title>Integrating gene regulatory pathways into differential network analysis of gene expression data</title>
+      <link>/publication/2019_pathways_in_dc/</link>
+      <pubDate>Tue, 02 Apr 2019 00:00:00 -0400</pubDate>
+      
+      <guid>/publication/2019_pathways_in_dc/</guid>
+      <description>More detail can easily be written here using Markdown and $\rm \LaTeX$ math code.</description>
+    </item>
+    
+    <item>
       <title>Predicting survival times for neuroblastoma patients using RNA-seq expression profiles</title>
       <link>/publication/camda_2017_neuroblastoma/</link>
       <pubDate>Wed, 30 May 2018 00:00:00 -0400</pubDate>

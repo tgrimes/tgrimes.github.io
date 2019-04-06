@@ -6,10 +6,28 @@
     <description>Recent content on Tyler Grimes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 30 May 2018 00:00:00 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 02 Apr 2019 00:00:00 -0400</lastBuildDate>
     
 	<atom:link href="/authors/tyler-grimes/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Integrating gene regulatory pathways into differential network analysis of gene expression data</title>
+      <link>/publication/2019_pathways_in_dc/</link>
+      <pubDate>Tue, 02 Apr 2019 00:00:00 -0400</pubDate>
+      
+      <guid>/publication/2019_pathways_in_dc/</guid>
+      <description>More detail can easily be written here using Markdown and $\rm \LaTeX$ math code.</description>
+    </item>
+    
+    <item>
+      <title>An exploratory approach for identifying cancer driver genes from gene expression data</title>
+      <link>/talk/ismb_2018/</link>
+      <pubDate>Sun, 08 Jul 2018 14:20:00 -0400</pubDate>
+      
+      <guid>/talk/ismb_2018/</guid>
+      <description>Q&amp;amp;A starts at 16:20</description>
+    </item>
     
     <item>
       <title>Predicting survival times for neuroblastoma patients using RNA-seq expression profiles</title>

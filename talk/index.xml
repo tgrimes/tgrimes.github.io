@@ -12,14 +12,12 @@
     
     
     <item>
-      <title>Example Talk</title>
-      <link>/talk/example/</link>
-      <pubDate>Sun, 01 Jan 2017 00:00:00 -0500</pubDate>
+      <title>An exploratory approach for identifying cancer driver genes from gene expression data</title>
+      <link>/talk/ismb_2018/</link>
+      <pubDate>Sun, 08 Jul 2018 14:20:00 -0400</pubDate>
       
-      <guid>/talk/example/</guid>
-      <description>Click on the Slides button above to view the built-in slides feature.
-  Slides can be added in a few ways:
- Create slides using Academic&amp;rsquo;s Slides feature and link using url_slides parameter in the front matter of the talk file Upload an existing slide deck to static/ and link using url_slides parameter in the front matter of the talk file Embed your slides (e.g. Google Slides) or presentation video on this page using shortcodes.</description>
+      <guid>/talk/ismb_2018/</guid>
+      <description>Q&amp;amp;A starts at 16:20</description>
     </item>
     
   </channel>
