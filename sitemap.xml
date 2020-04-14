@@ -202,6 +202,13 @@
     
     <url>
     
+      <loc>/download/</loc>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/tags/gene-regulatory-networks/</loc>
       <lastmod>2019-04-02T00:00:00-04:00</lastmod>
       <priority>0</priority>
