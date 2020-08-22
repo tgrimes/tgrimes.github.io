@@ -10,6 +10,32 @@
     <atom:link href="/" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Sat, 22 Aug 2020 21:48:51 -0700</pubDate>
+      
+      <guid>/about/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;m an Assistant Professor of Statistics at the Univeristy of North Florida. My research interests include the development of statistical methodology for high-dimensional data and building R packages to implement that work.&lt;/p&gt;
+
+&lt;p&gt;Recent work has focused on RNA-seq data (gene expression), developing methods in the areas of graphical modeling, prediction models, and survival analysis. Typical research questions include: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease? Future work will dive into single-cell data, which provides a much finer resolution of cellular activity.&lt;/p&gt;
+
+&lt;p&gt;I find that simulations are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand&amp;ndash;this is a process that has often lead me to new insights.&lt;/p&gt;
+
+&lt;p&gt;I am always open to discussing collaboration/consulting opportunities. My role as a statistician in collaborative projects is to (1) help formulate good research questions, (2) design experiments that produce informative and high-quality data, (3) develop a plan for analyzing the data, and (4) visualize and communicate the findings.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data</title>
+      <link>/publication/camda_2017_neuroblastoma-copy/</link>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 -0400</pubDate>
+      
+      <guid>/publication/camda_2017_neuroblastoma-copy/</guid>
+      <description>&lt;p&gt;This manuscript has been accepted for publication and is to appear.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Integrating gene regulatory pathways into differential network analysis of gene expression data</title>
       <link>/publication/2019_pathways_in_dc/</link>
       <pubDate>Tue, 02 Apr 2019 00:00:00 -0400</pubDate>
@@ -81,20 +107,6 @@ Q&amp;amp;A starts at 16:20&lt;/p&gt;
       
       <guid>/publication/camda_2017_metasub/</guid>
       <description></description>
-    </item>
-    
-    <item>
-      <title>About</title>
-      <link>/about/</link>
-      <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
-      
-      <guid>/about/</guid>
-      <description>&lt;p&gt;I’m a Ph.D. Candidate at the Univeristy of Florida. My research interests include the development of statistical methodology for -omics data.&lt;/p&gt;
-
-&lt;p&gt;Recent work has focused on RNA-seq data (transcriptomics), with methods in the areas of survival analysis, predictive modelling, and graphical models. How might gene expression profiles be used to predict patient survival times? How do gene-gene associations differ in high-risk vs. low-risk patients, and what clues do these differences leave us about the underlying disease? Future work will delve into methodology for single-cell data, which provides a much finer resolution of cellular activity.&lt;/p&gt;
-
-&lt;p&gt;I prefer assessing model performance through extensive simulations over large-sample inference; the latter can be reassuring, but the former forces us to better understand the biological context (or data generating process) to which the methods are applied. Through simulations we can explore conditions to find when our models work and when they fail - this is a process that has often lead me to new insights and a deeper understanding.&lt;/p&gt;
-</description>
     </item>
     
     <item>

@@ -48,6 +48,15 @@
     </item>
     
     <item>
+      <title>Graphical models</title>
+      <link>/tags/graphical-models/</link>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 -0400</pubDate>
+      
+      <guid>/tags/graphical-models/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Permutation testing</title>
       <link>/tags/permutation-testing/</link>
       <pubDate>Tue, 02 Apr 2019 00:00:00 -0400</pubDate>
@@ -59,9 +68,18 @@
     <item>
       <title>RNA-seq</title>
       <link>/tags/rna-seq/</link>
-      <pubDate>Tue, 02 Apr 2019 00:00:00 -0400</pubDate>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 -0400</pubDate>
       
       <guid>/tags/rna-seq/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Simulation</title>
+      <link>/tags/simulation/</link>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 -0400</pubDate>
+      
+      <guid>/tags/simulation/</guid>
       <description></description>
     </item>
     

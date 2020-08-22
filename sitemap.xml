@@ -4,6 +4,22 @@
     
     <url>
     
+      <loc>/about/</loc>
+      <lastmod>2020-08-22T21:48:51-07:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/publication/camda_2017_neuroblastoma-copy/</loc>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/publication/2019_pathways_in_dc/</loc>
       <lastmod>2019-04-02T00:00:00-04:00</lastmod>
     </url>
@@ -84,14 +100,6 @@
     
     <url>
     
-      <loc>/about/</loc>
-      <lastmod>2016-05-05T21:48:51-07:00</lastmod>
-    </url>
-    
-  
-    
-    <url>
-    
       <loc>/project/external-project/</loc>
       <lastmod>2016-04-27T00:00:00-04:00</lastmod>
     </url>
@@ -124,7 +132,7 @@
     <url>
     
       <loc>/publication_types/2/</loc>
-      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -218,6 +226,15 @@
     
     <url>
     
+      <loc>/tags/graphical-models/</loc>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
       <loc>/tags/permutation-testing/</loc>
       <lastmod>2019-04-02T00:00:00-04:00</lastmod>
       <priority>0</priority>
@@ -237,7 +254,7 @@
     <url>
     
       <loc>/publication_types/</loc>
-      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -246,7 +263,7 @@
     <url>
     
       <loc>/tags/rna-seq/</loc>
-      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -256,6 +273,15 @@
     
       <loc>/authors/s.-steven-potter/</loc>
       <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <priority>0</priority>
+    </url>
+    
+  
+    
+    <url>
+    
+      <loc>/tags/simulation/</loc>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -279,7 +305,7 @@
     <url>
     
       <loc>/authors/somnath-datta/</loc>
-      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
@@ -333,7 +359,7 @@
     <url>
     
       <loc>/authors/tyler-grimes/</loc>
-      <lastmod>2019-04-02T00:00:00-04:00</lastmod>
+      <lastmod>2020-08-22T00:00:00-04:00</lastmod>
       <priority>0</priority>
     </url>
     
