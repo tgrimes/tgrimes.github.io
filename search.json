@@ -1,0 +1,459 @@
+[
+  {
+    "objectID": "posts.html",
+    "href": "posts.html",
+    "title": "Posts",
+    "section": "",
+    "text": "No matching items\n Back to top"
+  },
+  {
+    "objectID": "notes/new/index.html",
+    "href": "notes/new/index.html",
+    "title": "Adjusting classification threshold by strata",
+    "section": "",
+    "text": "When predicting binary outcomes, if we want to threshold our estimated probabilities to obtain predicted classes, then we devise a strategy for determining the optimal threshold. This will almost always involve some trade-off between sensitivity and specificity, or between false positives and false negatives. However, if we know that the prevalence of the class varies across some known strata, should we choose different thresholds within each strata? How does that affect the final performance?\nCode\nlibrary(tidyverse)\nLet’s simulate data from three groups where the true prevalence ranges from 0.6 to 0.9 across the groups. Our dataset will be composed of samples from these three groups with unequal sizes.\nCode\nset.seed(0)\nn = 300\nx = rnorm(n)\ngroups = c(\"a\", \"b\", \"c\")\nz = sample(groups, n, replace = TRUE, prob = c(0.3, 0.2, 0.5))\nz = factor(z, levels = groups)\nbeta.x = 1\nbeta.z = c(\"a\" = 0, \"b\" = 1, \"c\" = 2)\nepsilon = rnorm(n, 0, 0.2)\nprob = 1 / (1 + exp(-(0.5 + beta.x * x + beta.z[z] + epsilon)))\ny = rbinom(n, 1, prob)\ndf = data.frame(x = x, z = z, y = y, prob = prob)\n\ntable(z)\n\n\nz\n  a   b   c \n 87  61 152 \n\n\nCode\ntapply(y, z, mean)\n\n\n        a         b         c \n0.6321839 0.7868852 0.8947368 \n\n\nCode\nmean(y)\n\n\n[1] 0.7966667\nWe’ll fit a logistic regression model with a single predictor and the strata variable. Two strategies for thresholding will be used:\nCode\nfit = glm(\"y ~ x + z\", family = \"binomial\", data = df)\ncoef(fit)\n\n\n(Intercept)           x          zb          zc \n  0.6803849   0.6825582   0.6736314   1.5837307 \n\n\nCode\ndf$p = predict(fit, newdat = df, type = \"response\")\n\ndf = df %&gt;%\n  mutate(thr = mean(y)) %&gt;%\n  group_by(z) %&gt;%\n  mutate(thr.z = mean(y) - 0.2 * (mean(y) - thr)) %&gt;%\n  ungroup() %&gt;%\n  mutate(y.hat = 1 * (p &gt; thr),\n         y.hat.z = 1 * (p &gt; thr.z))\n\nthr.group = sapply(groups, function(group) df$thr.z[df$z == group][1])\nJust looking at the overall accuracy, we see below that using the single threshold gives better performance (69.3% vs 67.7%). However, how does the performance vary across strata? Let’s take a look.\nHere’s the overall and within-strata accuracy for the single threshold strategy:\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(), \n            acc = mean(y == y.hat)) %&gt;%\n  mutate(overall_acc = sum(n * acc) / sum(n))\n\n\n# A tibble: 3 × 4\n  z         n   acc overall_acc\n  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;\n1 a        87 0.460       0.693\n2 b        61 0.607       0.693\n3 c       152 0.862       0.693\nand for the varying-threshold strategy:\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(), \n            acc = mean(y == y.hat.z)) %&gt;%\n  mutate(overall_acc = sum(n * acc) / sum(n)) \n\n\n# A tibble: 3 × 4\n  z         n   acc overall_acc\n  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;\n1 a        87 0.632       0.677\n2 b        61 0.607       0.677\n3 c       152 0.730       0.677\nWe see that that performance varies widely with the single-threshold strategy. By using an adaptive threshold, the classifier is able to account for the varying prevalance across the groups.\nHere’s another summary table showing more performance measures. We see the same thing, where the varying-threshold strategy provides more consistent performance results across strata.\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(),\n            p      = round(mean(y), 2), \n            pp     = round(mean(y.hat), 2),\n            pp.z   = round(mean(y.hat.z), 2),\n            acc    = round(mean(y == y.hat), 2),\n            sens   = round(mean(y[y==1] == y.hat[y==1]), 2),\n            spec   = round(mean(y[y==0] == y.hat[y==0]), 2),\n            PPV    = round(mean(y[y.hat==1] == y.hat[y.hat==1]), 2),\n            NPV    = round(mean(y[y.hat==0] == y.hat[y.hat==0]), 2),\n            acc.z  = round(mean(y == y.hat.z), 2),\n            sens.z = round(mean(y[y==1] == y.hat.z[y==1]), 2),\n            spec.z = round(mean(y[y==0] == y.hat.z[y==0]), 2),\n            PPV.z  = round(mean(y[y.hat.z==1] == y.hat.z[y.hat.z==1]), 2),\n            NPV.z  = round(mean(y[y.hat.z==0] == y.hat.z[y.hat.z==0]), 2)) %&gt;%\n  as.data.frame()\n\n\n  z   n    p   pp pp.z  acc sens spec  PPV  NPV acc.z sens.z spec.z PPV.z NPV.z\n1 a  87 0.63 0.14 0.40 0.46 0.18 0.94 0.83 0.40  0.63   0.53   0.81  0.83  0.50\n2 b  61 0.79 0.46 0.46 0.61 0.54 0.85 0.93 0.33  0.61   0.54   0.85  0.93  0.33\n3 c 152 0.89 0.94 0.72 0.86 0.95 0.12 0.90 0.22  0.73   0.75   0.56  0.94  0.21\nVisualization of the thresholds and distributions of each predicted probabilities.\nCode\ndf %&gt;%\n  ggplot(aes(x = p, fill = z, group = z)) +\n  geom_histogram(position = position_identity(), alpha = 0.6, bins = 30) +\n  geom_vline(xintercept = unique(df$thr), col = \"black\") +\n  geom_vline(xintercept = thr.group, col = scales::hue_pal()(length(thr.group))) +\n  theme_bw()",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Adjusting classification threshold by strata"
+    ]
+  },
+  {
+    "objectID": "notes/new/index.html#bias-in-ml-models",
+    "href": "notes/new/index.html#bias-in-ml-models",
+    "title": "Adjusting classification threshold by strata",
+    "section": "Bias in ML models",
+    "text": "Bias in ML models\nImagine that the strata in this simulation were gender, race, or some other demographic variable. Although the model accounted for the strata variable, hence it correctly modeled the underlying prevalence, the additional step of classifying can introduce bias if we do not account for prevalence differences in the threshold used. Using a single threshold may lead to overall optimal performance, but we must look to see whether performance is consistent across important groups. If not, using a varying threshold could improve consistency while providing similar overall performance.",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Adjusting classification threshold by strata"
+    ]
+  },
+  {
+    "objectID": "notes/partial-cor-vis-3-var/index.html",
+    "href": "notes/partial-cor-vis-3-var/index.html",
+    "title": "Visualizing partial correlations with 3 variables",
+    "section": "",
+    "text": "Consider three variables x, y, and z. The correlation between x and y is the linear association between them (a straight line in a scatter plot). But what if we think z is a confounder and want to condition on it? The partial correlation between x and y given z is a way to account for the value of z when looking at the linear association between x and y, but what does it look like? Furthermore, what does it mean if the partial correlation is zero?\nLet’s simulate some data and take a look. In these data, x and y are conditionally independent given z.\nflowchart TD\n    z --&gt; x\n    z --&gt; y\nCode\nlibrary(tidyverse)\nlibrary(ppcor)\nCode\nn = 200\nsigma = 0.05\n\nset.seed(0)\nz = rnorm(n)\nx = z + rnorm(n, sigma)\ny = z + rnorm(n, sigma)\nx.groups = cut(x, breaks = 9)\nz.groups = cut(z, breaks = 9)\nlevels(x.groups) = paste0(\"x in \", levels(x.groups))\nlevels(z.groups) = paste0(\"z in \", levels(z.groups))\ndf = tibble(x, y, z, x.groups, z.groups)\nThe correlation between x and y and partial correlation given z is computed below. We see the correlation is fairly strong but the partial correlation is near zero.\nCode\ncor(df$x, df$y)\n\n\n[1] 0.5094733\n\n\nCode\nppcor::pcor(df[, 1:3])$estimate[1, 2]\n\n\n[1] 0.03041614\n\n\nCode\n# Note: can also calculate partial correlation from the pairwise correlations:\nr_yx = sqrt(summary(lm(y ~ x))$r.sq) # or use cor(x, y).\nr_yz = sqrt(summary(lm(y ~ z))$r.sq)\nr_xz = sqrt(summary(lm(x ~ z))$r.sq)\nr_yx.z = (r_yx - r_yz * r_xz) / sqrt((1 - r_yz^2) * (1 - r_xz^2))\nr_yx.z\n\n\n[1] 0.03041614\nTo see the partial correlation, we need to look at x and y within a small window of values for z. The second plot below shows 9 windows, sliding from smaller values to larger. This is how to think of conditional associations–and the sliding windows is how to think of “controlling” for the confounder.\nCode\ndf %&gt;%\n  ggplot(aes(x = x, y = y, color = z)) +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\nWarning: The following aesthetics were dropped during statistical transformation:\ncolour.\nℹ This can happen when ggplot fails to infer the correct grouping structure in\n  the data.\nℹ Did you forget to specify a `group` aesthetic or to convert a numerical\n  variable into a factor?\n\n\n\n\n\nThe scatterplot of x and y shows they are correlated.\nCode\ndf %&gt;%\n  ggplot(aes(x = x, y = y)) +\n  facet_wrap(. ~ z.groups, scales = \"free\") +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\nLooking at scatterplots of x and y within different ranges of values for z, the relationship disappears.\nLet’s take a look at the relationship between z and y. Note how the partial correlation given x still shows a strong association, and we see the linear association persist across windows of x.\nCode\ncor(df$z, df$y)\n\n\n[1] 0.7199976\n\n\nCode\nppcor::pcor(df[, 1:3])$estimate[1, 3]\n\n\n[1] 0.5349701\nCode\ndf %&gt;%\n  ggplot(aes(x = z, y = y)) +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\nThe scatterplot of z and y shows they are correlated.\nCode\ndf %&gt;%\n  ggplot(aes(x = z, y = y)) +\n  facet_wrap(. ~ x.groups, scales = \"free\") +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\nWarning in qt((1 - level)/2, df): NaNs produced\n\n\nWarning in max(ids, na.rm = TRUE): no non-missing arguments to max; returning\n-Inf\n\n\n\n\n\nLooking at scatterplots of z and y within different ranges of values for x, the relationship persists.\nCode\ndf %&gt;%\n  group_by(x.groups) %&gt;%\n  summarize(n = n(),\n            `corr_zy|x` = cor(z, y),\n            corr_zy = cor(df$z, df$y)) %&gt;%\n  as.data.frame()\n\n\n              x.groups  n  corr_zy|x   corr_zy\n1   x in (-4.03,-3.21]  2 -1.0000000 0.7199976\n2   x in (-3.21,-2.39]  5  0.6153158 0.7199976\n3   x in (-2.39,-1.58] 14  0.2950542 0.7199976\n4  x in (-1.58,-0.768] 38  0.6371105 0.7199976\n5 x in (-0.768,0.0458] 39  0.5852865 0.7199976\n6  x in (0.0458,0.859] 47  0.5224778 0.7199976\n7    x in (0.859,1.67] 29  0.6070441 0.7199976\n8     x in (1.67,2.49] 15  0.7324336 0.7199976\n9     x in (2.49,3.31] 11  0.6928078 0.7199976",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Visualizing partial correlations with 3 variables"
+    ]
+  },
+  {
+    "objectID": "notes/partial-cor-vis-3-var/index.html#when-does-partial-correlation-fail",
+    "href": "notes/partial-cor-vis-3-var/index.html#when-does-partial-correlation-fail",
+    "title": "Visualizing partial correlations with 3 variables",
+    "section": "When does partial correlation fail?",
+    "text": "When does partial correlation fail?\nIn the above example, the correlation between z and y was positive and linear for every value of x. What if, instead, the association changed depending on x? An interaction effect. In this simulated dataset, x and y have a negative correlation if z &lt; 0 and a positive correlation if z \\geq 0.\n\n\n\n\n\n\nTipThink\n\n\n\nGiven the relationship described above, what would we expect the scatterplot of x and y to look like? What about the scatterplots across windows of z? What value do we expect the partial correlation of x and y given z to be?\n\n\n\n\nCode\n# July 02, 2024\nset.seed(0)\nx = rnorm(n)\nz = rnorm(n)\ny = (-1)^(z &lt; 0) * x + rnorm(n, sigma)\nx.groups = cut(x, breaks = 9)\nz.groups = cut(z, breaks = 9)\nlevels(x.groups) = paste0(\"x in \", levels(x.groups))\nlevels(z.groups) = paste0(\"z in \", levels(z.groups))\ndf = tibble(x, y, z, x.groups, z.groups)\n\n\n\n\nCode\ncor(df$x, df$y)\n\n\n[1] 0.09657089\n\n\nCode\nppcor::pcor(df[, 1:3])$estimate[1, 3]\n\n\n[1] 0.01930732\n\n\n\n\nCode\ndf %&gt;%\n  group_by(z.groups) %&gt;%\n  summarize(n = n(),\n            `corr_xy|z` = cor(x, y),\n            corr_xy = cor(df$x, df$y)) %&gt;%\n  as.data.frame()\n\n\n              z.groups  n  corr_xy|z    corr_xy\n1   z in (-2.91,-2.22]  1         NA 0.09657089\n2   z in (-2.22,-1.53] 12 -0.9033113 0.09657089\n3  z in (-1.53,-0.848] 29 -0.6202951 0.09657089\n4 z in (-0.848,-0.162] 40 -0.7262352 0.09657089\n5  z in (-0.162,0.524] 58  0.4046969 0.09657089\n6    z in (0.524,1.21] 34  0.7398319 0.09657089\n7      z in (1.21,1.9] 21  0.9325690 0.09657089\n8      z in (1.9,2.58]  3  0.2854700 0.09657089\n9     z in (2.58,3.27]  2 -1.0000000 0.09657089\n\n\n\n\nCode\ndf %&gt;%\n  ggplot(aes(x = z, y = y)) +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\n\n\n\n\nCode\ndf %&gt;%\n  ggplot(aes(x = z, y = y)) +\n  facet_wrap(. ~ x.groups, scales = \"free\") +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\n\n\n\n\nNotice also the linear model suggests the same–no association between x and y\n\n\nCode\nsummary(lm(y ~ x + z, data = df))\n\n\n\nCall:\nlm(formula = y ~ x + z, data = df)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-3.8590 -1.0467 -0.0356  1.0217  3.9886 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)\n(Intercept) -0.00504    0.10536  -0.048    0.962\nx            0.15595    0.11433   1.364    0.174\nz           -0.01335    0.10574  -0.126    0.900\n\nResidual standard error: 1.489 on 197 degrees of freedom\nMultiple R-squared:  0.009406,  Adjusted R-squared:  -0.0006507 \nF-statistic: 0.9353 on 2 and 197 DF,  p-value: 0.3942\n\n\nHowever, if we model the interaction, then we see the association.\n\n\nCode\nsummary(lm(y ~ x*z, data = df))\n\n\n\nCall:\nlm(formula = y ~ x * z, data = df)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-3.6673 -0.6147  0.0309  0.7276  3.6902 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.02679    0.07817  -0.343  0.73217    \nx            0.23817    0.08506   2.800  0.00562 ** \nz            0.11263    0.07906   1.425  0.15588    \nx:z          1.10060    0.08647  12.728  &lt; 2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.104 on 196 degrees of freedom\nMultiple R-squared:  0.4577,    Adjusted R-squared:  0.4494 \nF-statistic: 55.14 on 3 and 196 DF,  p-value: &lt; 2.2e-16",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Visualizing partial correlations with 3 variables"
+    ]
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Tyler Grimes",
+    "section": "",
+    "text": "Google Scholar\n  \n  \n    \n     LinkedIn\n  \n  \n    \n     Github\n  \n  \n     CV\n  \n\n      \nHey, I’m Tyler, a biostatistician working in genomics and clinical research. My current research is focused on the development of statistical methodology for high-dimensional -omics data to study the biological drivers of autoimmune diseases. This involves problems related to clinical predictive modeling, statistical inferences on association networks, multi-omics integration, and the development of statistical software packages that implement these methods."
+  },
+  {
+    "objectID": "about.html#interests",
+    "href": "about.html#interests",
+    "title": "Tyler Grimes",
+    "section": "Interests",
+    "text": "Interests\n\nStatistical methods for -omics data\nGraphical models and differential network analysis\nPredictive modeling\nHigh-dimensional data analysis\nStatistical computing\n\nPast research has focused on RNA-seq gene expression data, developing methods in the areas of graphical modeling, prediction, and survival analysis. Typical research questions included: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease?\nI find that simulations are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand–this is a process that has often lead me to new insights."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Tyler Grimes",
+    "section": "",
+    "text": "Google Scholar\n  \n  \n    \n     LinkedIn\n  \n  \n    \n     Github\n  \n  \n     CV\n  \n\n      \nHey, I’m Tyler, a biostatistician working in genomics and clinical research. My current research is focused on the development of statistical methodology for high-dimensional -omics data to study the biological drivers of autoimmune diseases. This involves problems related to clinical predictive modeling, statistical inferences on association networks, multi-omics integration, and the development of statistical software packages that implement these methods.\nOn this site, you can find various notes containing random experiments and code snippets used for testing ideas, along with talks and papers from past research projects."
+  },
+  {
+    "objectID": "talks/2022_UMBC/index.html",
+    "href": "talks/2022_UMBC/index.html",
+    "title": "Predictive modeling with differential co-expression of RNA-seq data",
+    "section": "",
+    "text": "Invited talk at the Statistical Colloquium for the University of Maryland, Department of Mathematics and Statistics."
+  },
+  {
+    "objectID": "talks/2022_UMBC/index.html#abstract",
+    "href": "talks/2022_UMBC/index.html#abstract",
+    "title": "Predictive modeling with differential co-expression of RNA-seq data",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression data from RNA-seq experiments provide a measure of biological activity at the cellular level. Differential expression (DE) analyses use these data to identify genes that are up- or down-regulated across groups of interest. Research in systems biology takes this analysis further by gleaning insights into gene regulatory networks through the analysis of gene co-expression networks. Similar to DE analysis, a differential network (DN) analysis is conducted to determine how co-expression patterns change across different groups of interest. A methodology is proposed for predictive modeling in this context that builds on a framework for conducting pathway-based differential network analysis. In an application to cancer gene expression datasets, our goal is to identify driver genes by considering both the functional changes of genes and the clinical relevance of those changes. Functional changes are identified by performing a differential network analysis, which compares the structure of gene-gene associations across different stages of cancer. Clinical relevance of these differential connections is assessed through predictive modeling. Potential driver genes are identified for Neuroblastoma and Breast cancer patient populations, and we identify regulatory pathways that are both differentially connected and whose expression profile is predictive of overall survival.\nEvent: Statistics Colloquium 2022\nSlides"
+  },
+  {
+    "objectID": "talks/2017_ISMB/index.html",
+    "href": "talks/2017_ISMB/index.html",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-Seq expression profiles",
+    "section": "",
+    "text": "My talk at the ISMB/CAMDA International Conference in Chicago, IL."
+  },
+  {
+    "objectID": "talks/2017_ISMB/index.html#abstract",
+    "href": "talks/2017_ISMB/index.html#abstract",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-Seq expression profiles",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression profiles from RNA-sequencing provide a window to the activity inside tumor cells. This view has enabled researchers to identify driver genes for the pathology, but often these results fail to validate or only hold for the particular cancer at hand. In this study, we investigate a robust method for identifying cancer-related genes. Two criteria are used: a gene must show functional changes among clinically different groups of patients, and the gene must have clinical relevance. These conditions are assessed through a differential network analysis and by modelling patient survival times. Preliminary results are shown from a neuroblastoma and breast cancer dataset.\nEvent: ISMB/CAMDA 2017, Prague, Czech Republic\nSlides\n\nQ&A starts at 16:20"
+  },
+  {
+    "objectID": "publications/2019_pathways_in_dc/index.html",
+    "href": "publications/2019_pathways_in_dc/index.html",
+    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
+    "section": "",
+    "text": "In Scientific Reports"
+  },
+  {
+    "objectID": "publications/2019_pathways_in_dc/index.html#abstract",
+    "href": "publications/2019_pathways_in_dc/index.html#abstract",
+    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: The analysis of gene-gene co-expression networks provides insight into the function of gene products. Exposing network irregularities offers an avenue for discovery in systems biology; these pursuits can include the study of gene function in developmental biology and understanding and treating diseases. Modern methods for differential network analysis often have two drawbacks: they implicitly rely on the selection of a relatively small subset of genes before analysis, and they are not flexible to the choice of association measure.\nMethods: A general framework for integrating known gene regulatory pathways into a differential network analysis is proposed. The framework allows for any gene-gene association measure to be used, and inference is carried out through permutation testing. A simulation study investigates the performance in identifying differentially connected genes when incorporating known pathways and compares the general framework to four state-of- the-art methods. Two RNA-seq datasets are analyzed to illustrate the use of this framework in practice.\nResults: The simulation study shows that incorporating pathway information can improve performance in terms of both sensitivity and true discovery rate. Furthermore, we demonstrate that the state-of-the-art methods each estimate different things and are not directly comparable – this emphasizes the fact that the choice of association measure can have a strong influence on results. In the applied examples, the analysis reveals genes and pathways that are known to be biologically significant along with new findings to motivate future research.\nConclusions: The proposed framework makes explicit two critical, but often overlooked, assumptions: the selection of a subset of genes and the meaning of gene-gene association. The results obtained from analyzing gene expression with this framework are more interpretable, and the pathway information provides context that can lead to deeper insights."
+  },
+  {
+    "objectID": "publications/2019_pathways_in_dc/index.html#summary",
+    "href": "publications/2019_pathways_in_dc/index.html#summary",
+    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
+    "section": "Summary",
+    "text": "Summary\nA framework for comparing gene-gene associations between two populations is proposed. Any association measure may be used - correlations, partial correlation, mutual information, etc; this flexibility is in contrast to the rigidity of existing methods. The framework makes explicit the practice of incoporating pathway information into the analysis. A simulation study explores the affect this has on performance, and we investigate what happens when pathway information is misspecified or incomplete.\ndoi: 10.1038/s41598-019-41918-3\ndnapath R package available on CRAN"
+  },
+  {
+    "objectID": "publications/2021_plosone_prob/index.html",
+    "href": "publications/2021_plosone_prob/index.html",
+    "title": "A novel probabilistic generator for large-scale gene association networks",
+    "section": "",
+    "text": "In PLOS ONE"
+  },
+  {
+    "objectID": "publications/2021_plosone_prob/index.html#abstract",
+    "href": "publications/2021_plosone_prob/index.html#abstract",
+    "title": "A novel probabilistic generator for large-scale gene association networks",
+    "section": "Abstract",
+    "text": "Abstract\nMotivation: Gene expression data provide an opportunity for reverse-engineering gene-gene associations using network inference methods. However, it is difficult to assess the performance of these methods because the true underlying network is unknown in real data. Current benchmarks address this problem by subsampling a known regulatory network to conduct simulations. But the topology of regulatory networks can vary greatly across organisms or tissues, and reference-based generators—such as GeneNetWeaver—are not designed to capture this heterogeneity. This means, for example, benchmark results from the E. coli regulatory network will not carry over to other organisms or tissues. In contrast, probabilistic generators do not require a reference network, and they have the potential to capture a rich distribution of topologies. This makes probabilistic generators an ideal approach for obtaining a robust benchmarking of network inference methods.\nResults: We propose a novel probabilistic network generator that (1) provides an alternative to address the inherent limitation of reference-based generators and (2) is able to create realistic gene association networks, and (3) captures the heterogeneity found across gold-standard networks better than existing generators used in practice. Eight organism-specific and 12 human tissue-specific gold-standard association networks are considered. Several measures of global topology are used to determine the similarity of generated networks to the gold-standards. Along with demonstrating the variability of network structure across organisms and tissues, we show that the commonly used “scale-free” model is insufficient for replicating these structures."
+  },
+  {
+    "objectID": "publications/2021_plosone_prob/index.html#summary",
+    "href": "publications/2021_plosone_prob/index.html#summary",
+    "title": "A novel probabilistic generator for large-scale gene association networks",
+    "section": "Summary",
+    "text": "Summary\nA novel probabilistic network generator is proposed that (1) provides an alternative to address the inherent limitation of reference-based generators and (2) is able to create realistic gene association networks, and (3) captures the heterogeneity found across gold-standard networks better than existing generators used in practice. Eight organism-specific and 12 human tissue-specific gold-standard association networks are considered. Several measures of global topology are used to determine the similarity of generated networks to the gold-standards. Along with demonstrating the variability of network structure across organisms and tissues, we show that the commonly used “scale-free” model is insufficient for replicating these structures.\ndoi: https://doi.org/10.1371/journal.pone.0259193"
+  },
+  {
+    "objectID": "publications/2017_camda_neuroblastoma/index.html",
+    "href": "publications/2017_camda_neuroblastoma/index.html",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
+    "section": "",
+    "text": "In Biology Direct"
+  },
+  {
+    "objectID": "publications/2017_camda_neuroblastoma/index.html#abstract",
+    "href": "publications/2017_camda_neuroblastoma/index.html#abstract",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: Neuroblastoma is the most common tumor of early childhood and is notorious for its high variability in clinical presentation. Accurate prognosis has remained a challenge for many patients. In this study, expression profiles from RNA-sequencing are used to predict survival times directly. Several models are investigated using various annotation levels of expression profiles (genes, transcripts, and introns), and an ensemble predictor is proposed as a heuristic for combining these different profiles.\nResults: The use of RNA-seq data is shown to improve accuracy in comparison to using clinical data alone for predicting overall survival times. Furthermore, clinically high-risk patients can be subclassified based on their predicted overall survival times. In this effort, the best performing model was the elastic net using both transcripts and introns together. This model separated patients into two groups with 2-year overall survival rates of 0.40±0.11 (n=22) versus 0.80±0.05 (n=68). The ensemble approach gave similar results, with groups 0.42±0.10 (n=25) versus 0.82±0.05 (n=65). This suggests that the ensemble is able to effectively combine the individual RNA-seq datasets. \nConclusions: Using predicted survival times based on RNA-seq data can provide improved prognosis by subclassifying clinically high-risk neuroblastoma patients."
+  },
+  {
+    "objectID": "publications/2017_camda_neuroblastoma/index.html#summary",
+    "href": "publications/2017_camda_neuroblastoma/index.html#summary",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
+    "section": "Summary",
+    "text": "Summary\nIn this study, expression profiles from RNA-sequencing of Neuroblastoma tumor samples are used to predict patient survival times. Several models are investigated using various annotation levels of expression profiles (genes, transcripts, and introns), and an ensemble predictor is proposed as a heuristic for combining these different profiles. The use of RNA-seq data is shown to improve accuracy in comparison to using clinical data alone for predicting overall survival times.\nSource code Slides"
+  },
+  {
+    "objectID": "talks.html",
+    "href": "talks.html",
+    "title": "Talks",
+    "section": "",
+    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nPredictive modeling with differential co-expression of RNA-seq data\n\n\n\n\n\n\n\n\nNov 18, 2022\n\n\n\n\n\n\n\n\n\n\n\n\nIdentifying cancer driver genes from differential co-expression networks\n\n\n\n\n\n\n\n\nDec 21, 2020\n\n\n\n\n\n\n\n\n\n\n\n\nAn exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data\n\n\n\n\n\n\n\n\nJul 8, 2018\n\n\n\n\n\n\n\n\n\n\n\n\nPredicting survival times for neuroblastoma patients using RNA-Seq expression profiles\n\n\n\n\n\n\n\n\nJul 23, 2017\n\n\n\n\n\nNo matching items\n Back to top"
+  },
+  {
+    "objectID": "notes.html",
+    "href": "notes.html",
+    "title": "Notes",
+    "section": "",
+    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nAdjusting classification threshold by strata\n\n\n\nPredictive modeling\n\nClassification\n\n\n\n\n\n\n\n\n\nJul 3, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nAdjusting classification threshold by strata\n\n\n\nPredictive modeling\n\nClassification\n\n\n\n\n\n\n\n\n\nJul 3, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nRegression for t-test and ANOVA with unequal variances\n\n\n\nStatistics\n\nHypothesis testing\n\n\n\n\n\n\n\n\n\nMay 12, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nVisualizing partial correlations with 3 variables\n\n\n\nVisualization\n\nPartial correlation\n\n\n\n\n\n\n\n\n\nJan 5, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nResampling and SMOTE to handle class imbalance\n\n\n\nPredictive modeling\n\nClassification\n\nClass imbalance\n\nCalibration\n\nSMOTE\n\n\n\nFindings: (1) Predicted probabilities are miscalibrated when using resampling techniques. (2) Typical inference methods are invalid. (3) Using the naive threshold of 0.5 leads to misleading performance estimates.\n\n\n\n\n\nDec 28, 2022\n\n\nTyler Grimes\n\n\n\n\n\nNo matching items\n Back to top"
+  },
+  {
+    "objectID": "publications/2023_BMC_Bio_pseudo/index.html",
+    "href": "publications/2023_BMC_Bio_pseudo/index.html",
+    "title": "A pseudo-value regression approach for differential network analysis of co-expression data",
+    "section": "",
+    "text": "In BMC Bioinformatics"
+  },
+  {
+    "objectID": "publications/2023_BMC_Bio_pseudo/index.html#abstract",
+    "href": "publications/2023_BMC_Bio_pseudo/index.html#abstract",
+    "title": "A pseudo-value regression approach for differential network analysis of co-expression data",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: The differential network (DN) analysis identifies changes in measures of association among genes under two or more experimental conditions. In this article, we introduce a pseudo-value regression approach for network analysis (PRANA). This is a novel method of differential network analysis that also adjusts for additional clinical covariates. We start from mutual information criteria, followed by pseudo-value calculations, which are then entered into a robust regression model.\nResults This article assesses the model performances of PRANA in a multivariable setting, followed by a comparison to dnapath and DINGO in both univariable and multivariable settings through variety of simulations. Performance in terms of precision, recall, and F1 score of differentially connected (DC) genes is assessed. By and large, PRANA outperformed dnapath and DINGO, neither of which is equipped to adjust for available covariates such as patient-age. Lastly, we employ PRANA in a real data application from the Gene Expression Omnibus database to identify DC genes that are associated with chronic obstructive pulmonary disease to demonstrate its utility.\nConclusion To the best of our knowledge, this is the first attempt of utilizing a regression modeling for DN analysis by collective gene expression levels between two or more groups with the inclusion of additional clinical covariates. By and large, adjusting for available covariates improves accuracy of a DN analysis."
+  },
+  {
+    "objectID": "publications/2017_camda_metasub/index.html",
+    "href": "publications/2017_camda_metasub/index.html",
+    "title": "Unraveling bacterial fingerprints of city subways from microbiome 16S gene profiles",
+    "section": "",
+    "text": "In Biology Direct"
+  },
+  {
+    "objectID": "publications/2017_camda_metasub/index.html#abstract",
+    "href": "publications/2017_camda_metasub/index.html#abstract",
+    "title": "Unraveling bacterial fingerprints of city subways from microbiome 16S gene profiles",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: Microbial communities can be location specific, and the abundance of species within locations can influence our ability to determine whether a sample belongs to one city or another. As part of the 2017 CAMDA MetaSUB Inter-City Challenge, next generation sequencing (NGS) data was generated from swipe samples collected from subway stations in Boston, New York City hereafter New York, and Sacramento. DNA was extracted and Illumina sequenced. Sequencing data was provided for all cities as part of 2017 CAMDA contest challenge dataset.\nResults: Principal component analysis (PCA) showed clear clustering of the samples for the three cities, with a substantial proportion of the variance explained by the first three components. We ran two different classifiers and results were robust for error rate (&lt; 6%) and accuracy (&gt; 95%). The analysis of variance (ANOVA) demonstrated that overall, bacterial composition across the three cities is significantly different. A similar conclusion was reached using a novel bootstrap based test using diversity indices. Last but not least, a co-abundance association network analyses for the taxonomic levels “order”, “family”, and “genus” found different patterns of bacterial networks for the three cities.\nConclusions: Bacterial fingerprint can be useful to predict sample provenance. In this work prediction of provenance reported with over 95% accuracy. Association based network analysis, emphasized similarities between the closest cities sharing common bacterial composition. ANOVA showed different patterns of bacterial amongst cities, and these findings strongly suggest that bacterial signature across multiple cities are different. This work advocates a data analysis pipeline which could be followed in order to get biological insight from this data. However, the biological conclusions from this analysis is just an early indication out of a pilot microbiome data provided to us through CAMDA 2017 challenge and will be subject to change as we get more complete data sets in the near future. This microbiome data can have potential applications in forensics, ecology, and other sciences.” abstract_short = “As part of the 2017 CAMDA MetaSUB Inter-City Challenge, next generation sequencing (NGS) data was generated from swipe samples collected from subway stations in Boston, New York City hereafter New York, and Sacramento. This work advocates a data analysis pipeline that could be followed in order to get biological insight from this data."
+  },
+  {
+    "objectID": "publications/2021_frontiers_tumor_purity/index.html",
+    "href": "publications/2021_frontiers_tumor_purity/index.html",
+    "title": "The Analysis of Gene Expression Data Incorporating Tumor Purity Information",
+    "section": "",
+    "text": "In BMC Bioinformatics"
+  },
+  {
+    "objectID": "publications/2021_frontiers_tumor_purity/index.html#abstract",
+    "href": "publications/2021_frontiers_tumor_purity/index.html#abstract",
+    "title": "The Analysis of Gene Expression Data Incorporating Tumor Purity Information",
+    "section": "Abstract",
+    "text": "Abstract\nThe tumor microenvironment is composed of tumor cells, stroma cells, immune cells, blood vessels, and other associated non-cancerous cells. Gene expression measurements on tumor samples are an average over cells in the microenvironment. However, research questions often seek answers about tumor cells rather than the surrounding non-tumor tissue. Previousstudies have suggested that the tumor purity (TP)—the proportion of tumor cells in a solid tumor sample—has a confounding effect on differential expression (DE) analysis of high vs. low survival groups. We investigate three ways incorporating the TP information in the two statistical methods used for analyzing gene expression data, namely, differential network (DN) analysis and DE analysis. Analysis 1 ignores the TP information completely, Analysis 2 uses a truncated sample by removing the low TP samples, and Analysis 3 uses TP as a covariate in the underlying statistical models. We use three gene expression data sets related to three different cancers from the Cancer Genome Atlas (TCGA) for our investigation. The networks from Analysis 2 have greater amount of differential connectivity in the two networks than that from Analysis 1 in all three cancer datasets. Similarly, Analysis 1 identified more differentially expressed genes than Analysis 2. Results of DN and DE analyses using Analysis 3 were mostly consistent with those of Analysis 1 across three cancers. However, Analysis 3 identified additional cancer-related genes in both DN and DE analyses. Our findings suggest that using TP as a covariate in a linear model is appropriate for DE analysis, but a more robust model is needed for DN analysis. However, because true DN or DE patterns are not known for the empirical datasets, simulated datasets can be used to study the statistical properties of these methods in future studies."
+  },
+  {
+    "objectID": "publications/2020_jss_seqnet/index.html",
+    "href": "publications/2020_jss_seqnet/index.html",
+    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
+    "section": "",
+    "text": "In Journal of Statistical Software"
+  },
+  {
+    "objectID": "publications/2020_jss_seqnet/index.html#abstract",
+    "href": "publications/2020_jss_seqnet/index.html#abstract",
+    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression data provide an abundant resource for inferring connections in gene regulatory networks. While methodologies developed for this task have shown success, a challenge remains in comparing the performance among methods. Gold-standard datasets are scarce and limited in use. And while tools for simulating expression data are available, they are not designed to resemble the data obtained from RNA-seq experiments. SeqNet is an R package that provides tools for generating a rich variety of gene network structures and simulating RNA-seq data from them. This produces in silico RNA-seq data for benchmarking and assessing gene network inference methods. The package is available on CRAN and on GitHub at https://github.com/tgrimes/SeqNet."
+  },
+  {
+    "objectID": "publications/2020_jss_seqnet/index.html#summary",
+    "href": "publications/2020_jss_seqnet/index.html#summary",
+    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
+    "section": "Summary",
+    "text": "Summary\nSeqNet is an R package that provides tools for generating a rich variety of gene network structures and simulating RNA-seq data from them. This produces in silico RNA-seq data for benchmarking and assessing gene network inference methods.\ndoi: 10.18637/jss.v098.i12\nSeqNet R package available on CRAN"
+  },
+  {
+    "objectID": "talks/2020_CMStatistics/index.html",
+    "href": "talks/2020_CMStatistics/index.html",
+    "title": "Identifying cancer driver genes from differential co-expression networks",
+    "section": "",
+    "text": "Invited talk at the CMStatistics 13th International Conference."
+  },
+  {
+    "objectID": "talks/2020_CMStatistics/index.html#abstract",
+    "href": "talks/2020_CMStatistics/index.html#abstract",
+    "title": "Identifying cancer driver genes from differential co-expression networks",
+    "section": "Abstract",
+    "text": "Abstract\nThe underlying driver of cancer stems from somatic mutations in the genome that change the function of gene products. However, not all mutations are associated with cancer progression. Rather, such “passenger” mutations are a symptom of DNA instability. Only a small portion of mutations are actual “drivers” that are responsible for disease progression. A methodology is proposed for analyzing gene expression data, to identify driver genes by considering both the functional changes of genes and the clinical relevance of those changes. Functional changes are identified by performing a differential network analysis, which compares the structure of gene-gene associations across different stages of cancer. Genes that are differentially connected indicate a change in their functional activity along with cancer progression. Clinical relevance of these differential connections is assessed using a survival model to predict overall survival. Potential driver genes are identified for Neuroblastoma and Breast cancer patient populations. We identify regulatory pathways that are both differentially connected and whose expression profile is predictive of overall survival. We plan to analyze additional cancers from the TCGA data repository and perform a meta-analysis to identify any pan-cancer driver genes or biomarkers.\nEvent: CMStatistics 2020"
+  },
+  {
+    "objectID": "talks/2018_ISMB/index.html",
+    "href": "talks/2018_ISMB/index.html",
+    "title": "An exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data",
+    "section": "",
+    "text": "My talk at the ISMB/CAMDA International Conference in Chicago, IL."
+  },
+  {
+    "objectID": "talks/2018_ISMB/index.html#abstract",
+    "href": "talks/2018_ISMB/index.html#abstract",
+    "title": "An exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression profiles from RNA-sequencing provide a window to the activity inside tumor cells. This view has enabled researchers to identify driver genes for the pathology, but often these results fail to validate or only hold for the particular cancer at hand. In this study, we investigate a robust method for identifying cancer-related genes. Two criteria are used: a gene must show functional changes among clinically different groups of patients, and the gene must have clinical relevance. These conditions are assessed through a differential network analysis and by modelling patient survival times. Preliminary results are shown from a neuroblastoma and breast cancer dataset.\nEvent: ISMB/CAMDA 2018, Chicago, USA\nSlides\n\nQ&A starts at 16:20"
+  },
+  {
+    "objectID": "publications.html",
+    "href": "publications.html",
+    "title": "Publications",
+    "section": "",
+    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nA pseudo-value regression approach for differential network analysis of co-expression data\n\n\n\n\n\n\n\n\n\nJan 9, 2023\n\n\n\n\n\n\n\n\n\n\n\n\n\nA novel probabilistic generator for large-scale gene association networks\n\n\n\n\n\n\n\n\n\nNov 12, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe Analysis of Gene Expression Data Incorporating Tumor Purity Information\n\n\n\n\n\n\n\n\n\nAug 23, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nSeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data\n\n\n\n\n\n\n\n\n\nJul 10, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nIntegrating gene regulatory pathways into differential network analysis of gene expression data\n\n\n\n\n\n\n\n\n\nApr 2, 2019\n\n\n\n\n\n\n\n\n\n\n\n\n\nPredicting survival times for neuroblastoma patients using RNA-seq expression profiles\n\n\n\n\n\n\n\n\n\nMay 30, 2018\n\n\n\n\n\n\n\n\n\n\n\n\n\nUnraveling bacterial fingerprints of city subways from microbiome 16S gene profiles\n\n\n\n\n\n\n\n\n\nMay 22, 2017\n\n\n\n\n\n\nNo matching items\n Back to top"
+  },
+  {
+    "objectID": "notes/effect-of-class-imbalance-strategies-on-calibration/index.html",
+    "href": "notes/effect-of-class-imbalance-strategies-on-calibration/index.html",
+    "title": "Resampling and SMOTE to handle class imbalance",
+    "section": "",
+    "text": "An important consideration in classification problems is class imbalance. Suppose there are two groups, where 99% of observations come from the majority group. A classifier that simply predicts the majority group every time will have 99% accuracy. But clearly this isn’t a good model (it’s not actually predicting anything!).\nConcerned by class imbalance, some modelers might consider strategies to address it, such as minority undersampling, majority oversampling, SMOTE, or many others. But how concerned should we really be? And, if we employ such methods, will it cause any unwanted side effects?\nIn this note we look at a simple case: a binary outcome with two predictors fit using a logistic regression model. We’ll simulate data and see how three approaches to class imbalance compare.\n\n\nCode\nlibrary(caret)\nlibrary(probably)    # For calibration curves.\nlibrary(smotefamily) # For SMOTE().\nlibrary(gt)\nlibrary(broom)\nlibrary(tidyverse)\noptions(digits = 2)\n\n\n\nGenerating data\nWe generate a large dataset of n=5000 observations, where \\sim10\\% of observations are from the minority group. There are two predictors, x and z, where x has a strong association with the outcome and z is independent of both x and y.\n\n\n\n\n\n\nNote\n\n\n\nIn practice, the study/experimental design matters. In this note, we’re assuming the data are a random sample from the population. I.e., the prevalence of classes observed in the data is reflective of the population or data generating process. We won’t be concerned with issues like population drift, and we’re not considering study designs that sample disproportionately, such as case-control studies.\n\n\n\n\nCode\nset.seed(12282022)\n\ngen_data = function(n, sigma = 0.1) {\n  x = rnorm(n)\n  z = rnorm(n)\n  p = 1 / (1 + exp(-(7 + 5 * x) + rnorm(n, 0, sigma)))\n  y = rbinom(n, 1, p)\n  return(data.frame(y, x, z))\n}\n\nn = 5000\ndf = gen_data(n)\ntable(df$y)\n\n\n\n   0    1 \n 507 4493 \n\n\n\n\nStrategies\nWe consider three strategies for model fitting:\n\nNo adjustment: Just fit the logistic regression model on the original data.\nResampling: use a mix of majority under-sampling and minority over-sampling to obtain a dataset that has exactly 50:50 split of observations between the classes. This produces a sample size equal to the original n = 5000.\nSMOTE: use synthetic minority oversampling to create additional observations from the minority class. We use the default arguments from smotefamily::SMOTE() which will use K=5 nearest neighbors and duplicate each observation to obtain approximately the same number of samples as the majority class. This produces a sample size larger than the original dataset.\n\n\n\nCode\napply_strategies = function(df) {\n  df.smote = SMOTE(df[, c(\"x\", \"z\")], target = df$y, K = 5, dup_size = 8)$data\n  df.smote$y = as.numeric(df.smote$class)\n  \n  index_1 &lt;- sample(which(df$y == 1), n / 2, replace = TRUE)\n  index_0 &lt;- sample(which(df$y == 0), n / 2, replace = TRUE)\n  df.sample = df[c(index_0, index_1), ]\n  \n  df.list = list(\n    \"no-adjustment\" = df,\n    \"resampling\" = df.sample,\n    \"SMOTE\" = df.smote\n  )\n  \n  return(df.list)\n}\n\ndf.list = apply_strategies(df)\nlapply(df.list, function(df) table(df$y))\n\n\n$`no-adjustment`\n\n   0    1 \n 507 4493 \n\n$resampling\n\n   0    1 \n2500 2500 \n\n$SMOTE\n\n   0    1 \n4563 4493 \n\n\n\n\nFitting the models\nWe fit a logistic regression model on the three datasets. No other adjustments are made to the data or models. We’ll use a separate dataset of size 5000 simulated from the same data generating process for testing.\n\n\nCode\nfits = lapply(df.list, function(df) glm(y ~ x + z, data = df, family = binomial))\n\nlapply(fits, function(fit) tidy(fit))\n\n\n$`no-adjustment`\n# A tibble: 3 × 5\n  term        estimate std.error statistic   p.value\n  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;\n1 (Intercept)   7.16      0.302     23.7   1.23e-124\n2 x             5.20      0.235     22.1   2.65e-108\n3 z            -0.0594    0.0771    -0.770 4.41e-  1\n\n$resampling\n# A tibble: 3 × 5\n  term        estimate std.error statistic   p.value\n  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;\n1 (Intercept)   5.01      0.188     26.7   4.64e-157\n2 x             5.18      0.171     30.2   1.37e-200\n3 z            -0.0349    0.0574    -0.608 5.43e-  1\n\n$SMOTE\n# A tibble: 3 × 5\n  term        estimate std.error statistic   p.value\n  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;\n1 (Intercept)  5.39       0.154     34.9   2.18e-267\n2 x            5.54       0.140     39.5   0        \n3 z           -0.00804    0.0460    -0.175 8.61e-  1\n\n\nA few observation from the coefficient estimates:\n\nWith no adjustments, the estimates for the intercept and two coefficients are within 1 SE from the true value.\nIn both re-sampling and SMOTE strategies, the estimate for the intercept is much lower than the true value. This is because the intercept adjusts for the baseline rate, and these two adjustments causes the baseline rate to be closer to 0.5.\nThe SE’s for the coefficient estimates are smaller with re-sampling and SMOTE strategies. This might seem like a good thing, but it turns out they are biased–the values are lower than the true standard deviation of the estimates. This can be confirmed analytically or through a simulation study.\n\nHere’s a quick simulation for (3), which suggests not only are the SE’s biased for the resampling method, but the actual SD’s are larger compared to the no-adjustment method (which makes sense, since we have the variation due to sampling from the popultion plus the variation due to the resampling strategy).\n\n\nCode\nres = replicate(100, {\n  df = gen_data(n) # Note, important to get a new random sample each time.\n  index_1 &lt;- sample(which(df$y == 1), n / 2, replace = TRUE)\n  index_0 &lt;- sample(which(df$y == 0), n / 2, replace = TRUE)\n  df.sample = df[c(index_0, index_1), ]\n  fit = glm(y ~ x + z, data = df.sample, family = binomial)\n  c(tidy(fit)$estimate, tidy(fit)$std.error)\n})\ngt(data.frame(param = c(\"Intercept\", \"x\", \"z\"),\n              estimated_SD = apply(res[1:3, ], 1, sd),\n              average_SE = apply(res[4:6, ], 1, mean)))\n\n\n\n\n\n\n\n\nparam\nestimated_SD\naverage_SE\n\n\n\n\nIntercept\n0.38\n0.18\n\n\nx\n0.33\n0.17\n\n\nz\n0.12\n0.06\n\n\n\n\n\n\n\n\n\n\n\n\n\nTipTake-away\n\n\n\nWith biased SE’s, the usual p-values and CI’s become invalid if we’re using a resampling strategy. Either a different method for computing p-values and CI’s needs to be used, or the model fitting procedure needs to be wrapped in a bootstrap to get valid inferences.\n\n\nHere’s another quick simulation to show that simple bootstrap estimates for SE’s are much closer to the true values.\n\n\nCode\nres.boot = replicate(100, {\n  df.boot = df[sample(1:n, n, replace = TRUE), ]\n  index_1 &lt;- sample(which(df.boot$y == 1), n / 2, replace = TRUE)\n  index_0 &lt;- sample(which(df.boot$y == 0), n / 2, replace = TRUE)\n  df.sample = df.boot[c(index_0, index_1), ]\n  fit = glm(y ~ x + z, data = df.sample, family = binomial)\n  c(tidy(fit)$estimate)\n})\ngt(data.frame(param = c(\"Intercept\", \"x\", \"z\"),\n              estimated_SD = apply(res[1:3, ], 1, sd),\n              bootstrap_SE = apply(res.boot, 1, sd)))\n\n\n\n\n\n\n\n\nparam\nestimated_SD\nbootstrap_SE\n\n\n\n\nIntercept\n0.38\n0.416\n\n\nx\n0.33\n0.336\n\n\nz\n0.12\n0.095\n\n\n\n\n\n\n\n\n\nCalibration\nBefore looking at classification performance, let’s first take a look at calibration. If we understand how the intercept term in the regression model reflects the baseline rate, then it should be no surprise that the two resampling strategies provide uncalibrated probabilities. These could always be re-calibrated, but it should be kept in mind when moving on to the next step of selecting a threshold for classification.\n\n\nCode\ntesting = gen_data(n) # Generate another dataset of the same size for testing.\nlapply(fits, function(fit) {\n  # Add predicted probabilities to the original dataset\n  testing$`.pred_1` = predict(fit, newdata = testing, type = \"response\")\n  testing$`.pred_0` = 1 - testing$`.pred_1`\n  testing$y = factor(testing$y)\n  cal_plot_breaks(testing, y, .pred_0)\n})\n\n\n$`no-adjustment`\n\n\n\n\n\n\n\n\n\n\n$resampling\n\n\n\n\n\n\n\n\n\n\n$SMOTE\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nTipTake-away\n\n\n\nThe model will not be calibrated when using resampling approaches.\n\n\n\n\nPerformance measures\nFinally, we turn our fitted model into a classifier. This involves applying a threshold to the predicted probabilities from the model to obtain the predicted class.\nFirst, let’s look at what happens if we naively use a threshold of 0.5.\n\n\nCode\ntesting = gen_data(n) # Generate another dataset of the same size for testing.\nres = lapply(fits, function(fit) {\n  threshold = 0.5\n  pred = predict(fit, newdata = testing, type = \"response\")\n  caret::confusionMatrix(factor((pred &gt; threshold) * 1),\n                         reference = factor(testing$y))$byClass\n})\ndo.call(cbind, res)\n\n\n                     no-adjustment resampling SMOTE\nSensitivity                  0.693      0.922 0.919\nSpecificity                  0.981      0.910 0.911\nPos Pred Value               0.813      0.548 0.551\nNeg Pred Value               0.964      0.990 0.990\nPrecision                    0.813      0.548 0.551\nRecall                       0.693      0.922 0.919\nF1                           0.748      0.687 0.688\nPrevalence                   0.106      0.106 0.106\nDetection Rate               0.073      0.097 0.097\nDetection Prevalence         0.090      0.178 0.176\nBalanced Accuracy            0.837      0.916 0.915\n\n\nWhile it looks like the no-adjustment method performs much worse than the other two approaches, this is only because of the 0.5 threshold.\n\n\n\n\n\n\nNote\n\n\n\nDon’t just apply a 0.5 threshold to get predicted classes. This is a naive approach that makes a well-calibrated model look like it performs poorly for classification. Instead, we should either (a) choose the baseline rate as the default threshold for calibrated models or (b) choose a threshold that maximizes some metric that reflects the balance of type-I and type-II errors that we’re willing to make (for example, the F1 score).\n\n\nLet’s run this again, but instead of using 0.5 we’ll use the prevalance in the data used to fit the model. (Note, both resampling methods this will be close to 0.5 by design, but for the no-adjustment it will be close to 0.1.)\n\n\nCode\ntesting = gen_data(n) # Generate another dataset of the same size for testing.\nres = lapply(fits, function(fit) {\n  threshold = mean(fit$data$y)\n  pred = predict(fit, newdata = testing, type = \"response\")\n  caret::confusionMatrix(factor((pred &gt; threshold) * 1),\n                         reference = factor(testing$y))$byClass\n})\ndo.call(cbind, res)\n\n\n                     no-adjustment resampling SMOTE\nSensitivity                  0.962      0.958 0.956\nSpecificity                  0.910      0.912 0.914\nPos Pred Value               0.528      0.532 0.537\nNeg Pred Value               0.996      0.995 0.995\nPrecision                    0.528      0.532 0.537\nRecall                       0.962      0.958 0.956\nF1                           0.682      0.684 0.688\nPrevalence                   0.095      0.095 0.095\nDetection Rate               0.091      0.091 0.090\nDetection Prevalence         0.172      0.170 0.168\nBalanced Accuracy            0.936      0.935 0.935\n\n\nNow we see that… well, all three models perform almost identically. This is due to a few key reasons:\n\nAll three are using the same underlying model (logistic regression) and the same predictors.\nAll three models are using a threshold set to the baseline rate the model saw during training, which removes any performance differences due to differences in calibration.\nWe generated a large dataset with a strong signal, so the variation introduced from the resampling methods doesn’t affect performance much.\n\n\n\n\n\n\n\nTipTake-away\n\n\n\nIf we think about model calibration and choose the threshold for the classifier appropriately, we find no advantage to the resampling or SMOTE strategies (at least for this simple model).\n\n\nThat last part–“at least for this simple model”–feels like it needs attention. Will these results still hold if we have a more noisy dataset? Or a dataset with more variables, or a more complex underlying model? What if we need to use a random forest or neural network? Does the simple solution of calibration and choosing an appropriate threshold fix all the problems caused by class imbalance in those scenarios?\nWell, that’s too much to get into for this note, but we’ll at least run a few more simulations with different sample sizes and noisy datasets. Otherwise, I’ll leave it here for now.\n\n\nCode\nset.seed(12345)\nres = lapply(1:20, function(sim) {\n  n = 100\n  sigma = 1\n  df = gen_data(n, sigma = sigma)\n  df.list = apply_strategies(df)\n  fits = lapply(df.list, function(df) glm(y ~ x + z, data = df, family = binomial))\n  testing = gen_data(n, sigma = sigma) # Generate another dataset of the same size for testing.\n  res = lapply(1:3, function(i) {\n    fit = fits[[i]]\n    threshold = mean(fit$data$y)\n    pred = predict(fit, newdata = testing, type = \"response\")\n    val = caret::confusionMatrix(factor((pred &gt; threshold) * 1),\n                                 reference = factor(testing$y))$byClass[-c(8:11)]\n    dat = data.frame(metric = names(val), value = val, model = names(fits)[i])\n    dat$metric = factor(dat$metric, levels = names(val))\n    return(dat)\n  })\n  data.frame(sim = sim, do.call(rbind, res))\n})\ndat = do.call(rbind, res)\n\n\n\n\nCode\ndat %&gt;%\n  ggplot(aes(x = model, y = value)) +\n  facet_wrap(. ~ metric, scales = \"free_y\") +\n  geom_point(position = position_jitter(width = 0.3)) +\n  geom_boxplot(alpha = 0.6) +\n  theme_bw()\n\n\n\n\n\n\n\n\nFigure 1: Boxplots summarizing marginal performance of each model across 20 simulations using a threshold set to baseline rate in training set.\n\n\n\n\n\n\n\nCode\ndat %&gt;%\n  ggplot(aes(x = model, y = value, color = factor(sim), group = model)) +\n  facet_wrap(. ~ metric, scales = \"free_y\") +\n  # geom_point(position = position_jitter(width = 0.3)) +\n  geom_point() +\n  geom_line(aes(group = factor(sim))) +\n  # geom_boxplot(alpha = 0.6) +\n  theme_bw() +\n  theme(legend.position = \"none\")\n\n\n\n\n\n\n\n\nFigure 2: Line plot to show relative performance of each approach for each of the 20 simulations.\n\n\n\n\n\n\n\n\n\n\n\nTipTake-away\n\n\n\nWith a fairly small, noisy dataset, there is minimal difference between the three approaches.\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Resampling and SMOTE to handle class imbalance"
+    ]
+  },
+  {
+    "objectID": "notes/testing-threshold-by-strata/index.html",
+    "href": "notes/testing-threshold-by-strata/index.html",
+    "title": "Adjusting classification threshold by strata",
+    "section": "",
+    "text": "When predicting binary outcomes, if we want to threshold our estimated probabilities to obtain predicted classes, then we devise a strategy for determining the optimal threshold. This will almost always involve some trade-off between sensitivity and specificity, or between false positives and false negatives. However, if we know that the prevalence of the class varies across some known strata, should we choose different thresholds within each strata? How does that affect the final performance?\nCode\nlibrary(tidyverse)\nLet’s simulate data from three groups where the true prevalence ranges from 0.6 to 0.9 across the groups. Our dataset will be composed of samples from these three groups with unequal sizes.\nCode\nset.seed(0)\nn = 300\nx = rnorm(n)\ngroups = c(\"a\", \"b\", \"c\")\nz = sample(groups, n, replace = TRUE, prob = c(0.3, 0.2, 0.5))\nz = factor(z, levels = groups)\nbeta.x = 1\nbeta.z = c(\"a\" = 0, \"b\" = 1, \"c\" = 2)\nepsilon = rnorm(n, 0, 0.2)\nprob = 1 / (1 + exp(-(0.5 + beta.x * x + beta.z[z] + epsilon)))\ny = rbinom(n, 1, prob)\ndf = data.frame(x = x, z = z, y = y, prob = prob)\n\ntable(z)\n\n\nz\n  a   b   c \n 87  61 152 \n\n\nCode\ntapply(y, z, mean)\n\n\n        a         b         c \n0.6321839 0.7868852 0.8947368 \n\n\nCode\nmean(y)\n\n\n[1] 0.7966667\nWe’ll fit a logistic regression model with a single predictor and the strata variable. Two strategies for thresholding will be used:\nCode\nfit = glm(\"y ~ x + z\", family = \"binomial\", data = df)\ncoef(fit)\n\n\n(Intercept)           x          zb          zc \n  0.6803849   0.6825582   0.6736314   1.5837307 \n\n\nCode\ndf$p = predict(fit, newdat = df, type = \"response\")\n\ndf = df %&gt;%\n  mutate(thr = mean(y)) %&gt;%\n  group_by(z) %&gt;%\n  mutate(thr.z = mean(y) - 0.2 * (mean(y) - thr)) %&gt;%\n  ungroup() %&gt;%\n  mutate(y.hat = 1 * (p &gt; thr),\n         y.hat.z = 1 * (p &gt; thr.z))\n\nthr.group = sapply(groups, function(group) df$thr.z[df$z == group][1])\nJust looking at the overall accuracy, we see below that using the single threshold gives better performance (69.3% vs 67.7%). However, how does the performance vary across strata? Let’s take a look.\nHere’s the overall and within-strata accuracy for the single threshold strategy:\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(), \n            acc = mean(y == y.hat)) %&gt;%\n  mutate(overall_acc = sum(n * acc) / sum(n))\n\n\n# A tibble: 3 × 4\n  z         n   acc overall_acc\n  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;\n1 a        87 0.460       0.693\n2 b        61 0.607       0.693\n3 c       152 0.862       0.693\nand for the varying-threshold strategy:\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(), \n            acc = mean(y == y.hat.z)) %&gt;%\n  mutate(overall_acc = sum(n * acc) / sum(n)) \n\n\n# A tibble: 3 × 4\n  z         n   acc overall_acc\n  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;\n1 a        87 0.632       0.677\n2 b        61 0.607       0.677\n3 c       152 0.730       0.677\nWe see that that performance varies widely with the single-threshold strategy. By using an adaptive threshold, the classifier is able to account for the varying prevalance across the groups.\nHere’s another summary table showing more performance measures. We see the same thing, where the varying-threshold strategy provides more consistent performance results across strata.\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(),\n            p      = round(mean(y), 2), \n            pp     = round(mean(y.hat), 2),\n            pp.z   = round(mean(y.hat.z), 2),\n            acc    = round(mean(y == y.hat), 2),\n            sens   = round(mean(y[y==1] == y.hat[y==1]), 2),\n            spec   = round(mean(y[y==0] == y.hat[y==0]), 2),\n            PPV    = round(mean(y[y.hat==1] == y.hat[y.hat==1]), 2),\n            NPV    = round(mean(y[y.hat==0] == y.hat[y.hat==0]), 2),\n            acc.z  = round(mean(y == y.hat.z), 2),\n            sens.z = round(mean(y[y==1] == y.hat.z[y==1]), 2),\n            spec.z = round(mean(y[y==0] == y.hat.z[y==0]), 2),\n            PPV.z  = round(mean(y[y.hat.z==1] == y.hat.z[y.hat.z==1]), 2),\n            NPV.z  = round(mean(y[y.hat.z==0] == y.hat.z[y.hat.z==0]), 2)) %&gt;%\n  as.data.frame()\n\n\n  z   n    p   pp pp.z  acc sens spec  PPV  NPV acc.z sens.z spec.z PPV.z NPV.z\n1 a  87 0.63 0.14 0.40 0.46 0.18 0.94 0.83 0.40  0.63   0.53   0.81  0.83  0.50\n2 b  61 0.79 0.46 0.46 0.61 0.54 0.85 0.93 0.33  0.61   0.54   0.85  0.93  0.33\n3 c 152 0.89 0.94 0.72 0.86 0.95 0.12 0.90 0.22  0.73   0.75   0.56  0.94  0.21\nVisualization of the thresholds and distributions of each predicted probabilities.\nCode\ndf %&gt;%\n  ggplot(aes(x = p, fill = z, group = z)) +\n  geom_histogram(position = position_identity(), alpha = 0.6, bins = 30) +\n  geom_vline(xintercept = unique(df$thr), col = \"black\") +\n  geom_vline(xintercept = thr.group, col = scales::hue_pal()(length(thr.group))) +\n  theme_bw()",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Adjusting classification threshold by strata"
+    ]
+  },
+  {
+    "objectID": "notes/testing-threshold-by-strata/index.html#bias-in-ml-models",
+    "href": "notes/testing-threshold-by-strata/index.html#bias-in-ml-models",
+    "title": "Adjusting classification threshold by strata",
+    "section": "Bias in ML models",
+    "text": "Bias in ML models\nImagine that the strata in this simulation were gender, race, or some other demographic variable. Although the model accounted for the strata variable, hence it correctly modeled the underlying prevalence, the additional step of classifying can introduce bias if we do not account for prevalence differences in the threshold used. Using a single threshold may lead to overall optimal performance, but we must look to see whether performance is consistent across important groups. If not, using a varying threshold could improve consistency while providing similar overall performance.",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Adjusting classification threshold by strata"
+    ]
+  },
+  {
+    "objectID": "notes/lme-heteroskedastic-t-test/index.html",
+    "href": "notes/lme-heteroskedastic-t-test/index.html",
+    "title": "Regression for t-test and ANOVA with unequal variances",
+    "section": "",
+    "text": "Welch’s t-test or Welch’s ANOVA, used in the case of heteroskedasticity (unequal variances), is “equivalent” to a likelihood ratio test (LRT) using a generalized least squares (GLS) model.\nCode\nlibrary(tidyverse)\nlibrary(rstatix)\nlibrary(nlme)",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Regression for t-test and ANOVA with unequal variances"
+    ]
+  },
+  {
+    "objectID": "notes/lme-heteroskedastic-t-test/index.html#simulate-heteroskedastic-data-from-three-groups",
+    "href": "notes/lme-heteroskedastic-t-test/index.html#simulate-heteroskedastic-data-from-three-groups",
+    "title": "Regression for t-test and ANOVA with unequal variances",
+    "section": "Simulate heteroskedastic data from three groups",
+    "text": "Simulate heteroskedastic data from three groups\n\n\nCode\nset.seed(0)\nn = 40\ngroups = c(\"A\", \"B\", \"C\")\nmeans  = c(0, 0, 2)\nsds    = c(1, 3, 2)\nx = sample(groups, n, replace = T)\nr = rnorm(n, 0, sds[match(x, groups)])\ny = means[match(x, groups)] + r\ndf = data.frame(y = y, \n                group = x)\ndf %&gt;%\n  ggplot(aes(x = group, y = y)) +\n  geom_point(position = position_jitter(width = 0.25, height = 0)) +\n  stat_summary(fun = mean, color = \"red\", size = 1.5) +\n  theme_bw()\n\n\nWarning: Removed 3 rows containing missing values or values outside the scale range\n(`geom_segment()`).",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Regression for t-test and ANOVA with unequal variances"
+    ]
+  },
+  {
+    "objectID": "notes/lme-heteroskedastic-t-test/index.html#anova-and-lm",
+    "href": "notes/lme-heteroskedastic-t-test/index.html#anova-and-lm",
+    "title": "Regression for t-test and ANOVA with unequal variances",
+    "section": "ANOVA and LM",
+    "text": "ANOVA and LM\nFirst, let’s run ANOVA and an F-test for a LM, both assuming equal variances. These give the same exact p-values (and we can show they are mathematically equivalent).\n\n\nCode\noneway.test(y ~ group, data = df, var.equal = TRUE)\n\n\n\n    One-way analysis of means\n\ndata:  y and group\nF = 2.4555, num df = 2, denom df = 37, p-value = 0.09969\n\n\nCode\nanova(lm(y ~ group, data = df))\n\n\nAnalysis of Variance Table\n\nResponse: y\n          Df  Sum Sq Mean Sq F value  Pr(&gt;F)  \ngroup      2  18.272  9.1358  2.4555 0.09969 .\nResiduals 37 137.659  3.7205                  \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Regression for t-test and ANOVA with unequal variances"
+    ]
+  },
+  {
+    "objectID": "notes/lme-heteroskedastic-t-test/index.html#welchs-anova-and-gls",
+    "href": "notes/lme-heteroskedastic-t-test/index.html#welchs-anova-and-gls",
+    "title": "Regression for t-test and ANOVA with unequal variances",
+    "section": "Welch’s ANOVA and GLS",
+    "text": "Welch’s ANOVA and GLS\nHere we run the same comparison, but assuming unequal variances. The GLS model allows us to estimate weights for each for each group, corresponding to the different variances. Note, the GLS is fit using REML by default. This shows results when fitting by ML.\n\n\nCode\noneway.test(y ~ group, data = df, var.equal = FALSE)\n\n\n\n    One-way analysis of means (not assuming equal variances)\n\ndata:  y and group\nF = 3.6425, num df = 2.000, denom df = 16.451, p-value = 0.04902\n\n\nCode\nanova(gls(y ~ group, data = df, weights = varIdent(form = ~ 1|group)))\n\n\nDenom. DF: 37 \n            numDF  F-value p-value\n(Intercept)     1 1.302945  0.2610\ngroup           2 3.790149  0.0318\n\n\nCode\nanova(gls(y ~ group, data = df, weights = varIdent(form = ~ 1|group), method = \"ML\"))\n\n\nDenom. DF: 37 \n            numDF  F-value p-value\n(Intercept)     1 1.351793  0.2524\ngroup           2 3.838852  0.0306",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Regression for t-test and ANOVA with unequal variances"
+    ]
+  },
+  {
+    "objectID": "notes/lme-heteroskedastic-t-test/index.html#kruskal-wallis-rank-sum-test-and-lm-on-ranks",
+    "href": "notes/lme-heteroskedastic-t-test/index.html#kruskal-wallis-rank-sum-test-and-lm-on-ranks",
+    "title": "Regression for t-test and ANOVA with unequal variances",
+    "section": "Kruskal-Wallis rank sum test and LM on ranks",
+    "text": "Kruskal-Wallis rank sum test and LM on ranks\nFinally, what if we use a nonparametric test? Well, fitting a LM on the ranks of y gives similar results to the Kruskal-Wallis rank sum test.\n\n\nCode\nkruskal.test(y ~ group, data = df)\n\n\n\n    Kruskal-Wallis rank sum test\n\ndata:  y by group\nKruskal-Wallis chi-squared = 5.2532, df = 2, p-value = 0.07232\n\n\nCode\nanova(lm(I(rank(y)) ~ group, data = df))\n\n\nAnalysis of Variance Table\n\nResponse: I(rank(y))\n          Df Sum Sq Mean Sq F value Pr(&gt;F)  \ngroup      2  717.9  358.97  2.8798 0.0688 .\nResiduals 37 4612.1  124.65                 \n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Regression for t-test and ANOVA with unequal variances"
+    ]
+  },
+  {
+    "objectID": "notes/lme-heteroskedastic-t-test/index.html#read-more",
+    "href": "notes/lme-heteroskedastic-t-test/index.html#read-more",
+    "title": "Regression for t-test and ANOVA with unequal variances",
+    "section": "Read more",
+    "text": "Read more\nhttps://lindeloev.github.io/tests-as-linear/",
+    "crumbs": [
+      "About",
+      "Notes",
+      "Regression for t-test and ANOVA with unequal variances"
+    ]
+  },
+  {
+    "objectID": "about.html#grimes-lab",
+    "href": "about.html#grimes-lab",
+    "title": "Tyler Grimes",
+    "section": "Grimes Lab",
+    "text": "Grimes Lab\nOur group is working on understanding the biological drivers of systemic lupus erythematosus (SLE). Lupus is the one of the most common autoimmune diseases and can affect multiple organ systems. It’s a very heterogeneous disease–meaning it presents very differently from one person to the next. This makes it hard to diagnose, and there’s no single treatment plan that works for everyone. The cause of SLE is unknown, but it’s believed to develop in response to a combination of environmental and internal, biological factors. We are interested in understanding the genetic and biological drivers of SLE. The statistical methods we develop are aimed at finding predictive biomarkers that can be used for prognosis or to guide treatment decisions."
+  },
+  {
+    "objectID": "about.html#areas-of-statistical-research",
+    "href": "about.html#areas-of-statistical-research",
+    "title": "Tyler Grimes",
+    "section": "Areas of statistical research",
+    "text": "Areas of statistical research\n\nStatistical methods for -omics data\nGraphical models and differential network analysis\nPredictive modeling\nHigh-dimensional data analysis\nStatistical computing\n\nPast research has focused on RNA-seq gene expression data, developing methods in the areas of graphical modeling, prediction, and survival analysis. Typical research questions included: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease?\nI find that simulations are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand–this is a process that has often lead me to new insights."
+  },
+  {
+    "objectID": "about.html#statistical-research",
+    "href": "about.html#statistical-research",
+    "title": "Tyler Grimes",
+    "section": "Statistical research",
+    "text": "Statistical research\nOur areas of statistical research include topics in:\n\nStatistical methods for -omics data\nGraphical models and differential network analysis\nPredictive modeling\nHigh-dimensional data analysis\nStatistical computing\n\nPast research has focused on RNA-seq gene expression data, developing methods in the areas of graphical modeling, prediction, and survival analysis. Typical research questions included: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease?\nSimulation studies are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand–this is a process that has often lead me to new insights."
+  },
+  {
+    "objectID": "index.html#grimes-lab",
+    "href": "index.html#grimes-lab",
+    "title": "Tyler Grimes",
+    "section": "Grimes Lab",
+    "text": "Grimes Lab\nOur group is working on understanding the biological drivers of systemic lupus erythematosus (SLE). Lupus is the one of the most common autoimmune diseases and can affect multiple organ systems. It’s a very heterogeneous disease–meaning it presents very differently from one person to the next. This makes it hard to diagnose, and there’s no single treatment plan that works for everyone. The cause of SLE is unknown, but it’s believed to develop in response to a combination of environmental and internal, biological factors. We are interested in understanding the genetic and biological drivers of SLE. The statistical methods we develop are aimed at finding predictive biomarkers that can be used for prognosis or to guide treatment decisions."
+  },
+  {
+    "objectID": "index.html#statistical-research",
+    "href": "index.html#statistical-research",
+    "title": "Tyler Grimes",
+    "section": "Statistical research",
+    "text": "Statistical research\nOur areas of statistical research include topics in:\n\nStatistical methods for -omics data\nGraphical models and differential network analysis\nPredictive modeling\nHigh-dimensional data analysis\nStatistical computing\n\nPast research has focused on RNA-seq gene expression data, developing methods in the areas of graphical modeling, prediction, and survival analysis. Typical research questions included: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease?\nSimulation studies are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand–this is a process that has often lead me to new insights."
+  },
+  {
+    "objectID": "people.html",
+    "href": "people.html",
+    "title": "Group Members",
+    "section": "",
+    "text": "First Last, BS (Graduate Research Assistant, Aug. 2026 – Current)"
+  },
+  {
+    "objectID": "people.html#grimes-lab",
+    "href": "people.html#grimes-lab",
+    "title": "Group Members",
+    "section": "Grimes Lab",
+    "text": "Grimes Lab\nOur group is working on understanding the biological drivers of systemic lupus erythematosus (SLE). Lupus is the one of the most common autoimmune diseases and can affect multiple organ systems. It’s a very heterogeneous disease–meaning it presents very differently from one person to the next. This makes it hard to diagnose, and there’s no single treatment plan that works for everyone. The cause of SLE is unknown, but it’s believed to develop in response to a combination of environmental and internal, biological factors. We are interested in understanding the genetic and biological drivers of SLE. The statistical methods we develop are aimed at finding predictive biomarkers that can be used for prognosis or to guide treatment decisions."
+  },
+  {
+    "objectID": "people.html#statistical-research",
+    "href": "people.html#statistical-research",
+    "title": "Group Members",
+    "section": "Statistical research",
+    "text": "Statistical research\nOur areas of statistical research include topics in:\n\nStatistical methods for -omics data\nGraphical models and differential network analysis\nPredictive modeling\nHigh-dimensional data analysis\nStatistical computing\n\nPast research has focused on RNA-seq gene expression data, developing methods in the areas of graphical modeling, prediction, and survival analysis. Typical research questions included: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease?\nSimulation studies are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand–this is a process that has often lead me to new insights."
+  },
+  {
+    "objectID": "people.html#current-members",
+    "href": "people.html#current-members",
+    "title": "Group Members",
+    "section": "",
+    "text": "First Last, BS (Graduate Research Assistant, Aug. 2026 – Current)"
+  },
+  {
+    "objectID": "people.html#alumni",
+    "href": "people.html#alumni",
+    "title": "Group Members",
+    "section": "Alumni",
+    "text": "Alumni"
+  }
+]
