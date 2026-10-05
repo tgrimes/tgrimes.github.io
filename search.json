@@ -25,7 +25,7 @@
     "href": "notes/adjusting-class-threshold-by-strata2.html",
     "title": "Adjusting classification threshold by strata",
     "section": "",
-    "text": "When predicting binary outcomes, if we want to threshold our estimated probabilities to obtain predicted classes, then we devise a strategy for determining the optimal threshold. In plain terms, a threshold is just the cutoff probability above which we call a prediction “positive,” and prevalence is how common the positive outcome actually is. Choosing a threshold almost always involves a trade-off between sensitivity and specificity, or between false positives and false negatives. But if we know the prevalence of the outcome varies across some known strata (subgroups), should we choose a different threshold within each stratum? And how does that choice affect performance, both overall and within each group? This post works through a small simulated example to build some intuition.\nCode\nlibrary(tidyverse)\nlibrary(gt)"
+    "text": "When predicting binary outcomes, if we want to threshold our estimated probabilities to obtain predicted classes, then we devise a strategy for determining the optimal threshold. In plain terms, a threshold is just the cutoff probability above which we call a prediction “positive,” and prevalence is how common the positive outcome actually is. Choosing a threshold always involves a trade-off between sensitivity and specificity (false positives and false negatives). But if we know the prevalence of the outcome varies across some known strata (subgroups), should we choose a different threshold within each stratum? And how does that choice affect performance, both overall and within each group? This post works through a small simulated example to build some intuition.\nCode\nlibrary(tidyverse)\nlibrary(gt)"
   },
   {
     "objectID": "notes/adjusting-class-threshold-by-strata2.html#simulating-grouped-data",
@@ -77,6 +77,230 @@
     "text": "When does partial correlation fail?\nIn the above example, the correlation between z and y was positive and linear for every value of x. What if, instead, the association changed depending on x? An interaction effect. In this simulated dataset, x and y have a negative correlation if z &lt; 0 and a positive correlation if z \\geq 0.\n\n\n\n\n\n\nTipThink\n\n\n\nGiven the relationship described above, what would we expect the scatterplot of x and y to look like? What about the scatterplots across windows of z? What value do we expect the partial correlation of x and y given z to be?\n\n\n\n\nCode\n# July 02, 2024\nset.seed(0)\nx = rnorm(n)\nz = rnorm(n)\ny = (-1)^(z &lt; 0) * x + rnorm(n, sigma)\nx.groups = cut(x, breaks = 9)\nz.groups = cut(z, breaks = 9)\nlevels(x.groups) = paste0(\"x in \", levels(x.groups))\nlevels(z.groups) = paste0(\"z in \", levels(z.groups))\ndf = tibble(x, y, z, x.groups, z.groups)\n\n\n\n\nCode\ncor(df$x, df$y)\n\n\n[1] 0.09657089\n\n\nCode\nppcor::pcor(df[, 1:3])$estimate[1, 3]\n\n\n[1] 0.01930732\n\n\n\n\nCode\ndf %&gt;%\n  group_by(z.groups) %&gt;%\n  summarize(n = n(),\n            `corr_xy|z` = cor(x, y),\n            corr_xy = cor(df$x, df$y)) %&gt;%\n  as.data.frame()\n\n\n              z.groups  n  corr_xy|z    corr_xy\n1   z in (-2.91,-2.22]  1         NA 0.09657089\n2   z in (-2.22,-1.53] 12 -0.9033113 0.09657089\n3  z in (-1.53,-0.848] 29 -0.6202951 0.09657089\n4 z in (-0.848,-0.162] 40 -0.7262352 0.09657089\n5  z in (-0.162,0.524] 58  0.4046969 0.09657089\n6    z in (0.524,1.21] 34  0.7398319 0.09657089\n7      z in (1.21,1.9] 21  0.9325690 0.09657089\n8      z in (1.9,2.58]  3  0.2854700 0.09657089\n9     z in (2.58,3.27]  2 -1.0000000 0.09657089\n\n\n\n\nCode\ndf %&gt;%\n  ggplot(aes(x = z, y = y)) +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\n\n\n\n\nCode\ndf %&gt;%\n  ggplot(aes(x = z, y = y)) +\n  facet_wrap(. ~ x.groups, scales = \"free\") +\n  geom_point() +\n  stat_smooth(method = \"lm\") +\n  theme_bw()\n\n\n`geom_smooth()` using formula = 'y ~ x'\n\n\n\n\n\n\n\n\n\nNotice also the linear model suggests the same–no association between x and y\n\n\nCode\nsummary(lm(y ~ x + z, data = df))\n\n\n\nCall:\nlm(formula = y ~ x + z, data = df)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-3.8590 -1.0467 -0.0356  1.0217  3.9886 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)\n(Intercept) -0.00504    0.10536  -0.048    0.962\nx            0.15595    0.11433   1.364    0.174\nz           -0.01335    0.10574  -0.126    0.900\n\nResidual standard error: 1.489 on 197 degrees of freedom\nMultiple R-squared:  0.009406,  Adjusted R-squared:  -0.0006507 \nF-statistic: 0.9353 on 2 and 197 DF,  p-value: 0.3942\n\n\nHowever, if we model the interaction, then we see the association.\n\n\nCode\nsummary(lm(y ~ x*z, data = df))\n\n\n\nCall:\nlm(formula = y ~ x * z, data = df)\n\nResiduals:\n    Min      1Q  Median      3Q     Max \n-3.6673 -0.6147  0.0309  0.7276  3.6902 \n\nCoefficients:\n            Estimate Std. Error t value Pr(&gt;|t|)    \n(Intercept) -0.02679    0.07817  -0.343  0.73217    \nx            0.23817    0.08506   2.800  0.00562 ** \nz            0.11263    0.07906   1.425  0.15588    \nx:z          1.10060    0.08647  12.728  &lt; 2e-16 ***\n---\nSignif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n\nResidual standard error: 1.104 on 196 degrees of freedom\nMultiple R-squared:  0.4577,    Adjusted R-squared:  0.4494 \nF-statistic: 55.14 on 3 and 196 DF,  p-value: &lt; 2.2e-16"
   },
   {
+    "objectID": "publications.html",
+    "href": "publications.html",
+    "title": "Publications",
+    "section": "",
+    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nA pseudo-value regression approach for differential network analysis of co-expression data\n\n\n\n\n\n\n\n\n\nJan 9, 2023\n\n\n\n\n\n\n\n\n\n\n\n\n\nA novel probabilistic generator for large-scale gene association networks\n\n\n\n\n\n\n\n\n\nNov 12, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe Analysis of Gene Expression Data Incorporating Tumor Purity Information\n\n\n\n\n\n\n\n\n\nAug 23, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nSeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data\n\n\n\n\n\n\n\n\n\nJul 10, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nIntegrating gene regulatory pathways into differential network analysis of gene expression data\n\n\n\n\n\n\n\n\n\nApr 2, 2019\n\n\n\n\n\n\n\n\n\n\n\n\n\nPredicting survival times for neuroblastoma patients using RNA-seq expression profiles\n\n\n\n\n\n\n\n\n\nMay 30, 2018\n\n\n\n\n\n\n\n\n\n\n\n\n\nUnraveling bacterial fingerprints of city subways from microbiome 16S gene profiles\n\n\n\n\n\n\n\n\n\nMay 22, 2017\n\n\n\n\n\n\nNo matching items\n Back to top"
+  },
+  {
+    "objectID": "talks/2018_ISMB/index.html",
+    "href": "talks/2018_ISMB/index.html",
+    "title": "An exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data",
+    "section": "",
+    "text": "My talk at the ISMB/CAMDA International Conference in Chicago, IL."
+  },
+  {
+    "objectID": "talks/2018_ISMB/index.html#abstract",
+    "href": "talks/2018_ISMB/index.html#abstract",
+    "title": "An exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression profiles from RNA-sequencing provide a window to the activity inside tumor cells. This view has enabled researchers to identify driver genes for the pathology, but often these results fail to validate or only hold for the particular cancer at hand. In this study, we investigate a robust method for identifying cancer-related genes. Two criteria are used: a gene must show functional changes among clinically different groups of patients, and the gene must have clinical relevance. These conditions are assessed through a differential network analysis and by modelling patient survival times. Preliminary results are shown from a neuroblastoma and breast cancer dataset.\nEvent: ISMB/CAMDA 2018, Chicago, USA\nSlides\n\nQ&A starts at 16:20"
+  },
+  {
+    "objectID": "talks/2020_CMStatistics/index.html",
+    "href": "talks/2020_CMStatistics/index.html",
+    "title": "Identifying cancer driver genes from differential co-expression networks",
+    "section": "",
+    "text": "Invited talk at the CMStatistics 13th International Conference."
+  },
+  {
+    "objectID": "talks/2020_CMStatistics/index.html#abstract",
+    "href": "talks/2020_CMStatistics/index.html#abstract",
+    "title": "Identifying cancer driver genes from differential co-expression networks",
+    "section": "Abstract",
+    "text": "Abstract\nThe underlying driver of cancer stems from somatic mutations in the genome that change the function of gene products. However, not all mutations are associated with cancer progression. Rather, such “passenger” mutations are a symptom of DNA instability. Only a small portion of mutations are actual “drivers” that are responsible for disease progression. A methodology is proposed for analyzing gene expression data, to identify driver genes by considering both the functional changes of genes and the clinical relevance of those changes. Functional changes are identified by performing a differential network analysis, which compares the structure of gene-gene associations across different stages of cancer. Genes that are differentially connected indicate a change in their functional activity along with cancer progression. Clinical relevance of these differential connections is assessed using a survival model to predict overall survival. Potential driver genes are identified for Neuroblastoma and Breast cancer patient populations. We identify regulatory pathways that are both differentially connected and whose expression profile is predictive of overall survival. We plan to analyze additional cancers from the TCGA data repository and perform a meta-analysis to identify any pan-cancer driver genes or biomarkers.\nEvent: CMStatistics 2020"
+  },
+  {
+    "objectID": "publications/2020_jss_seqnet/index.html",
+    "href": "publications/2020_jss_seqnet/index.html",
+    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
+    "section": "",
+    "text": "In Journal of Statistical Software"
+  },
+  {
+    "objectID": "publications/2020_jss_seqnet/index.html#abstract",
+    "href": "publications/2020_jss_seqnet/index.html#abstract",
+    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression data provide an abundant resource for inferring connections in gene regulatory networks. While methodologies developed for this task have shown success, a challenge remains in comparing the performance among methods. Gold-standard datasets are scarce and limited in use. And while tools for simulating expression data are available, they are not designed to resemble the data obtained from RNA-seq experiments. SeqNet is an R package that provides tools for generating a rich variety of gene network structures and simulating RNA-seq data from them. This produces in silico RNA-seq data for benchmarking and assessing gene network inference methods. The package is available on CRAN and on GitHub at https://github.com/tgrimes/SeqNet."
+  },
+  {
+    "objectID": "publications/2020_jss_seqnet/index.html#summary",
+    "href": "publications/2020_jss_seqnet/index.html#summary",
+    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
+    "section": "Summary",
+    "text": "Summary\nSeqNet is an R package that provides tools for generating a rich variety of gene network structures and simulating RNA-seq data from them. This produces in silico RNA-seq data for benchmarking and assessing gene network inference methods.\ndoi: 10.18637/jss.v098.i12\nSeqNet R package available on CRAN"
+  },
+  {
+    "objectID": "publications/2021_frontiers_tumor_purity/index.html",
+    "href": "publications/2021_frontiers_tumor_purity/index.html",
+    "title": "The Analysis of Gene Expression Data Incorporating Tumor Purity Information",
+    "section": "",
+    "text": "In BMC Bioinformatics"
+  },
+  {
+    "objectID": "publications/2021_frontiers_tumor_purity/index.html#abstract",
+    "href": "publications/2021_frontiers_tumor_purity/index.html#abstract",
+    "title": "The Analysis of Gene Expression Data Incorporating Tumor Purity Information",
+    "section": "Abstract",
+    "text": "Abstract\nThe tumor microenvironment is composed of tumor cells, stroma cells, immune cells, blood vessels, and other associated non-cancerous cells. Gene expression measurements on tumor samples are an average over cells in the microenvironment. However, research questions often seek answers about tumor cells rather than the surrounding non-tumor tissue. Previousstudies have suggested that the tumor purity (TP)—the proportion of tumor cells in a solid tumor sample—has a confounding effect on differential expression (DE) analysis of high vs. low survival groups. We investigate three ways incorporating the TP information in the two statistical methods used for analyzing gene expression data, namely, differential network (DN) analysis and DE analysis. Analysis 1 ignores the TP information completely, Analysis 2 uses a truncated sample by removing the low TP samples, and Analysis 3 uses TP as a covariate in the underlying statistical models. We use three gene expression data sets related to three different cancers from the Cancer Genome Atlas (TCGA) for our investigation. The networks from Analysis 2 have greater amount of differential connectivity in the two networks than that from Analysis 1 in all three cancer datasets. Similarly, Analysis 1 identified more differentially expressed genes than Analysis 2. Results of DN and DE analyses using Analysis 3 were mostly consistent with those of Analysis 1 across three cancers. However, Analysis 3 identified additional cancer-related genes in both DN and DE analyses. Our findings suggest that using TP as a covariate in a linear model is appropriate for DE analysis, but a more robust model is needed for DN analysis. However, because true DN or DE patterns are not known for the empirical datasets, simulated datasets can be used to study the statistical properties of these methods in future studies."
+  },
+  {
+    "objectID": "publications/2017_camda_metasub/index.html",
+    "href": "publications/2017_camda_metasub/index.html",
+    "title": "Unraveling bacterial fingerprints of city subways from microbiome 16S gene profiles",
+    "section": "",
+    "text": "In Biology Direct"
+  },
+  {
+    "objectID": "publications/2017_camda_metasub/index.html#abstract",
+    "href": "publications/2017_camda_metasub/index.html#abstract",
+    "title": "Unraveling bacterial fingerprints of city subways from microbiome 16S gene profiles",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: Microbial communities can be location specific, and the abundance of species within locations can influence our ability to determine whether a sample belongs to one city or another. As part of the 2017 CAMDA MetaSUB Inter-City Challenge, next generation sequencing (NGS) data was generated from swipe samples collected from subway stations in Boston, New York City hereafter New York, and Sacramento. DNA was extracted and Illumina sequenced. Sequencing data was provided for all cities as part of 2017 CAMDA contest challenge dataset.\nResults: Principal component analysis (PCA) showed clear clustering of the samples for the three cities, with a substantial proportion of the variance explained by the first three components. We ran two different classifiers and results were robust for error rate (&lt; 6%) and accuracy (&gt; 95%). The analysis of variance (ANOVA) demonstrated that overall, bacterial composition across the three cities is significantly different. A similar conclusion was reached using a novel bootstrap based test using diversity indices. Last but not least, a co-abundance association network analyses for the taxonomic levels “order”, “family”, and “genus” found different patterns of bacterial networks for the three cities.\nConclusions: Bacterial fingerprint can be useful to predict sample provenance. In this work prediction of provenance reported with over 95% accuracy. Association based network analysis, emphasized similarities between the closest cities sharing common bacterial composition. ANOVA showed different patterns of bacterial amongst cities, and these findings strongly suggest that bacterial signature across multiple cities are different. This work advocates a data analysis pipeline which could be followed in order to get biological insight from this data. However, the biological conclusions from this analysis is just an early indication out of a pilot microbiome data provided to us through CAMDA 2017 challenge and will be subject to change as we get more complete data sets in the near future. This microbiome data can have potential applications in forensics, ecology, and other sciences.” abstract_short = “As part of the 2017 CAMDA MetaSUB Inter-City Challenge, next generation sequencing (NGS) data was generated from swipe samples collected from subway stations in Boston, New York City hereafter New York, and Sacramento. This work advocates a data analysis pipeline that could be followed in order to get biological insight from this data."
+  },
+  {
+    "objectID": "publications/2023_BMC_Bio_pseudo/index.html",
+    "href": "publications/2023_BMC_Bio_pseudo/index.html",
+    "title": "A pseudo-value regression approach for differential network analysis of co-expression data",
+    "section": "",
+    "text": "In BMC Bioinformatics"
+  },
+  {
+    "objectID": "publications/2023_BMC_Bio_pseudo/index.html#abstract",
+    "href": "publications/2023_BMC_Bio_pseudo/index.html#abstract",
+    "title": "A pseudo-value regression approach for differential network analysis of co-expression data",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: The differential network (DN) analysis identifies changes in measures of association among genes under two or more experimental conditions. In this article, we introduce a pseudo-value regression approach for network analysis (PRANA). This is a novel method of differential network analysis that also adjusts for additional clinical covariates. We start from mutual information criteria, followed by pseudo-value calculations, which are then entered into a robust regression model.\nResults This article assesses the model performances of PRANA in a multivariable setting, followed by a comparison to dnapath and DINGO in both univariable and multivariable settings through variety of simulations. Performance in terms of precision, recall, and F1 score of differentially connected (DC) genes is assessed. By and large, PRANA outperformed dnapath and DINGO, neither of which is equipped to adjust for available covariates such as patient-age. Lastly, we employ PRANA in a real data application from the Gene Expression Omnibus database to identify DC genes that are associated with chronic obstructive pulmonary disease to demonstrate its utility.\nConclusion To the best of our knowledge, this is the first attempt of utilizing a regression modeling for DN analysis by collective gene expression levels between two or more groups with the inclusion of additional clinical covariates. By and large, adjusting for available covariates improves accuracy of a DN analysis."
+  },
+  {
+    "objectID": "notes.html",
+    "href": "notes.html",
+    "title": "Notes",
+    "section": "",
+    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nHow to write a research paper\n\n\n\n\n\n\n\n\nOct 5, 2026\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nAdjusting classification threshold by strata\n\n\n\n\n\n\n\n\nJul 4, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nRegression for t-test and ANOVA with unequal variances\n\n\n\n\n\n\n\n\nMay 12, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nVisualizing partial correlations with 3 variables\n\n\n\n\n\n\n\n\nJan 5, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nResampling and SMOTE to handle class imbalance\n\n\nFindings: (1) Predicted probabilities are miscalibrated when using resampling techniques. (2) Typical inference methods are invalid. (3) Using the naive threshold of 0.5 leads to misleading performance estimates.\n\n\n\n\n\nDec 28, 2022\n\n\nTyler Grimes\n\n\n\n\n\nNo matching items\n Back to top"
+  },
+  {
+    "objectID": "talks.html",
+    "href": "talks.html",
+    "title": "Talks",
+    "section": "",
+    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nPredictive modeling with differential co-expression of RNA-seq data\n\n\n\n\n\n\n\n\nNov 18, 2022\n\n\n\n\n\n\n\n\n\n\n\n\nIdentifying cancer driver genes from differential co-expression networks\n\n\n\n\n\n\n\n\nDec 21, 2020\n\n\n\n\n\n\n\n\n\n\n\n\nAn exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data\n\n\n\n\n\n\n\n\nJul 8, 2018\n\n\n\n\n\n\n\n\n\n\n\n\nPredicting survival times for neuroblastoma patients using RNA-Seq expression profiles\n\n\n\n\n\n\n\n\nJul 23, 2017\n\n\n\n\n\nNo matching items\n Back to top"
+  },
+  {
+    "objectID": "publications/2017_camda_neuroblastoma/index.html",
+    "href": "publications/2017_camda_neuroblastoma/index.html",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
+    "section": "",
+    "text": "In Biology Direct"
+  },
+  {
+    "objectID": "publications/2017_camda_neuroblastoma/index.html#abstract",
+    "href": "publications/2017_camda_neuroblastoma/index.html#abstract",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: Neuroblastoma is the most common tumor of early childhood and is notorious for its high variability in clinical presentation. Accurate prognosis has remained a challenge for many patients. In this study, expression profiles from RNA-sequencing are used to predict survival times directly. Several models are investigated using various annotation levels of expression profiles (genes, transcripts, and introns), and an ensemble predictor is proposed as a heuristic for combining these different profiles.\nResults: The use of RNA-seq data is shown to improve accuracy in comparison to using clinical data alone for predicting overall survival times. Furthermore, clinically high-risk patients can be subclassified based on their predicted overall survival times. In this effort, the best performing model was the elastic net using both transcripts and introns together. This model separated patients into two groups with 2-year overall survival rates of 0.40±0.11 (n=22) versus 0.80±0.05 (n=68). The ensemble approach gave similar results, with groups 0.42±0.10 (n=25) versus 0.82±0.05 (n=65). This suggests that the ensemble is able to effectively combine the individual RNA-seq datasets. \nConclusions: Using predicted survival times based on RNA-seq data can provide improved prognosis by subclassifying clinically high-risk neuroblastoma patients."
+  },
+  {
+    "objectID": "publications/2017_camda_neuroblastoma/index.html#summary",
+    "href": "publications/2017_camda_neuroblastoma/index.html#summary",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
+    "section": "Summary",
+    "text": "Summary\nIn this study, expression profiles from RNA-sequencing of Neuroblastoma tumor samples are used to predict patient survival times. Several models are investigated using various annotation levels of expression profiles (genes, transcripts, and introns), and an ensemble predictor is proposed as a heuristic for combining these different profiles. The use of RNA-seq data is shown to improve accuracy in comparison to using clinical data alone for predicting overall survival times.\nSource code Slides"
+  },
+  {
+    "objectID": "publications/2021_plosone_prob/index.html",
+    "href": "publications/2021_plosone_prob/index.html",
+    "title": "A novel probabilistic generator for large-scale gene association networks",
+    "section": "",
+    "text": "In PLOS ONE"
+  },
+  {
+    "objectID": "publications/2021_plosone_prob/index.html#abstract",
+    "href": "publications/2021_plosone_prob/index.html#abstract",
+    "title": "A novel probabilistic generator for large-scale gene association networks",
+    "section": "Abstract",
+    "text": "Abstract\nMotivation: Gene expression data provide an opportunity for reverse-engineering gene-gene associations using network inference methods. However, it is difficult to assess the performance of these methods because the true underlying network is unknown in real data. Current benchmarks address this problem by subsampling a known regulatory network to conduct simulations. But the topology of regulatory networks can vary greatly across organisms or tissues, and reference-based generators—such as GeneNetWeaver—are not designed to capture this heterogeneity. This means, for example, benchmark results from the E. coli regulatory network will not carry over to other organisms or tissues. In contrast, probabilistic generators do not require a reference network, and they have the potential to capture a rich distribution of topologies. This makes probabilistic generators an ideal approach for obtaining a robust benchmarking of network inference methods.\nResults: We propose a novel probabilistic network generator that (1) provides an alternative to address the inherent limitation of reference-based generators and (2) is able to create realistic gene association networks, and (3) captures the heterogeneity found across gold-standard networks better than existing generators used in practice. Eight organism-specific and 12 human tissue-specific gold-standard association networks are considered. Several measures of global topology are used to determine the similarity of generated networks to the gold-standards. Along with demonstrating the variability of network structure across organisms and tissues, we show that the commonly used “scale-free” model is insufficient for replicating these structures."
+  },
+  {
+    "objectID": "publications/2021_plosone_prob/index.html#summary",
+    "href": "publications/2021_plosone_prob/index.html#summary",
+    "title": "A novel probabilistic generator for large-scale gene association networks",
+    "section": "Summary",
+    "text": "Summary\nA novel probabilistic network generator is proposed that (1) provides an alternative to address the inherent limitation of reference-based generators and (2) is able to create realistic gene association networks, and (3) captures the heterogeneity found across gold-standard networks better than existing generators used in practice. Eight organism-specific and 12 human tissue-specific gold-standard association networks are considered. Several measures of global topology are used to determine the similarity of generated networks to the gold-standards. Along with demonstrating the variability of network structure across organisms and tissues, we show that the commonly used “scale-free” model is insufficient for replicating these structures.\ndoi: https://doi.org/10.1371/journal.pone.0259193"
+  },
+  {
+    "objectID": "publications/2019_pathways_in_dc/index.html",
+    "href": "publications/2019_pathways_in_dc/index.html",
+    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
+    "section": "",
+    "text": "In Scientific Reports"
+  },
+  {
+    "objectID": "publications/2019_pathways_in_dc/index.html#abstract",
+    "href": "publications/2019_pathways_in_dc/index.html#abstract",
+    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
+    "section": "Abstract",
+    "text": "Abstract\nBackground: The analysis of gene-gene co-expression networks provides insight into the function of gene products. Exposing network irregularities offers an avenue for discovery in systems biology; these pursuits can include the study of gene function in developmental biology and understanding and treating diseases. Modern methods for differential network analysis often have two drawbacks: they implicitly rely on the selection of a relatively small subset of genes before analysis, and they are not flexible to the choice of association measure.\nMethods: A general framework for integrating known gene regulatory pathways into a differential network analysis is proposed. The framework allows for any gene-gene association measure to be used, and inference is carried out through permutation testing. A simulation study investigates the performance in identifying differentially connected genes when incorporating known pathways and compares the general framework to four state-of- the-art methods. Two RNA-seq datasets are analyzed to illustrate the use of this framework in practice.\nResults: The simulation study shows that incorporating pathway information can improve performance in terms of both sensitivity and true discovery rate. Furthermore, we demonstrate that the state-of-the-art methods each estimate different things and are not directly comparable – this emphasizes the fact that the choice of association measure can have a strong influence on results. In the applied examples, the analysis reveals genes and pathways that are known to be biologically significant along with new findings to motivate future research.\nConclusions: The proposed framework makes explicit two critical, but often overlooked, assumptions: the selection of a subset of genes and the meaning of gene-gene association. The results obtained from analyzing gene expression with this framework are more interpretable, and the pathway information provides context that can lead to deeper insights."
+  },
+  {
+    "objectID": "publications/2019_pathways_in_dc/index.html#summary",
+    "href": "publications/2019_pathways_in_dc/index.html#summary",
+    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
+    "section": "Summary",
+    "text": "Summary\nA framework for comparing gene-gene associations between two populations is proposed. Any association measure may be used - correlations, partial correlation, mutual information, etc; this flexibility is in contrast to the rigidity of existing methods. The framework makes explicit the practice of incoporating pathway information into the analysis. A simulation study explores the affect this has on performance, and we investigate what happens when pathway information is misspecified or incomplete.\ndoi: 10.1038/s41598-019-41918-3\ndnapath R package available on CRAN"
+  },
+  {
+    "objectID": "talks/2017_ISMB/index.html",
+    "href": "talks/2017_ISMB/index.html",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-Seq expression profiles",
+    "section": "",
+    "text": "My talk at the ISMB/CAMDA International Conference in Chicago, IL."
+  },
+  {
+    "objectID": "talks/2017_ISMB/index.html#abstract",
+    "href": "talks/2017_ISMB/index.html#abstract",
+    "title": "Predicting survival times for neuroblastoma patients using RNA-Seq expression profiles",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression profiles from RNA-sequencing provide a window to the activity inside tumor cells. This view has enabled researchers to identify driver genes for the pathology, but often these results fail to validate or only hold for the particular cancer at hand. In this study, we investigate a robust method for identifying cancer-related genes. Two criteria are used: a gene must show functional changes among clinically different groups of patients, and the gene must have clinical relevance. These conditions are assessed through a differential network analysis and by modelling patient survival times. Preliminary results are shown from a neuroblastoma and breast cancer dataset.\nEvent: ISMB/CAMDA 2017, Prague, Czech Republic\nSlides\n\nQ&A starts at 16:20"
+  },
+  {
+    "objectID": "talks/2022_UMBC/index.html",
+    "href": "talks/2022_UMBC/index.html",
+    "title": "Predictive modeling with differential co-expression of RNA-seq data",
+    "section": "",
+    "text": "Invited talk at the Statistical Colloquium for the University of Maryland, Department of Mathematics and Statistics."
+  },
+  {
+    "objectID": "talks/2022_UMBC/index.html#abstract",
+    "href": "talks/2022_UMBC/index.html#abstract",
+    "title": "Predictive modeling with differential co-expression of RNA-seq data",
+    "section": "Abstract",
+    "text": "Abstract\nGene expression data from RNA-seq experiments provide a measure of biological activity at the cellular level. Differential expression (DE) analyses use these data to identify genes that are up- or down-regulated across groups of interest. Research in systems biology takes this analysis further by gleaning insights into gene regulatory networks through the analysis of gene co-expression networks. Similar to DE analysis, a differential network (DN) analysis is conducted to determine how co-expression patterns change across different groups of interest. A methodology is proposed for predictive modeling in this context that builds on a framework for conducting pathway-based differential network analysis. In an application to cancer gene expression datasets, our goal is to identify driver genes by considering both the functional changes of genes and the clinical relevance of those changes. Functional changes are identified by performing a differential network analysis, which compares the structure of gene-gene associations across different stages of cancer. Clinical relevance of these differential connections is assessed through predictive modeling. Potential driver genes are identified for Neuroblastoma and Breast cancer patient populations, and we identify regulatory pathways that are both differentially connected and whose expression profile is predictive of overall survival.\nEvent: Statistics Colloquium 2022\nSlides"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Tyler Grimes",
+    "section": "",
+    "text": "Google Scholar\n  \n  \n    \n     LinkedIn\n  \n  \n    \n     Github\n  \n  \n     CV\n  \n\n      \nHey, I’m Tyler, a biostatistician working in genomics and clinical research. My research is focused on the development of statistical methodology for high-dimensional -omics data to study the biological drivers of autoimmune diseases. This involves problems related to clinical predictive modeling, statistical inferences on association networks, multi-omics integration, and the development of statistical software packages that implement these methods.\nOn this site, you can find various notes containing random experiments and code snippets used for testing ideas, along with talks and papers from past research projects."
+  },
+  {
+    "objectID": "index.html#grimes-lab",
+    "href": "index.html#grimes-lab",
+    "title": "Tyler Grimes",
+    "section": "Grimes Lab",
+    "text": "Grimes Lab\nOur group is working on understanding the biological drivers of systemic lupus erythematosus (SLE). Lupus is the one of the most common autoimmune diseases and can affect multiple organ systems. It’s a heterogeneous disease–meaning it presents differently from one person to the next. This makes it hard to diagnose, and there’s no single treatment plan that works for everyone. The cause of SLE is unknown, but it’s believed to develop in response to a combination of environmental and internal, biological factors. We are interested in understanding the genetic and biological drivers of SLE. The statistical methods we develop are aimed at finding predictive biomarkers that can be used for prognosis or to guide treatment decisions."
+  },
+  {
+    "objectID": "index.html#statistical-research",
+    "href": "index.html#statistical-research",
+    "title": "Tyler Grimes",
+    "section": "Statistical research",
+    "text": "Statistical research\nOur areas of statistical research include topics in:\n\nStatistical methods for -omics data\nGraphical models and differential network analysis\nPredictive modeling\nHigh-dimensional data analysis\nStatistical computing\n\nPast research has focused on RNA-seq gene expression data, developing methods in the areas of graphical modeling, prediction, and survival analysis. Typical research questions included: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease?\nSimulation studies are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand–this is a process that has often lead me to new insights."
+  },
+  {
     "objectID": "notes/lme-heteroskedastic-t-test.html",
     "href": "notes/lme-heteroskedastic-t-test.html",
     "title": "Regression for t-test and ANOVA with unequal variances",
@@ -117,244 +341,6 @@
     "title": "Regression for t-test and ANOVA with unequal variances",
     "section": "Read more",
     "text": "Read more\nhttps://lindeloev.github.io/tests-as-linear/"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "Tyler Grimes",
-    "section": "",
-    "text": "Google Scholar\n  \n  \n    \n     LinkedIn\n  \n  \n    \n     Github\n  \n  \n     CV\n  \n\n      \nHey, I’m Tyler, a biostatistician working in genomics and clinical research. My research is focused on the development of statistical methodology for high-dimensional -omics data to study the biological drivers of autoimmune diseases. This involves problems related to clinical predictive modeling, statistical inferences on association networks, multi-omics integration, and the development of statistical software packages that implement these methods.\nOn this site, you can find various notes containing random experiments and code snippets used for testing ideas, along with talks and papers from past research projects."
-  },
-  {
-    "objectID": "index.html#grimes-lab",
-    "href": "index.html#grimes-lab",
-    "title": "Tyler Grimes",
-    "section": "Grimes Lab",
-    "text": "Grimes Lab\nOur group is working on understanding the biological drivers of systemic lupus erythematosus (SLE). Lupus is the one of the most common autoimmune diseases and can affect multiple organ systems. It’s a heterogeneous disease–meaning it presents differently from one person to the next. This makes it hard to diagnose, and there’s no single treatment plan that works for everyone. The cause of SLE is unknown, but it’s believed to develop in response to a combination of environmental and internal, biological factors. We are interested in understanding the genetic and biological drivers of SLE. The statistical methods we develop are aimed at finding predictive biomarkers that can be used for prognosis or to guide treatment decisions."
-  },
-  {
-    "objectID": "index.html#statistical-research",
-    "href": "index.html#statistical-research",
-    "title": "Tyler Grimes",
-    "section": "Statistical research",
-    "text": "Statistical research\nOur areas of statistical research include topics in:\n\nStatistical methods for -omics data\nGraphical models and differential network analysis\nPredictive modeling\nHigh-dimensional data analysis\nStatistical computing\n\nPast research has focused on RNA-seq gene expression data, developing methods in the areas of graphical modeling, prediction, and survival analysis. Typical research questions included: How can gene expression be used to improve prediction of survival in cancer patients? Do gene regulatory networks differ in high-risk vs. low-risk patients, and what do those differences tell us about the underlying disease?\nSimulation studies are an indispensable tool for modern research. Aside from allowing us to assess model performance, creating a simulation forces us to think deeply about the data generating process and the context of the problem at hand–this is a process that has often lead me to new insights."
-  },
-  {
-    "objectID": "talks/2022_UMBC/index.html",
-    "href": "talks/2022_UMBC/index.html",
-    "title": "Predictive modeling with differential co-expression of RNA-seq data",
-    "section": "",
-    "text": "Invited talk at the Statistical Colloquium for the University of Maryland, Department of Mathematics and Statistics."
-  },
-  {
-    "objectID": "talks/2022_UMBC/index.html#abstract",
-    "href": "talks/2022_UMBC/index.html#abstract",
-    "title": "Predictive modeling with differential co-expression of RNA-seq data",
-    "section": "Abstract",
-    "text": "Abstract\nGene expression data from RNA-seq experiments provide a measure of biological activity at the cellular level. Differential expression (DE) analyses use these data to identify genes that are up- or down-regulated across groups of interest. Research in systems biology takes this analysis further by gleaning insights into gene regulatory networks through the analysis of gene co-expression networks. Similar to DE analysis, a differential network (DN) analysis is conducted to determine how co-expression patterns change across different groups of interest. A methodology is proposed for predictive modeling in this context that builds on a framework for conducting pathway-based differential network analysis. In an application to cancer gene expression datasets, our goal is to identify driver genes by considering both the functional changes of genes and the clinical relevance of those changes. Functional changes are identified by performing a differential network analysis, which compares the structure of gene-gene associations across different stages of cancer. Clinical relevance of these differential connections is assessed through predictive modeling. Potential driver genes are identified for Neuroblastoma and Breast cancer patient populations, and we identify regulatory pathways that are both differentially connected and whose expression profile is predictive of overall survival.\nEvent: Statistics Colloquium 2022\nSlides"
-  },
-  {
-    "objectID": "talks/2017_ISMB/index.html",
-    "href": "talks/2017_ISMB/index.html",
-    "title": "Predicting survival times for neuroblastoma patients using RNA-Seq expression profiles",
-    "section": "",
-    "text": "My talk at the ISMB/CAMDA International Conference in Chicago, IL."
-  },
-  {
-    "objectID": "talks/2017_ISMB/index.html#abstract",
-    "href": "talks/2017_ISMB/index.html#abstract",
-    "title": "Predicting survival times for neuroblastoma patients using RNA-Seq expression profiles",
-    "section": "Abstract",
-    "text": "Abstract\nGene expression profiles from RNA-sequencing provide a window to the activity inside tumor cells. This view has enabled researchers to identify driver genes for the pathology, but often these results fail to validate or only hold for the particular cancer at hand. In this study, we investigate a robust method for identifying cancer-related genes. Two criteria are used: a gene must show functional changes among clinically different groups of patients, and the gene must have clinical relevance. These conditions are assessed through a differential network analysis and by modelling patient survival times. Preliminary results are shown from a neuroblastoma and breast cancer dataset.\nEvent: ISMB/CAMDA 2017, Prague, Czech Republic\nSlides\n\nQ&A starts at 16:20"
-  },
-  {
-    "objectID": "publications/2019_pathways_in_dc/index.html",
-    "href": "publications/2019_pathways_in_dc/index.html",
-    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
-    "section": "",
-    "text": "In Scientific Reports"
-  },
-  {
-    "objectID": "publications/2019_pathways_in_dc/index.html#abstract",
-    "href": "publications/2019_pathways_in_dc/index.html#abstract",
-    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
-    "section": "Abstract",
-    "text": "Abstract\nBackground: The analysis of gene-gene co-expression networks provides insight into the function of gene products. Exposing network irregularities offers an avenue for discovery in systems biology; these pursuits can include the study of gene function in developmental biology and understanding and treating diseases. Modern methods for differential network analysis often have two drawbacks: they implicitly rely on the selection of a relatively small subset of genes before analysis, and they are not flexible to the choice of association measure.\nMethods: A general framework for integrating known gene regulatory pathways into a differential network analysis is proposed. The framework allows for any gene-gene association measure to be used, and inference is carried out through permutation testing. A simulation study investigates the performance in identifying differentially connected genes when incorporating known pathways and compares the general framework to four state-of- the-art methods. Two RNA-seq datasets are analyzed to illustrate the use of this framework in practice.\nResults: The simulation study shows that incorporating pathway information can improve performance in terms of both sensitivity and true discovery rate. Furthermore, we demonstrate that the state-of-the-art methods each estimate different things and are not directly comparable – this emphasizes the fact that the choice of association measure can have a strong influence on results. In the applied examples, the analysis reveals genes and pathways that are known to be biologically significant along with new findings to motivate future research.\nConclusions: The proposed framework makes explicit two critical, but often overlooked, assumptions: the selection of a subset of genes and the meaning of gene-gene association. The results obtained from analyzing gene expression with this framework are more interpretable, and the pathway information provides context that can lead to deeper insights."
-  },
-  {
-    "objectID": "publications/2019_pathways_in_dc/index.html#summary",
-    "href": "publications/2019_pathways_in_dc/index.html#summary",
-    "title": "Integrating gene regulatory pathways into differential network analysis of gene expression data",
-    "section": "Summary",
-    "text": "Summary\nA framework for comparing gene-gene associations between two populations is proposed. Any association measure may be used - correlations, partial correlation, mutual information, etc; this flexibility is in contrast to the rigidity of existing methods. The framework makes explicit the practice of incoporating pathway information into the analysis. A simulation study explores the affect this has on performance, and we investigate what happens when pathway information is misspecified or incomplete.\ndoi: 10.1038/s41598-019-41918-3\ndnapath R package available on CRAN"
-  },
-  {
-    "objectID": "publications/2021_plosone_prob/index.html",
-    "href": "publications/2021_plosone_prob/index.html",
-    "title": "A novel probabilistic generator for large-scale gene association networks",
-    "section": "",
-    "text": "In PLOS ONE"
-  },
-  {
-    "objectID": "publications/2021_plosone_prob/index.html#abstract",
-    "href": "publications/2021_plosone_prob/index.html#abstract",
-    "title": "A novel probabilistic generator for large-scale gene association networks",
-    "section": "Abstract",
-    "text": "Abstract\nMotivation: Gene expression data provide an opportunity for reverse-engineering gene-gene associations using network inference methods. However, it is difficult to assess the performance of these methods because the true underlying network is unknown in real data. Current benchmarks address this problem by subsampling a known regulatory network to conduct simulations. But the topology of regulatory networks can vary greatly across organisms or tissues, and reference-based generators—such as GeneNetWeaver—are not designed to capture this heterogeneity. This means, for example, benchmark results from the E. coli regulatory network will not carry over to other organisms or tissues. In contrast, probabilistic generators do not require a reference network, and they have the potential to capture a rich distribution of topologies. This makes probabilistic generators an ideal approach for obtaining a robust benchmarking of network inference methods.\nResults: We propose a novel probabilistic network generator that (1) provides an alternative to address the inherent limitation of reference-based generators and (2) is able to create realistic gene association networks, and (3) captures the heterogeneity found across gold-standard networks better than existing generators used in practice. Eight organism-specific and 12 human tissue-specific gold-standard association networks are considered. Several measures of global topology are used to determine the similarity of generated networks to the gold-standards. Along with demonstrating the variability of network structure across organisms and tissues, we show that the commonly used “scale-free” model is insufficient for replicating these structures."
-  },
-  {
-    "objectID": "publications/2021_plosone_prob/index.html#summary",
-    "href": "publications/2021_plosone_prob/index.html#summary",
-    "title": "A novel probabilistic generator for large-scale gene association networks",
-    "section": "Summary",
-    "text": "Summary\nA novel probabilistic network generator is proposed that (1) provides an alternative to address the inherent limitation of reference-based generators and (2) is able to create realistic gene association networks, and (3) captures the heterogeneity found across gold-standard networks better than existing generators used in practice. Eight organism-specific and 12 human tissue-specific gold-standard association networks are considered. Several measures of global topology are used to determine the similarity of generated networks to the gold-standards. Along with demonstrating the variability of network structure across organisms and tissues, we show that the commonly used “scale-free” model is insufficient for replicating these structures.\ndoi: https://doi.org/10.1371/journal.pone.0259193"
-  },
-  {
-    "objectID": "publications/2017_camda_neuroblastoma/index.html",
-    "href": "publications/2017_camda_neuroblastoma/index.html",
-    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
-    "section": "",
-    "text": "In Biology Direct"
-  },
-  {
-    "objectID": "publications/2017_camda_neuroblastoma/index.html#abstract",
-    "href": "publications/2017_camda_neuroblastoma/index.html#abstract",
-    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
-    "section": "Abstract",
-    "text": "Abstract\nBackground: Neuroblastoma is the most common tumor of early childhood and is notorious for its high variability in clinical presentation. Accurate prognosis has remained a challenge for many patients. In this study, expression profiles from RNA-sequencing are used to predict survival times directly. Several models are investigated using various annotation levels of expression profiles (genes, transcripts, and introns), and an ensemble predictor is proposed as a heuristic for combining these different profiles.\nResults: The use of RNA-seq data is shown to improve accuracy in comparison to using clinical data alone for predicting overall survival times. Furthermore, clinically high-risk patients can be subclassified based on their predicted overall survival times. In this effort, the best performing model was the elastic net using both transcripts and introns together. This model separated patients into two groups with 2-year overall survival rates of 0.40±0.11 (n=22) versus 0.80±0.05 (n=68). The ensemble approach gave similar results, with groups 0.42±0.10 (n=25) versus 0.82±0.05 (n=65). This suggests that the ensemble is able to effectively combine the individual RNA-seq datasets. \nConclusions: Using predicted survival times based on RNA-seq data can provide improved prognosis by subclassifying clinically high-risk neuroblastoma patients."
-  },
-  {
-    "objectID": "publications/2017_camda_neuroblastoma/index.html#summary",
-    "href": "publications/2017_camda_neuroblastoma/index.html#summary",
-    "title": "Predicting survival times for neuroblastoma patients using RNA-seq expression profiles",
-    "section": "Summary",
-    "text": "Summary\nIn this study, expression profiles from RNA-sequencing of Neuroblastoma tumor samples are used to predict patient survival times. Several models are investigated using various annotation levels of expression profiles (genes, transcripts, and introns), and an ensemble predictor is proposed as a heuristic for combining these different profiles. The use of RNA-seq data is shown to improve accuracy in comparison to using clinical data alone for predicting overall survival times.\nSource code Slides"
-  },
-  {
-    "objectID": "talks.html",
-    "href": "talks.html",
-    "title": "Talks",
-    "section": "",
-    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nPredictive modeling with differential co-expression of RNA-seq data\n\n\n\n\n\n\n\n\nNov 18, 2022\n\n\n\n\n\n\n\n\n\n\n\n\nIdentifying cancer driver genes from differential co-expression networks\n\n\n\n\n\n\n\n\nDec 21, 2020\n\n\n\n\n\n\n\n\n\n\n\n\nAn exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data\n\n\n\n\n\n\n\n\nJul 8, 2018\n\n\n\n\n\n\n\n\n\n\n\n\nPredicting survival times for neuroblastoma patients using RNA-Seq expression profiles\n\n\n\n\n\n\n\n\nJul 23, 2017\n\n\n\n\n\nNo matching items\n Back to top"
-  },
-  {
-    "objectID": "notes.html",
-    "href": "notes.html",
-    "title": "Notes",
-    "section": "",
-    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nHow to write a research paper\n\n\n\n\n\n\n\n\nOct 5, 2026\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nAdjusting classification threshold by strata\n\n\n\n\n\n\n\n\nJul 4, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nAdjusting classification threshold by strata\n\n\n\n\n\n\n\n\nJul 4, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nRegression for t-test and ANOVA with unequal variances\n\n\n\n\n\n\n\n\nMay 12, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nVisualizing partial correlations with 3 variables\n\n\n\n\n\n\n\n\nJan 5, 2024\n\n\nTyler Grimes\n\n\n\n\n\n\n\n\n\n\n\n\nResampling and SMOTE to handle class imbalance\n\n\nFindings: (1) Predicted probabilities are miscalibrated when using resampling techniques. (2) Typical inference methods are invalid. (3) Using the naive threshold of 0.5 leads to misleading performance estimates.\n\n\n\n\n\nDec 28, 2022\n\n\nTyler Grimes\n\n\n\n\n\nNo matching items\n Back to top"
-  },
-  {
-    "objectID": "publications/2023_BMC_Bio_pseudo/index.html",
-    "href": "publications/2023_BMC_Bio_pseudo/index.html",
-    "title": "A pseudo-value regression approach for differential network analysis of co-expression data",
-    "section": "",
-    "text": "In BMC Bioinformatics"
-  },
-  {
-    "objectID": "publications/2023_BMC_Bio_pseudo/index.html#abstract",
-    "href": "publications/2023_BMC_Bio_pseudo/index.html#abstract",
-    "title": "A pseudo-value regression approach for differential network analysis of co-expression data",
-    "section": "Abstract",
-    "text": "Abstract\nBackground: The differential network (DN) analysis identifies changes in measures of association among genes under two or more experimental conditions. In this article, we introduce a pseudo-value regression approach for network analysis (PRANA). This is a novel method of differential network analysis that also adjusts for additional clinical covariates. We start from mutual information criteria, followed by pseudo-value calculations, which are then entered into a robust regression model.\nResults This article assesses the model performances of PRANA in a multivariable setting, followed by a comparison to dnapath and DINGO in both univariable and multivariable settings through variety of simulations. Performance in terms of precision, recall, and F1 score of differentially connected (DC) genes is assessed. By and large, PRANA outperformed dnapath and DINGO, neither of which is equipped to adjust for available covariates such as patient-age. Lastly, we employ PRANA in a real data application from the Gene Expression Omnibus database to identify DC genes that are associated with chronic obstructive pulmonary disease to demonstrate its utility.\nConclusion To the best of our knowledge, this is the first attempt of utilizing a regression modeling for DN analysis by collective gene expression levels between two or more groups with the inclusion of additional clinical covariates. By and large, adjusting for available covariates improves accuracy of a DN analysis."
-  },
-  {
-    "objectID": "publications/2017_camda_metasub/index.html",
-    "href": "publications/2017_camda_metasub/index.html",
-    "title": "Unraveling bacterial fingerprints of city subways from microbiome 16S gene profiles",
-    "section": "",
-    "text": "In Biology Direct"
-  },
-  {
-    "objectID": "publications/2017_camda_metasub/index.html#abstract",
-    "href": "publications/2017_camda_metasub/index.html#abstract",
-    "title": "Unraveling bacterial fingerprints of city subways from microbiome 16S gene profiles",
-    "section": "Abstract",
-    "text": "Abstract\nBackground: Microbial communities can be location specific, and the abundance of species within locations can influence our ability to determine whether a sample belongs to one city or another. As part of the 2017 CAMDA MetaSUB Inter-City Challenge, next generation sequencing (NGS) data was generated from swipe samples collected from subway stations in Boston, New York City hereafter New York, and Sacramento. DNA was extracted and Illumina sequenced. Sequencing data was provided for all cities as part of 2017 CAMDA contest challenge dataset.\nResults: Principal component analysis (PCA) showed clear clustering of the samples for the three cities, with a substantial proportion of the variance explained by the first three components. We ran two different classifiers and results were robust for error rate (&lt; 6%) and accuracy (&gt; 95%). The analysis of variance (ANOVA) demonstrated that overall, bacterial composition across the three cities is significantly different. A similar conclusion was reached using a novel bootstrap based test using diversity indices. Last but not least, a co-abundance association network analyses for the taxonomic levels “order”, “family”, and “genus” found different patterns of bacterial networks for the three cities.\nConclusions: Bacterial fingerprint can be useful to predict sample provenance. In this work prediction of provenance reported with over 95% accuracy. Association based network analysis, emphasized similarities between the closest cities sharing common bacterial composition. ANOVA showed different patterns of bacterial amongst cities, and these findings strongly suggest that bacterial signature across multiple cities are different. This work advocates a data analysis pipeline which could be followed in order to get biological insight from this data. However, the biological conclusions from this analysis is just an early indication out of a pilot microbiome data provided to us through CAMDA 2017 challenge and will be subject to change as we get more complete data sets in the near future. This microbiome data can have potential applications in forensics, ecology, and other sciences.” abstract_short = “As part of the 2017 CAMDA MetaSUB Inter-City Challenge, next generation sequencing (NGS) data was generated from swipe samples collected from subway stations in Boston, New York City hereafter New York, and Sacramento. This work advocates a data analysis pipeline that could be followed in order to get biological insight from this data."
-  },
-  {
-    "objectID": "publications/2021_frontiers_tumor_purity/index.html",
-    "href": "publications/2021_frontiers_tumor_purity/index.html",
-    "title": "The Analysis of Gene Expression Data Incorporating Tumor Purity Information",
-    "section": "",
-    "text": "In BMC Bioinformatics"
-  },
-  {
-    "objectID": "publications/2021_frontiers_tumor_purity/index.html#abstract",
-    "href": "publications/2021_frontiers_tumor_purity/index.html#abstract",
-    "title": "The Analysis of Gene Expression Data Incorporating Tumor Purity Information",
-    "section": "Abstract",
-    "text": "Abstract\nThe tumor microenvironment is composed of tumor cells, stroma cells, immune cells, blood vessels, and other associated non-cancerous cells. Gene expression measurements on tumor samples are an average over cells in the microenvironment. However, research questions often seek answers about tumor cells rather than the surrounding non-tumor tissue. Previousstudies have suggested that the tumor purity (TP)—the proportion of tumor cells in a solid tumor sample—has a confounding effect on differential expression (DE) analysis of high vs. low survival groups. We investigate three ways incorporating the TP information in the two statistical methods used for analyzing gene expression data, namely, differential network (DN) analysis and DE analysis. Analysis 1 ignores the TP information completely, Analysis 2 uses a truncated sample by removing the low TP samples, and Analysis 3 uses TP as a covariate in the underlying statistical models. We use three gene expression data sets related to three different cancers from the Cancer Genome Atlas (TCGA) for our investigation. The networks from Analysis 2 have greater amount of differential connectivity in the two networks than that from Analysis 1 in all three cancer datasets. Similarly, Analysis 1 identified more differentially expressed genes than Analysis 2. Results of DN and DE analyses using Analysis 3 were mostly consistent with those of Analysis 1 across three cancers. However, Analysis 3 identified additional cancer-related genes in both DN and DE analyses. Our findings suggest that using TP as a covariate in a linear model is appropriate for DE analysis, but a more robust model is needed for DN analysis. However, because true DN or DE patterns are not known for the empirical datasets, simulated datasets can be used to study the statistical properties of these methods in future studies."
-  },
-  {
-    "objectID": "publications/2020_jss_seqnet/index.html",
-    "href": "publications/2020_jss_seqnet/index.html",
-    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
-    "section": "",
-    "text": "In Journal of Statistical Software"
-  },
-  {
-    "objectID": "publications/2020_jss_seqnet/index.html#abstract",
-    "href": "publications/2020_jss_seqnet/index.html#abstract",
-    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
-    "section": "Abstract",
-    "text": "Abstract\nGene expression data provide an abundant resource for inferring connections in gene regulatory networks. While methodologies developed for this task have shown success, a challenge remains in comparing the performance among methods. Gold-standard datasets are scarce and limited in use. And while tools for simulating expression data are available, they are not designed to resemble the data obtained from RNA-seq experiments. SeqNet is an R package that provides tools for generating a rich variety of gene network structures and simulating RNA-seq data from them. This produces in silico RNA-seq data for benchmarking and assessing gene network inference methods. The package is available on CRAN and on GitHub at https://github.com/tgrimes/SeqNet."
-  },
-  {
-    "objectID": "publications/2020_jss_seqnet/index.html#summary",
-    "href": "publications/2020_jss_seqnet/index.html#summary",
-    "title": "SeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data",
-    "section": "Summary",
-    "text": "Summary\nSeqNet is an R package that provides tools for generating a rich variety of gene network structures and simulating RNA-seq data from them. This produces in silico RNA-seq data for benchmarking and assessing gene network inference methods.\ndoi: 10.18637/jss.v098.i12\nSeqNet R package available on CRAN"
-  },
-  {
-    "objectID": "talks/2020_CMStatistics/index.html",
-    "href": "talks/2020_CMStatistics/index.html",
-    "title": "Identifying cancer driver genes from differential co-expression networks",
-    "section": "",
-    "text": "Invited talk at the CMStatistics 13th International Conference."
-  },
-  {
-    "objectID": "talks/2020_CMStatistics/index.html#abstract",
-    "href": "talks/2020_CMStatistics/index.html#abstract",
-    "title": "Identifying cancer driver genes from differential co-expression networks",
-    "section": "Abstract",
-    "text": "Abstract\nThe underlying driver of cancer stems from somatic mutations in the genome that change the function of gene products. However, not all mutations are associated with cancer progression. Rather, such “passenger” mutations are a symptom of DNA instability. Only a small portion of mutations are actual “drivers” that are responsible for disease progression. A methodology is proposed for analyzing gene expression data, to identify driver genes by considering both the functional changes of genes and the clinical relevance of those changes. Functional changes are identified by performing a differential network analysis, which compares the structure of gene-gene associations across different stages of cancer. Genes that are differentially connected indicate a change in their functional activity along with cancer progression. Clinical relevance of these differential connections is assessed using a survival model to predict overall survival. Potential driver genes are identified for Neuroblastoma and Breast cancer patient populations. We identify regulatory pathways that are both differentially connected and whose expression profile is predictive of overall survival. We plan to analyze additional cancers from the TCGA data repository and perform a meta-analysis to identify any pan-cancer driver genes or biomarkers.\nEvent: CMStatistics 2020"
-  },
-  {
-    "objectID": "talks/2018_ISMB/index.html",
-    "href": "talks/2018_ISMB/index.html",
-    "title": "An exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data",
-    "section": "",
-    "text": "My talk at the ISMB/CAMDA International Conference in Chicago, IL."
-  },
-  {
-    "objectID": "talks/2018_ISMB/index.html#abstract",
-    "href": "talks/2018_ISMB/index.html#abstract",
-    "title": "An exploratory approach for identifying novel biomarkers in subgroups of cancer patients from RNA-seq data",
-    "section": "Abstract",
-    "text": "Abstract\nGene expression profiles from RNA-sequencing provide a window to the activity inside tumor cells. This view has enabled researchers to identify driver genes for the pathology, but often these results fail to validate or only hold for the particular cancer at hand. In this study, we investigate a robust method for identifying cancer-related genes. Two criteria are used: a gene must show functional changes among clinically different groups of patients, and the gene must have clinical relevance. These conditions are assessed through a differential network analysis and by modelling patient survival times. Preliminary results are shown from a neuroblastoma and breast cancer dataset.\nEvent: ISMB/CAMDA 2018, Chicago, USA\nSlides\n\nQ&A starts at 16:20"
-  },
-  {
-    "objectID": "publications.html",
-    "href": "publications.html",
-    "title": "Publications",
-    "section": "",
-    "text": "Order By\n      Default\n      \n        Title\n      \n      \n        Date - Oldest\n      \n      \n        Date - Newest\n      \n    \n  \n    \n      \n      \n    \n\n\n\n\n\n\n\n\n\n\nA pseudo-value regression approach for differential network analysis of co-expression data\n\n\n\n\n\n\n\n\n\nJan 9, 2023\n\n\n\n\n\n\n\n\n\n\n\n\n\nA novel probabilistic generator for large-scale gene association networks\n\n\n\n\n\n\n\n\n\nNov 12, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nThe Analysis of Gene Expression Data Incorporating Tumor Purity Information\n\n\n\n\n\n\n\n\n\nAug 23, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nSeqNet: An R Package for Generating Gene-Gene Networks and Simulating RNA-Seq Data\n\n\n\n\n\n\n\n\n\nJul 10, 2021\n\n\n\n\n\n\n\n\n\n\n\n\n\nIntegrating gene regulatory pathways into differential network analysis of gene expression data\n\n\n\n\n\n\n\n\n\nApr 2, 2019\n\n\n\n\n\n\n\n\n\n\n\n\n\nPredicting survival times for neuroblastoma patients using RNA-seq expression profiles\n\n\n\n\n\n\n\n\n\nMay 30, 2018\n\n\n\n\n\n\n\n\n\n\n\n\n\nUnraveling bacterial fingerprints of city subways from microbiome 16S gene profiles\n\n\n\n\n\n\n\n\n\nMay 22, 2017\n\n\n\n\n\n\nNo matching items\n Back to top"
-  },
-  {
-    "objectID": "notes/adjusting-class-threshold-by-strata.html",
-    "href": "notes/adjusting-class-threshold-by-strata.html",
-    "title": "Adjusting classification threshold by strata",
-    "section": "",
-    "text": "When predicting binary outcomes, if we want to threshold our estimated probabilities to obtain predicted classes, then we devise a strategy for determining the optimal threshold. This will almost always involve some trade-off between sensitivity and specificity, or between false positives and false negatives. However, if we know that the prevalence of the class varies across some known strata, should we choose different thresholds within each strata? How does that affect the final performance?\nCode\nlibrary(tidyverse)\nLet’s simulate data from three groups where the true prevalence ranges from 0.6 to 0.9 across the groups. Our dataset will be composed of samples from these three groups with unequal sizes.\nCode\nset.seed(0)\nn = 300\nx = rnorm(n)\ngroups = c(\"a\", \"b\", \"c\")\nz = sample(groups, n, replace = TRUE, prob = c(0.3, 0.2, 0.5))\nz = factor(z, levels = groups)\nbeta.x = 1\nbeta.z = c(\"a\" = 0, \"b\" = 1, \"c\" = 2)\nepsilon = rnorm(n, 0, 0.2)\nprob = 1 / (1 + exp(-(0.5 + beta.x * x + beta.z[z] + epsilon)))\ny = rbinom(n, 1, prob)\ndf = data.frame(x = x, z = z, y = y, prob = prob)\n\ntable(z)\n\n\nz\n  a   b   c \n 87  61 152 \n\n\nCode\ntapply(y, z, mean)\n\n\n        a         b         c \n0.6321839 0.7868852 0.8947368 \n\n\nCode\nmean(y)\n\n\n[1] 0.7966667\nWe’ll fit a logistic regression model with a single predictor and the strata variable. Two strategies for thresholding will be used:\nCode\nfit = glm(\"y ~ x + z\", family = \"binomial\", data = df)\ncoef(fit)\n\n\n(Intercept)           x          zb          zc \n  0.6803849   0.6825582   0.6736314   1.5837307 \n\n\nCode\ndf$p = predict(fit, newdat = df, type = \"response\")\n\ndf = df %&gt;%\n  mutate(thr = mean(y)) %&gt;%\n  group_by(z) %&gt;%\n  mutate(thr.z = mean(y) - 0.2 * (mean(y) - thr)) %&gt;%\n  ungroup() %&gt;%\n  mutate(y.hat = 1 * (p &gt; thr),\n         y.hat.z = 1 * (p &gt; thr.z))\n\nthr.group = sapply(groups, function(group) df$thr.z[df$z == group][1])\nJust looking at the overall accuracy, we see below that using the single threshold gives better performance (69.3% vs 67.7%). However, how does the performance vary across strata? Let’s take a look.\nHere’s the overall and within-strata accuracy for the single threshold strategy:\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(), \n            acc = mean(y == y.hat)) %&gt;%\n  mutate(overall_acc = sum(n * acc) / sum(n))\n\n\n# A tibble: 3 × 4\n  z         n   acc overall_acc\n  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;\n1 a        87 0.460       0.693\n2 b        61 0.607       0.693\n3 c       152 0.862       0.693\nand for the varying-threshold strategy:\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(), \n            acc = mean(y == y.hat.z)) %&gt;%\n  mutate(overall_acc = sum(n * acc) / sum(n)) \n\n\n# A tibble: 3 × 4\n  z         n   acc overall_acc\n  &lt;fct&gt; &lt;int&gt; &lt;dbl&gt;       &lt;dbl&gt;\n1 a        87 0.632       0.677\n2 b        61 0.607       0.677\n3 c       152 0.730       0.677\nWe see that that performance varies widely with the single-threshold strategy. By using an adaptive threshold, the classifier is able to account for the varying prevalance across the groups.\nHere’s another summary table showing more performance measures. We see the same thing, where the varying-threshold strategy provides more consistent performance results across strata.\nCode\ndf %&gt;%\n  group_by(z) %&gt;%\n  summarize(n = n(),\n            p      = round(mean(y), 2), \n            pp     = round(mean(y.hat), 2),\n            pp.z   = round(mean(y.hat.z), 2),\n            acc    = round(mean(y == y.hat), 2),\n            sens   = round(mean(y[y==1] == y.hat[y==1]), 2),\n            spec   = round(mean(y[y==0] == y.hat[y==0]), 2),\n            PPV    = round(mean(y[y.hat==1] == y.hat[y.hat==1]), 2),\n            NPV    = round(mean(y[y.hat==0] == y.hat[y.hat==0]), 2),\n            acc.z  = round(mean(y == y.hat.z), 2),\n            sens.z = round(mean(y[y==1] == y.hat.z[y==1]), 2),\n            spec.z = round(mean(y[y==0] == y.hat.z[y==0]), 2),\n            PPV.z  = round(mean(y[y.hat.z==1] == y.hat.z[y.hat.z==1]), 2),\n            NPV.z  = round(mean(y[y.hat.z==0] == y.hat.z[y.hat.z==0]), 2)) %&gt;%\n  as.data.frame()\n\n\n  z   n    p   pp pp.z  acc sens spec  PPV  NPV acc.z sens.z spec.z PPV.z NPV.z\n1 a  87 0.63 0.14 0.40 0.46 0.18 0.94 0.83 0.40  0.63   0.53   0.81  0.83  0.50\n2 b  61 0.79 0.46 0.46 0.61 0.54 0.85 0.93 0.33  0.61   0.54   0.85  0.93  0.33\n3 c 152 0.89 0.94 0.72 0.86 0.95 0.12 0.90 0.22  0.73   0.75   0.56  0.94  0.21\nVisualization of the thresholds and distributions of each predicted probabilities.\nCode\ng = df %&gt;%\n  ggplot(aes(x = p, fill = z, group = z)) +\n  geom_histogram(position = position_identity(), alpha = 0.6, bins = 30) +\n  geom_vline(xintercept = unique(df$thr), col = \"black\") +\n  geom_vline(xintercept = thr.group, col = scales::hue_pal()(length(thr.group))) +\n  theme_bw()\ng\n\n\n\n\n\n\n\n\nFigure 1: Distribution of predicted probabilities by strata. Vertical lines mark strata-specific thresholds along with overall threshold (in black)."
-  },
-  {
-    "objectID": "notes/adjusting-class-threshold-by-strata.html#bias-in-ml-models",
-    "href": "notes/adjusting-class-threshold-by-strata.html#bias-in-ml-models",
-    "title": "Adjusting classification threshold by strata",
-    "section": "Bias in ML models",
-    "text": "Bias in ML models\nImagine that the strata in this simulation were gender, race, or some other demographic variable. Although the model accounted for the strata variable, hence it correctly modeled the underlying prevalence, the additional step of classifying can introduce bias if we do not account for prevalence differences in the threshold used. Using a single threshold may lead to overall optimal performance, but we must look to see whether performance is consistent across important groups. If not, using a varying threshold could improve consistency while providing similar overall performance."
   },
   {
     "objectID": "notes/class-imbalance-strategies-on-calibration.html",
