@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Bootstrap and resampling for statistical inference – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/estimation-and-inference/mathematics-statistics-bridge.html" rel="next">
+<link href="../../guides/estimation-and-inference/dependent-observations.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Bootstrap and resampling for statistical inference</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimation and uncertainty</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/large-sample-reasoning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Large-sample reasoning for methods research</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/estimating-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimating equations and asymptotic linearity</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/uncertainty-and-interpretation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Uncertainty, confidence intervals, and tests</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Extensions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/dependent-observations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dependent observations and cluster-aware inference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/bootstrap-and-resampling.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Bootstrap and resampling for statistical inference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/mathematics-statistics-bridge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A bridge between mathematics and statistical inference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/checkpoints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Completion checkpoints</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#a-resampling-distribution-needs-a-target" id="toc-a-resampling-distribution-needs-a-target" class="nav-link active" data-scroll-target="#a-resampling-distribution-needs-a-target"><span class="header-section-number">1</span> A resampling distribution needs a target</a></li>
+  <li><a href="#center-the-bootstrap-error-correctly" id="toc-center-the-bootstrap-error-correctly" class="nav-link" data-scroll-target="#center-the-bootstrap-error-correctly"><span class="header-section-number">2</span> Center the bootstrap error correctly</a></li>
+  <li><a href="#run-a-small-example-with-a-known-reference" id="toc-run-a-small-example-with-a-known-reference" class="nav-link" data-scroll-target="#run-a-small-example-with-a-known-reference"><span class="header-section-number">3</span> Run a small example with a known reference</a></li>
+  <li><a href="#interval-recipes-make-different-transformations" id="toc-interval-recipes-make-different-transformations" class="nav-link" data-scroll-target="#interval-recipes-make-different-transformations"><span class="header-section-number">4</span> Interval recipes make different transformations</a></li>
+  <li><a href="#preserve-the-independent-unit-and-the-target-weights" id="toc-preserve-the-independent-unit-and-the-target-weights" class="nav-link" data-scroll-target="#preserve-the-independent-unit-and-the-target-weights"><span class="header-section-number">5</span> Preserve the independent unit and the target weights</a></li>
+  <li><a href="#decide-what-must-be-refitted" id="toc-decide-what-must-be-refitted" class="nav-link" data-scroll-target="#decide-what-must-be-refitted"><span class="header-section-number">6</span> Decide what must be refitted</a>
+  <ul class="collapse">
+  <li><a href="#later-extension-multiplier-resampling-optional" id="toc-later-extension-multiplier-resampling-optional" class="nav-link" data-scroll-target="#later-extension-multiplier-resampling-optional"><span class="header-section-number">6.1</span> Later extension: multiplier resampling (optional)</a></li>
+  </ul></li>
+  <li><a href="#a-concrete-failure-estimating-a-support-endpoint" id="toc-a-concrete-failure-estimating-a-support-endpoint" class="nav-link" data-scroll-target="#a-concrete-failure-estimating-a-support-endpoint"><span class="header-section-number">7</span> A concrete failure: estimating a support endpoint</a></li>
+  <li><a href="#separate-sampling-uncertainty-from-resampling-monte-carlo-error" id="toc-separate-sampling-uncertainty-from-resampling-monte-carlo-error" class="nav-link" data-scroll-target="#separate-sampling-uncertainty-from-resampling-monte-carlo-error"><span class="header-section-number">8</span> Separate sampling uncertainty from resampling Monte Carlo error</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">9</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-boot-01-derive-what-the-bootstrap-mean-approximates" id="toc-checkpoint-boot-01-derive-what-the-bootstrap-mean-approximates" class="nav-link" data-scroll-target="#checkpoint-boot-01-derive-what-the-bootstrap-mean-approximates">Checkpoint · BOOT-01 — Derive what the bootstrap mean approximates</a></li>
+  <li><a href="#checkpoint-boot-02-prove-an-ordinary-bootstrap-failure" id="toc-checkpoint-boot-02-prove-an-ordinary-bootstrap-failure" class="nav-link" data-scroll-target="#checkpoint-boot-02-prove-an-ordinary-bootstrap-failure">Checkpoint · BOOT-02 — Prove an ordinary bootstrap failure</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">10</span> Reading</a></li>
+  <li><a href="#continue-through-the-collection" id="toc-continue-through-the-collection" class="nav-link" data-scroll-target="#continue-through-the-collection"><span class="header-section-number">11</span> Continue through the guide</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Bootstrap and resampling for statistical inference</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">What is resampled, what is refitted, and when the approximation works</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> Means, variance, and standard errors. <a href="../../guides/estimation-and-inference/large-sample-reasoning.html">Large-sample reasoning for methods research</a> supplies the approximation theory; <a href="../../guides/statistical-models/influence-functions.html">Influence functions</a> supports the multiplier section. Use <a href="../../guides/estimation-and-inference/dependent-observations.html">Dependent observations and cluster-aware inference</a> for the cluster branch.</p>
+<section id="a-resampling-distribution-needs-a-target" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="a-resampling-distribution-needs-a-target"><span class="header-section-number">1</span> A resampling distribution needs a target</h2>
+<p>A standard error describes variation under repeated sampling from a population. A bootstrap approximates that variation by generating new datasets from a fitted or empirical distribution and recomputing a stated statistic. Specify the target, estimator, independent unit, and sampling design first. More bootstrap replicates reduce numerical error in that approximation; they do not establish its validity.</p>
+<p>For i.i.d. observations <span class="math inline">W_1,\ldots,W_n</span>, the empirical law <span class="math inline">P_n</span> puts mass <span class="math inline">1/n</span> on each observation. The ordinary nonparametric bootstrap draws <span class="math inline">n</span> observations independently from <span class="math inline">P_n</span>, with replacement. Resample each person’s complete vector, retaining associations among their features and covariates. Sampling each feature column separately would replace the observed joint law with another model.</p>
+<p>“With replacement” means an observed record can appear several times in one resampled dataset, while another record can be absent. For observed values <span class="math inline">(1,3,5)</span>, one possible bootstrap sample is <span class="math inline">(3,3,5)</span>. Both datasets have size 3, but their means are 3 and <span class="math inline">11/3</span>. Repeating this draw-and-recompute operation produces a distribution of bootstrap means. The replicate count <span class="math inline">B</span> is the number of resampled datasets, each still containing <span class="math inline">n</span> observations.</p>
+<p>There are two levels of randomness. First, the original study draws data from the unknown population. Second, with that dataset fixed, we generate resamples from its empirical law. A new original study would supply a different empirical law and a different bootstrap distribution. A star on <span class="math inline">\Pr_*</span>, <span class="math inline">E_*</span>, or <span class="math inline">\operatorname{Var}_*</span> means probability, expectation, or variance over the second level, conditional on the original observations.</p>
+<p>A <strong>parametric bootstrap</strong> instead simulates from a fitted probability model. Its justification includes that model. A permutation test calibrates a statistic through a null assignment or exchangeability mechanism; it is a different construction. See <a href="../../guides/analysis-problems/multivariate-comparisons.html">Multivariate comparisons: permutation and distance-based tests</a> for the distinction.</p>
+</section>
+<section id="center-the-bootstrap-error-correctly" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="center-the-bootstrap-error-correctly"><span class="header-section-number">2</span> Center the bootstrap error correctly</h2>
+<p>For one draw <span class="math inline">Y^*</span> from the empirical distribution, <span class="math inline">E_*[f(Y^*)]=E_{P_n}(f(Y))=P_nf</span>, using the empirical-expectation notation from <a href="../../guides/estimation-and-inference/large-sample-reasoning.html#expectation-shorthand">Large-sample reasoning for methods research</a>.</p>
+<p>For an estimator <span class="math inline">\widehat\theta</span>, let <span class="math inline">\widehat\theta^*</span> denote its bootstrap version. A usual first-order goal is for the conditional distribution of the bootstrap error to approximate the sampling distribution of the original error, with both on the same scale:</p>
+<p><span class="math display">
+\begin{aligned}
+\text{Bootstrap: }&amp;\sqrt n(\widehat\theta^*-\widehat\theta),\\
+\text{Sampling: }&amp;\sqrt n(\widehat\theta-\theta_0).
+\end{aligned}
+</span></p>
+<p>This is a claim about distributions as <span class="math inline">n</span> increases, not equality in one finite sample. The bootstrap center is the observed estimate because the bootstrap population is fitted from that dataset. Some bootstrap methods approximate finite-sample bias using <span class="math inline">E_*[\widehat\theta^*]-\widehat\theta</span> under appropriate conditions. That calculation does not establish that the estimator’s population limit equals the scientific target.</p>
+<p>For the population mean <span class="math inline">\mu=E[Y]</span>, assume i.i.d. observations with <span class="math inline">0&lt;\sigma^2=\operatorname{Var}(Y)&lt;\infty</span>. The original error is <span class="math inline">\bar Y-\mu</span>. Inside the bootstrap world, the empirical population has mean <span class="math inline">\bar Y</span>, so the corresponding error is <span class="math inline">\bar Y^*-\bar Y</span>. Subtracting the same unknown <span class="math inline">\mu</span> from bootstrap estimates would not reproduce this fitted-population estimation error.</p>
+<p>For the sample mean, let <span class="math inline">Y^*</span> denote one bootstrap draw. Each observed value has probability <span class="math inline">1/n</span>, giving</p>
+<p><span class="math display">
+\begin{aligned}
+E_*[Y^*]&amp;=\bar Y,\\
+\operatorname{Var}_*(Y^*)&amp;=\frac1n\sum_i(Y_i-\bar Y)^2.
+\end{aligned}
+</span></p>
+<p>The <span class="math inline">n</span> draws in a bootstrap sample are independent conditional on the original data. Averaging them leaves the conditional mean at <span class="math inline">\bar Y</span> and divides their conditional variance by <span class="math inline">n</span>:</p>
+<p><span class="math display">
+\begin{aligned}
+\operatorname{Var}_*(\bar Y^*)&amp;=\frac{1}{n^2}\sum_i(Y_i-\bar Y)^2\\
+&amp;=\frac{n-1}{n}\frac{s_Y^2}{n}.
+\end{aligned}
+</span></p>
+<p>Thus <span class="math inline">E_*[\bar Y^*]=\bar Y</span>, and the conditional variance is asymptotically equivalent to the sampling variance <span class="math inline">\sigma^2/n</span> when <span class="math inline">s_Y^2\xrightarrow{p}\sigma^2</span>. This compares variation of <span class="math inline">\bar Y^*</span> around <span class="math inline">\bar Y</span> with the data fixed, and variation of <span class="math inline">\bar Y</span> around <span class="math inline">\mu</span> across original studies.</p>
+<p>Variance matching is one check. Bootstrap validity also needs the distributional approximation. For the i.i.d. finite, nonzero variance mean, a conditional CLT gives, at each fixed <span class="math inline">t</span>,</p>
+<p><span class="math display">
+\Pr_*\{\sqrt n(\bar Y^*-\bar Y)\le t\}
+\xrightarrow{p}\Phi(t/\sigma).
+</span></p>
+<p>The left side is itself a random quantity across original datasets. Convergence in probability says the fitted conditional CDF approaches the same normal CDF as the original scaled mean error. Here <span class="math inline">\Phi</span> is the standard normal CDF. General statistics need their own smoothness, moment, and remainder arguments; the mean calculation does not establish validity for every resampling procedure.</p>
+</section>
+<section id="run-a-small-example-with-a-known-reference" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="run-a-small-example-with-a-known-reference"><span class="header-section-number">3</span> Run a small example with a known reference</h2>
+<p>The following <strong>synthetic</strong> sample comes from a normal population with mean 2 and SD 1.5. The true sampling law of the scaled mean error is normal. Compare that law with the conditional bootstrap approximation before looking at the intervals.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3101</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">80</span>; B <span class="ot">&lt;-</span> <span class="dv">1999</span>; y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>mean_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(y)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>boot_mean <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(y[<span class="fu">sample.int</span>(n, n, <span class="at">replace =</span> <span class="cn">TRUE</span>)]))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>root <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(n) <span class="sc">*</span> (boot_mean <span class="sc">-</span> mean_hat)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>root_density <span class="ot">&lt;-</span> <span class="fu">density</span>(root)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(root_density, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>),</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1.08</span><span class="sc">*</span><span class="fu">max</span>(root_density<span class="sc">$</span>y, <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">1.5</span>))),</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"#2F80C8"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">"Scaled mean error"</span>, <span class="at">ylab =</span> <span class="st">"Density"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x, <span class="at">sd =</span> <span class="fl">1.5</span>), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"Conditional bootstrap"</span>, <span class="st">"Known sampling law"</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">influence_SE =</span> <span class="fu">sd</span>(y)<span class="sc">/</span><span class="fu">sqrt</span>(n), <span class="at">bootstrap_SE =</span> <span class="fu">sd</span>(boot_mean),</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">exact_conditional_bootstrap_SE =</span> <span class="fu">sqrt</span>((n<span class="dv">-1</span>)<span class="sc">/</span>n) <span class="sc">*</span> <span class="fu">sd</span>(y)<span class="sc">/</span><span class="fu">sqrt</span>(n))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                  influence_SE                   bootstrap_SE 
+                     0.1758772                      0.1693985 
+exact_conditional_bootstrap_SE 
+                     0.1747745 </code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-bootstrap-mean" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A density of centered bootstrap mean errors is compared with the known normal sampling density.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bootstrap-mean-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="bootstrap-and-resampling_files/figure-html/fig-bootstrap-mean-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: One synthetic normal sample (n=80), with 1,999 ordinary bootstrap replicates. The bootstrap errors are centered at the observed mean; the reference is the known repeated-sampling law of sqrt(n)(sample mean − 2). Differences include the realized sample and bootstrap Monte Carlo error."><img src="bootstrap-and-resampling_files/figure-html/fig-bootstrap-mean-1.png" class="img-fluid figure-img" alt="A density of centered bootstrap mean errors is compared with the known normal sampling density." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bootstrap-mean-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: One synthetic normal sample (n=80), with 1,999 ordinary bootstrap replicates. The bootstrap errors are centered at the observed mean; the reference is the known repeated-sampling law of sqrt(n)(sample mean − 2). Differences include the realized sample and bootstrap Monte Carlo error.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In the output, <code>sd(boot_mean)</code> estimates <span class="math inline">\sqrt{\operatorname{Var}_*(\bar Y^*)}</span> using <span class="math inline">B</span> simulations. The exact conditional expression follows from the algebra above; the influence-based SE estimates <span class="math inline">\sigma/\sqrt n</span> using the original study. The two population-level quantities are close at first order, and the simulated SE also has Monte Carlo error. A new original dataset would give another approximation.</p>
+<p>An exact normal-population t interval is also available in this particular example; the bootstrap is used to teach the construction. Its histogram is a sampling-distribution approximation, rather than a posterior distribution for <span class="math inline">\mu</span>.</p>
+</section>
+<section id="interval-recipes-make-different-transformations" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="interval-recipes-make-different-transformations"><span class="header-section-number">4</span> Interval recipes make different transformations</h2>
+<p>Let <span class="math inline">q^*_{a}</span> be an <span class="math inline">a</span>-quantile of the bootstrap estimates. At nominal 95% coverage:</p>
+<div class="table-responsive">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Construction</th>
+<th>Interval</th>
+<th>What must be justified</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Normal approximation</td>
+<td><span class="math inline">\widehat\theta\pm1.96\widehat{\mathrm{SE}}_*</span></td>
+<td>A centered normal approximation and a consistent variance</td>
+</tr>
+<tr class="even">
+<td>Percentile</td>
+<td><span class="math inline">[q^*_{.025},q^*_{.975}]</span></td>
+<td>An appropriate bootstrap approximation; this does not automatically correct bias</td>
+</tr>
+<tr class="odd">
+<td>Basic</td>
+<td><span class="math inline">[2\widehat\theta-q^*_{.975},2\widehat\theta-q^*_{.025}]</span></td>
+<td>Approximation of the centered error distribution</td>
+</tr>
+<tr class="even">
+<td>Studentized</td>
+<td>Invert quantiles of <span class="math inline">(\widehat\theta^*-\widehat\theta)/\widehat{\mathrm{SE}}^*</span></td>
+<td>A justified SE within each replicate and a valid studentized approximation</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The <strong>basic</strong> interval follows by approximating the estimation-error distribution. The bootstrap error quantiles are <span class="math inline">q^*_{.025}-\widehat\theta</span> and <span class="math inline">q^*_{.975}-\widehat\theta</span>. If those bracket <span class="math inline">\widehat\theta-\theta_0</span>, solving the two inequalities for <span class="math inline">\theta_0</span> reverses and reflects the endpoints:</p>
+<p><span class="math display">
+\left[2\widehat\theta-q^*_{.975},\;
+2\widehat\theta-q^*_{.025}\right].
+</span></p>
+<p>For example, with observed estimate 10 and bootstrap estimate quantiles 8 and 13, the percentile interval is <span class="math inline">[8,13]</span> and the basic interval is <span class="math inline">[7,12]</span>. Their difference comes from the transformation, not from more data or a different replicate count. With a symmetric, centered normal approximation they can agree at first order; skewness and bias make the distinction more visible.</p>
+<p>For <strong>studentization</strong>, calculate an SE in each resample and form <span class="math inline">T^*=(\widehat\theta^*-\widehat\theta)/\widehat{\operatorname{SE}}^*</span>. If <span class="math inline">t^*_{.025}</span> and <span class="math inline">t^*_{.975}</span> are its quantiles, inversion gives</p>
+<p><span class="math display">
+\left[\widehat\theta-t^*_{.975}\widehat{\operatorname{SE}},\;
+\widehat\theta-t^*_{.025}\widehat{\operatorname{SE}}\right].
+</span></p>
+<p>The final SE here comes from the original study; each starred SE was needed to construct the resampled standardized errors. The procedure requires both the estimator and its variance calculation to behave appropriately under resampling.</p>
+<p>The <a href="https://stat.ethz.ch/R-manual/R-devel/library/boot/html/boot.ci.html">boot.ci documentation</a> also describes BCa intervals. Their corrections and extra accuracy require additional conditions; choosing a sophisticated interval label does not remove those conditions.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_mean, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>), <span class="at">names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">normal =</span> mean_hat <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">*</span><span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span><span class="fu">sd</span>(boot_mean),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">percentile =</span> q, <span class="at">basic =</span> <span class="dv">2</span><span class="sc">*</span>mean_hat<span class="sc">-</span><span class="fu">rev</span>(q))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>               [,1]     [,2]
+normal     2.046090 2.710119
+percentile 2.042315 2.715710
+basic      2.040499 2.713894</code></pre>
+</div>
+</div>
+<p>In this particular simulated sample, all three intervals lie above the known mean 2. That is one random noncoverage event; it does not estimate a method’s coverage probability. Assess coverage across independent datasets under stated conditions.</p>
+<p>These are pointwise intervals for one target. They do not automatically provide simultaneous or post-selection coverage for thousands of features. See <a href="../../guides/analysis-problems/multiple-testing.html">Multiple testing when the tests are not independent</a>.</p>
+</section>
+<section id="preserve-the-independent-unit-and-the-target-weights" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="preserve-the-independent-unit-and-the-target-weights"><span class="header-section-number">5</span> Preserve the independent unit and the target weights</h2>
+<p>For independent people with repeated records, draw people with replacement and carry all of each sampled person’s records together. The resampled object should reproduce the sampling design. A bootstrap for a stratified design may need resampling within the original sampling strata; a complex survey or dependence across clusters needs its own scheme.</p>
+<p>Resampling rows independently would break the pattern of shared person effects in the data. Holding people together preserves their joint records. This choice addresses dependence; the statistic recomputed on those records still determines whether the target weights people or records equally.</p>
+<p>If the target is the mean of a person’s recorded-visit average, first form one summary per person. If it is a record-weighted ratio, retain each person’s total and record count and recompute the ratio after resampling. The following <strong>invented</strong> records demonstrate both, using the same resampled people.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3102</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>G <span class="ot">&lt;-</span> <span class="dv">80</span>; size <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>), G, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(G), size)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>values <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">rnorm</span>(G), size) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">sum</span>(size), <span class="at">sd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>total <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">rowsum</span>(values, id))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>bootstrap <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">1999</span>, {</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  selected <span class="ot">&lt;-</span> <span class="fu">sample.int</span>(G, G, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">person =</span> <span class="fu">mean</span>(total[selected]<span class="sc">/</span>size[selected]),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">record =</span> <span class="fu">sum</span>(total[selected])<span class="sc">/</span><span class="fu">sum</span>(size[selected]))</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(bootstrap, <span class="dv">1</span>, sd)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   person    record 
+0.1259339 0.1324401 </code></pre>
+</div>
+</div>
+<p>Duplicating a person in a bootstrap sample is intentional. If rebuilding a raw-record analysis, give the duplicate cluster copies distinct bootstrap cluster IDs where needed. Do not replace person weighting with row weighting by accident. The <a href="../../guides/estimation-and-inference/dependent-observations.html">Dependent observations and cluster-aware inference</a> page derives the corresponding influence functions and few-cluster limitations.</p>
+</section>
+<section id="decide-what-must-be-refitted" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="decide-what-must-be-refitted"><span class="header-section-number">6</span> Decide what must be refitted</h2>
+<p>A full bootstrap statistic repeats the estimator’s learned preprocessing, model fitting, selection, tuning, and uncertainty calculation according to its declared algorithm. Holding fitted parts fixed changes what is being approximated; it needs an argument. Repeating the full algorithm is also not sufficient for bootstrap consistency when the target or selection is nonregular.</p>
+<p>Cross-fitting requires particular care. Copies of an original person’s outcomes can leak between training and evaluation if bootstrap duplicates are randomly sent to different folds. Specify a bootstrap weighting/identity and fold scheme whose theory applies to the estimator. Grouping duplicates can prevent that leakage, but does not itself prove conditional remainder control. There is no universal instruction to bootstrap every machine-learning pipeline in the same way.</p>
+<section id="later-extension-multiplier-resampling-optional" class="level3" data-number="6.1">
+<h3 data-number="6.1" class="anchored" data-anchor-id="later-extension-multiplier-resampling-optional"><span class="header-section-number">6.1</span> Later extension: multiplier resampling (optional)</h3>
+<p>Return to this extension after learning influence functions. A <strong>multiplier approximation</strong> can avoid nuisance refitting when a valid asymptotically linear representation is already available. If the estimated centered contributions are <span class="math inline">\widehat D_i</span>, independent multipliers <span class="math inline">\xi_i</span> with mean zero and variance one, also independent of the data, generate</p>
+<p><span class="math display">
+Z^*=\frac{1}{\sqrt n}\sum_i\xi_i\widehat D_i.
+</span></p>
+<p>With a valid negligible estimator remainder, consistent contribution/variance estimation, and conditional CLT/non-dominance conditions, this approximates the first-order error law. For Gaussian multipliers and a scalar target it is conditionally normal with variance <span class="math inline">n^{-1}\sum_i\widehat D_i^2</span>; that variance match alone does not prove the estimator’s expansion. With independent clusters, use cluster contributions and the cluster count. This construction approximates the first-order fluctuation; it does not measure persistent nuisance bias.</p>
+<p>Conditional on the data, the <span class="math inline">\widehat D_i</span> are fixed, and independent mean-zero multipliers make the covariance terms vanish. This explains the displayed variance. <span class="math inline">Z^*</span> is on the <strong>scaled-error</strong> scale of <span class="math inline">\sqrt n(\widehat\theta-\theta_0)</span>; divide it by <span class="math inline">\sqrt n</span> to approximate an unscaled estimation error. Inference still depends on having correctly derived the original estimator’s expansion.</p>
+</section>
+</section>
+<section id="a-concrete-failure-estimating-a-support-endpoint" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="a-concrete-failure-estimating-a-support-endpoint"><span class="header-section-number">7</span> A concrete failure: estimating a support endpoint</h2>
+<p>Let <span class="math inline">Y_i</span> be i.i.d. uniform on <span class="math inline">[0,\theta]</span> and estimate <span class="math inline">\theta</span> by the sample maximum <span class="math inline">M_n</span>. Here we study the positive gap <span class="math inline">\theta-M_n</span> and its bootstrap counterpart <span class="math inline">M_n-M_n^*</span>; both reverse the sign of the earlier estimate-minus-target convention. The scaling is <span class="math inline">n</span>, rather than the usual square root. Define the scaled gap’s CDF as <span class="math inline">F_n(t)=\Pr\{n(\theta-M_n)/\theta\le t\}</span>. For <span class="math inline">0\le t\le n</span>,</p>
+<p><span class="math display">
+\begin{aligned}
+F_n(t)&amp;=1-(1-t/n)^n\\
+&amp;\longrightarrow1-e^{-t}.
+\end{aligned}
+</span></p>
+<p>To obtain this, note that <span class="math inline">M_n\le x</span> requires all <span class="math inline">n</span> independent observations to be at most <span class="math inline">x</span>, giving probability <span class="math inline">(x/\theta)^n</span> for <span class="math inline">0\le x\le\theta</span>. The scaled-error event instead asks whether <span class="math inline">M_n</span> is at least <span class="math inline">\theta(1-t/n)</span>, so taking the complement gives the formula. Its limiting law is exponential, not the mean’s normal limit.</p>
+<p>With a unique sample maximum, the ordinary bootstrap maximum equals <span class="math inline">M_n</span> whenever that observed maximum is selected at least once:</p>
+<p><span class="math display">
+\begin{aligned}
+\Pr_*(M_n^*=M_n)&amp;=1-(1-1/n)^n\\
+&amp;\longrightarrow1-e^{-1}.
+\end{aligned}
+</span></p>
+<p>Each draw misses that particular record with probability <span class="math inline">1-1/n</span>; all <span class="math inline">n</span> draws miss it with probability <span class="math inline">(1-1/n)^n</span>. The bootstrap cannot generate a larger value than the observed maximum. Thus it retains positive probability of exactly zero centered error even as the dataset grows.</p>
+<p>The centered bootstrap error consequently retains an atom at zero, whereas the sampling limit is continuous. Increasing the number of bootstrap replicates estimates the wrong approximation more precisely. An ordinary percentile interval is particularly revealing: both endpoints are at most <span class="math inline">M_n&lt;\theta</span> almost surely, so it cannot cover the true endpoint. Specialized endpoint procedures require another argument; the failure does not say every resampling procedure fails for every endpoint problem.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3103</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">80</span>); n_endpoint <span class="ot">&lt;-</span> <span class="fu">length</span>(x); maximum <span class="ot">&lt;-</span> <span class="fu">max</span>(x)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>boot_max <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">3999</span>, <span class="fu">max</span>(x[<span class="fu">sample.int</span>(n_endpoint, n_endpoint, <span class="at">replace =</span> <span class="cn">TRUE</span>)]))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>endpoint_error <span class="ot">&lt;-</span> n_endpoint<span class="sc">*</span>(maximum<span class="sc">-</span>boot_max)<span class="sc">/</span>maximum</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">ecdf</span>(endpoint_error), <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.2</span>, <span class="dv">5</span>), <span class="at">verticals =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">do.points =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">main =</span> <span class="st">""</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Endpoint error on the n scale"</span>, <span class="at">ylab =</span> <span class="st">"CDF"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>t_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">300</span>)</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t_grid, <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>t_grid<span class="sc">/</span>n_endpoint)<span class="sc">^</span>n_endpoint, <span class="at">col =</span> <span class="st">"#2F80C8"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="fu">c</span>(<span class="st">"Conditional bootstrap"</span>, <span class="st">"Exact sampling law"</span>),</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#D55E00"</span>, <span class="st">"#2F80C8"</span>), <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">empirical_atom =</span> <span class="fu">mean</span>(boot_max <span class="sc">==</span> maximum),</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">exact_atom =</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1-1</span><span class="sc">/</span>n_endpoint)<span class="sc">^</span>n_endpoint)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>empirical_atom     exact_atom 
+     0.6256564      0.6344319 </code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-bootstrap-endpoint" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A step CDF jumps by about 0.63 at zero, while the exact endpoint-error sampling CDF starts continuously from zero.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bootstrap-endpoint-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="bootstrap-and-resampling_files/figure-html/fig-bootstrap-endpoint-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: One uniform(0,1) teaching sample (n=80), with 3,999 ordinary bootstrap maxima. The conditional bootstrap CDF has a large jump at zero; the exact sampling CDF is continuous. This compares endpoint errors on their n scale, not sqrt(n)."><img src="bootstrap-and-resampling_files/figure-html/fig-bootstrap-endpoint-1.png" class="img-fluid figure-img" alt="A step CDF jumps by about 0.63 at zero, while the exact endpoint-error sampling CDF starts continuously from zero." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bootstrap-endpoint-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: One uniform(0,1) teaching sample (n=80), with 3,999 ordinary bootstrap maxima. The conditional bootstrap CDF has a large jump at zero; the exact sampling CDF is continuous. This compares endpoint errors on their n scale, not sqrt(n).
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p><a href="https://doi.org/10.1214/aos/1176345637">Bickel and Freedman</a> give foundational consistency results and counterexamples. Nonsmooth sample equations are not automatically failures: <a href="../../guides/statistical-models/quantiles-and-local-expansions.html">Quantiles and local expansions</a> develops the regular positive-density case. Boundary behavior, unstable selection, weak identification, infinite moments, and the bootstrap’s own remainder conditions require examination.</p>
+</section>
+<section id="separate-sampling-uncertainty-from-resampling-monte-carlo-error" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="separate-sampling-uncertainty-from-resampling-monte-carlo-error"><span class="header-section-number">8</span> Separate sampling uncertainty from resampling Monte Carlo error</h2>
+<p>The dataset size controls information about the population. The replicate count <span class="math inline">B</span> controls simulation accuracy conditional on that dataset. At a fixed threshold, a bootstrap tail probability estimated from independent replicates has MCSE approximately <span class="math inline">\sqrt{p_*(1-p_*)/B}</span>. An interval endpoint is a quantile; its Monte Carlo error also depends on local density and cannot be read directly from this probability-scale formula.</p>
+<p>For example, if a conditional tail probability is 0.025, 1,999 resamples supply about 50 observations in that tail on average. Increasing <span class="math inline">B</span> to 19,999 reduces probability-scale Monte Carlo error by about <span class="math inline">\sqrt{10}</span> while leaving the original study unchanged. It does not divide the study’s SE by <span class="math inline">\sqrt{10}</span>. For a cluster bootstrap, the population information is governed by the number and structure of independent clusters, rather than simply the row count.</p>
+<p>Check endpoint stability with independent resampling seeds or a justified quantile-uncertainty calculation. Report the scheme, resampling unit, statistic, refitting/fold rules, replicate count, seed, interval construction, and failed or degenerate replicates. A failed replicate is an outcome to diagnose, not a row to silently discard.</p>
+</section>
+<section id="exercises" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">9</span> Exercises</h2>
+<p>Try each checkpoint before opening its hint or solution.</p>
+<div id="checkpoint-boot-01" class="checkpoint">
+<section id="checkpoint-boot-01-derive-what-the-bootstrap-mean-approximates" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-boot-01-derive-what-the-bootstrap-mean-approximates">Checkpoint · BOOT-01 — Derive what the bootstrap mean approximates</h3>
+<p><strong>Task type:</strong> Derivation and interpretation.</p>
+<p>For i.i.d. scalar observations with finite nonzero variance, derive the conditional mean and variance of the ordinary bootstrap sample mean. Explain the center and scaling of the bootstrap root, construct percentile and basic intervals from bootstrap quantiles, and distinguish n from the replicate count B. State what changes for a mean of person-level visit averages.</p>
+<p><strong>Ready to continue when:</strong> you can connect the empirical resampling law, the target error distribution, and the independent unit without confusing sampling error with Monte Carlo error.</p>
+<p><strong>Transfer:</strong> Would holding every fitted nuisance fixed approximate the same finite-sample algorithm as refitting it? When could a first-order multiplier approximation still be justified?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>A bootstrap draw is uniform over the n observed values. Conditional on the dataset, the n draws are independent.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The conditional mean is the observed mean and the variance is (n−1)s²/n². The bootstrap root sqrt(n)(mean*−mean) approximates sqrt(n)(mean−μ) under the mean CLT and bootstrap conditions. Percentile endpoints are the estimate quantiles; basic endpoints reverse and reflect them about the observed estimate. Increasing B reduces conditional simulation error, while increasing n adds population information. For equally person-weighted visit averages, resample whole people or their defined summaries and use the person count.</p>
+</details>
+</section>
+</div>
+<div id="checkpoint-boot-02" class="checkpoint">
+<section id="checkpoint-boot-02-prove-an-ordinary-bootstrap-failure" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-boot-02-prove-an-ordinary-bootstrap-failure">Checkpoint · BOOT-02 — Prove an ordinary bootstrap failure</h3>
+<p><strong>Task type:</strong> Derivation and diagnosis.</p>
+<p>For a continuous uniform sample with a unique maximum, derive the probability that an ordinary bootstrap sample contains that maximum. Compare its limiting atom with the sampling limit of n(θ−M_n)/θ. Explain why an ordinary percentile interval cannot cover θ, and whether increasing B or resampling rows instead of people could repair the respective validity problems.</p>
+<p><strong>Ready to continue when:</strong> you can diagnose a failure of the resampling approximation separately from limited replicate precision and an incorrect sampling unit.</p>
+<p><strong>Transfer:</strong> Why does a positive-density sample median require a different diagnosis from a support maximum?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Compute the probability of never drawing the maximum in n draws. Both percentile endpoints must be observed-sample-supported maxima.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The probability is 1−(1−1/n)^n, tending to 1−exp(−1). The bootstrap centered error therefore has a nonvanishing atom at zero, while the sampling endpoint error converges to a continuous exponential law. Percentile endpoints are at most M_n, below θ almost surely, so coverage is zero. More replicates sharpen this invalid approximation; an independent-row bootstrap also cannot reproduce within-person dependence. Each problem requires a different justified procedure.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Use three independent bootstrap seeds with B=199 and B=1999. Compare interval endpoint stability without changing the dataset.</li>
+<li>Derive the conditional variance of the Gaussian multiplier root and explain why matching it is not a proof of target consistency.</li>
+<li>Write the full refitting and identity rules for bootstrapping one of your own estimators; identify which step still needs a bootstrap-validity argument.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="reading"><span class="header-section-number">10</span> Reading</h2>
+<ul>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/boot/html/boot.html">R boot documentation</a>: statistic and resampling interfaces.</li>
+<li><a href="https://stat.ethz.ch/R-manual/R-devel/library/boot/html/boot.ci.html">R boot.ci documentation</a>: interval constructions and their inputs.</li>
+<li>Bickel and Freedman (1981), <a href="https://doi.org/10.1214/aos/1176345637">Some asymptotic theory for the bootstrap</a>.</li>
+</ul>
+</section>
+<section id="continue-through-the-collection" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="continue-through-the-collection"><span class="header-section-number">11</span> Continue through the guide</h2>
+<p>Use <a href="../../guides/method-development/sensitivity-analysis.html">Sensitivity analysis for assumptions and research decisions</a> to investigate assumptions that resampling alone cannot assess. Use the group’s <a href="../../publications.html">published manuscripts</a> as case studies for identifying the target and uncertainty argument.</p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/estimation-and-inference/dependent-observations.html" class="pagination-link" aria-label="Dependent observations and cluster-aware inference">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Dependent observations and cluster-aware inference</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/estimation-and-inference/mathematics-statistics-bridge.html" class="pagination-link" aria-label="A bridge between mathematics and statistical inference">
+        <span class="nav-page-text">A bridge between mathematics and statistical inference</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Bootstrap and resampling for statistical inference"</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "What is resampled, what is refitted, and when the approximation works"</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>**Before reading:** Means, variance, and standard errors. <span class="co">[</span><span class="ot">Large-sample reasoning for methods research</span><span class="co">](large-sample-reasoning.qmd)</span> supplies the approximation theory; <span class="co">[</span><span class="ot">Influence functions</span><span class="co">](../statistical-models/influence-functions.qmd)</span> supports the multiplier section. Use <span class="co">[</span><span class="ot">Dependent observations and cluster-aware inference</span><span class="co">](dependent-observations.qmd)</span> for the cluster branch.</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## A resampling distribution needs a target</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>A standard error describes variation under repeated sampling from a population. A bootstrap approximates that variation by generating new datasets from a fitted or empirical distribution and recomputing a stated statistic. Specify the target, estimator, independent unit, and sampling design first. More bootstrap replicates reduce numerical error in that approximation; they do not establish its validity.</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>For i.i.d. observations $W_1,\ldots,W_n$, the empirical law $P_n$ puts mass $1/n$ on each observation. The ordinary nonparametric bootstrap draws $n$ observations independently from $P_n$, with replacement. Resample each person's complete vector, retaining associations among their features and covariates. Sampling each feature column separately would replace the observed joint law with another model.</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>“With replacement” means an observed record can appear several times in one resampled dataset, while another record can be absent. For observed values $(1,3,5)$, one possible bootstrap sample is $(3,3,5)$. Both datasets have size 3, but their means are 3 and $11/3$. Repeating this draw-and-recompute operation produces a distribution of bootstrap means. The replicate count $B$ is the number of resampled datasets, each still containing $n$ observations.</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>There are two levels of randomness. First, the original study draws data from the unknown population. Second, with that dataset fixed, we generate resamples from its empirical law. A new original study would supply a different empirical law and a different bootstrap distribution. A star on $\Pr_*$, $E_*$, or $\operatorname{Var}_*$ means probability, expectation, or variance over the second level, conditional on the original observations.</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>A **parametric bootstrap** instead simulates from a fitted probability model. Its justification includes that model. A permutation test calibrates a statistic through a null assignment or exchangeability mechanism; it is a different construction. See <span class="co">[</span><span class="ot">Multivariate comparisons: permutation and distance-based tests</span><span class="co">](../analysis-problems/multivariate-comparisons.qmd)</span> for the distinction.</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## Center the bootstrap error correctly</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>For one draw $Y^*$ from the empirical distribution, $E_*[f(Y^*)]=E_{P_n}(f(Y))=P_nf$, using the empirical-expectation notation from <span class="co">[</span><span class="ot">Large-sample reasoning for methods research</span><span class="co">](large-sample-reasoning.qmd#expectation-shorthand)</span>.</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>For an estimator $\widehat\theta$, let $\widehat\theta^*$ denote its bootstrap version. A usual first-order goal is for the conditional distribution of the bootstrap error to approximate the sampling distribution of the original error, with both on the same scale:</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>\text{Bootstrap: }&amp;\sqrt n(\widehat\theta^*-\widehat\theta),<span class="sc">\\</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>\text{Sampling: }&amp;\sqrt n(\widehat\theta-\theta_0).</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>This is a claim about distributions as $n$ increases, not equality in one finite sample. The bootstrap center is the observed estimate because the bootstrap population is fitted from that dataset. Some bootstrap methods approximate finite-sample bias using $E_*[\widehat\theta^*]-\widehat\theta$ under appropriate conditions. That calculation does not establish that the estimator's population limit equals the scientific target.</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>For the population mean $\mu=E<span class="co">[</span><span class="ot">Y</span><span class="co">]</span>$, assume i.i.d. observations with $0&lt;\sigma^2=\operatorname{Var}(Y)&lt;\infty$. The original error is $\bar Y-\mu$. Inside the bootstrap world, the empirical population has mean $\bar Y$, so the corresponding error is $\bar Y^*-\bar Y$. Subtracting the same unknown $\mu$ from bootstrap estimates would not reproduce this fitted-population estimation error.</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>For the sample mean, let $Y^*$ denote one bootstrap draw. Each observed value has probability $1/n$, giving</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>E_*[Y^*]&amp;=\bar Y,<span class="sc">\\</span></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}_*(Y^*)&amp;=\frac1n\sum_i(Y_i-\bar Y)^2.</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>The $n$ draws in a bootstrap sample are independent conditional on the original data. Averaging them leaves the conditional mean at $\bar Y$ and divides their conditional variance by $n$:</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}_*(\bar Y^*)&amp;=\frac{1}{n^2}\sum_i(Y_i-\bar Y)^2<span class="sc">\\</span></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>&amp;=\frac{n-1}{n}\frac{s_Y^2}{n}.</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>Thus $E_*[\bar Y^*]=\bar Y$, and the conditional variance is asymptotically equivalent to the sampling variance $\sigma^2/n$ when $s_Y^2\xrightarrow{p}\sigma^2$. This compares variation of $\bar Y^*$ around $\bar Y$ with the data fixed, and variation of $\bar Y$ around $\mu$ across original studies.</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>Variance matching is one check. Bootstrap validity also needs the distributional approximation. For the i.i.d. finite, nonzero variance mean, a conditional CLT gives, at each fixed $t$,</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>\Pr_*\{\sqrt n(\bar Y^*-\bar Y)\le t<span class="sc">\}</span></span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>\xrightarrow{p}\Phi(t/\sigma).</span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>The left side is itself a random quantity across original datasets. Convergence in probability says the fitted conditional CDF approaches the same normal CDF as the original scaled mean error. Here $\Phi$ is the standard normal CDF. General statistics need their own smoothness, moment, and remainder arguments; the mean calculation does not establish validity for every resampling procedure.</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Run a small example with a known reference</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>The following **synthetic** sample comes from a normal population with mean 2 and SD 1.5. The true sampling law of the scaled mean error is normal. Compare that law with the conditional bootstrap approximation before looking at the intervals.</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-bootstrap-mean</span></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 4.5</span></span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "One synthetic normal sample (n=80), with 1,999 ordinary bootstrap replicates. The bootstrap errors are centered at the observed mean; the reference is the known repeated-sampling law of sqrt(n)(sample mean − 2). Differences include the realized sample and bootstrap Monte Carlo error."</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A density of centered bootstrap mean errors is compared with the known normal sampling density."</span></span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3101</span>)</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">80</span>; B <span class="ot">&lt;-</span> <span class="dv">1999</span>; y <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="at">mean =</span> <span class="dv">2</span>, <span class="at">sd =</span> <span class="fl">1.5</span>)</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>mean_hat <span class="ot">&lt;-</span> <span class="fu">mean</span>(y)</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>boot_mean <span class="ot">&lt;-</span> <span class="fu">replicate</span>(B, <span class="fu">mean</span>(y[<span class="fu">sample.int</span>(n, n, <span class="at">replace =</span> <span class="cn">TRUE</span>)]))</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>root <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(n) <span class="sc">*</span> (boot_mean <span class="sc">-</span> mean_hat)</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>root_density <span class="ot">&lt;-</span> <span class="fu">density</span>(root)</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(root_density, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">5</span>),</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1.08</span><span class="sc">*</span><span class="fu">max</span>(root_density<span class="sc">$</span>y, <span class="fu">dnorm</span>(<span class="dv">0</span>, <span class="at">sd =</span> <span class="fl">1.5</span>))),</span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"#2F80C8"</span>, <span class="at">lwd =</span> <span class="dv">2</span>,</span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">""</span>, <span class="at">xlab =</span> <span class="st">"Scaled mean error"</span>, <span class="at">ylab =</span> <span class="st">"Density"</span>)</span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x, <span class="at">sd =</span> <span class="fl">1.5</span>), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"Conditional bootstrap"</span>, <span class="st">"Known sampling law"</span>),</span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">influence_SE =</span> <span class="fu">sd</span>(y)<span class="sc">/</span><span class="fu">sqrt</span>(n), <span class="at">bootstrap_SE =</span> <span class="fu">sd</span>(boot_mean),</span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>  <span class="at">exact_conditional_bootstrap_SE =</span> <span class="fu">sqrt</span>((n<span class="dv">-1</span>)<span class="sc">/</span>n) <span class="sc">*</span> <span class="fu">sd</span>(y)<span class="sc">/</span><span class="fu">sqrt</span>(n))</span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>In the output, <span class="in">`sd(boot_mean)`</span> estimates $\sqrt{\operatorname{Var}_*(\bar Y^*)}$ using $B$ simulations. The exact conditional expression follows from the algebra above; the influence-based SE estimates $\sigma/\sqrt n$ using the original study. The two population-level quantities are close at first order, and the simulated SE also has Monte Carlo error. A new original dataset would give another approximation.</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a>An exact normal-population t interval is also available in this particular example; the bootstrap is used to teach the construction. Its histogram is a sampling-distribution approximation, rather than a posterior distribution for $\mu$.</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Interval recipes make different transformations</span></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>Let $q^*_{a}$ be an $a$-quantile of the bootstrap estimates. At nominal 95% coverage:</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>::: {.table-responsive}</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Construction <span class="pp">|</span> Interval <span class="pp">|</span> What must be justified <span class="pp">|</span></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Normal approximation <span class="pp">|</span> $\widehat\theta\pm1.96\widehat{\mathrm{SE}}_*$ <span class="pp">|</span> A centered normal approximation and a consistent variance <span class="pp">|</span></span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Percentile <span class="pp">|</span> $<span class="co">[</span><span class="ot">q^*_{.025},q^*_{.975}</span><span class="co">]</span>$ <span class="pp">|</span> An appropriate bootstrap approximation; this does not automatically correct bias <span class="pp">|</span></span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Basic <span class="pp">|</span> $<span class="co">[</span><span class="ot">2\widehat\theta-q^*_{.975},2\widehat\theta-q^*_{.025}</span><span class="co">]</span>$ <span class="pp">|</span> Approximation of the centered error distribution <span class="pp">|</span></span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Studentized <span class="pp">|</span> Invert quantiles of $(\widehat\theta^*-\widehat\theta)/\widehat{\mathrm{SE}}^*$ <span class="pp">|</span> A justified SE within each replicate and a valid studentized approximation <span class="pp">|</span></span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>The **basic** interval follows by approximating the estimation-error distribution. The bootstrap error quantiles are $q^*_{.025}-\widehat\theta$ and $q^*_{.975}-\widehat\theta$. If those bracket $\widehat\theta-\theta_0$, solving the two inequalities for $\theta_0$ reverses and reflects the endpoints:</span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>\left[2\widehat\theta-q^*_{.975},\;</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>2\widehat\theta-q^*_{.025}\right].</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>For example, with observed estimate 10 and bootstrap estimate quantiles 8 and 13, the percentile interval is $<span class="co">[</span><span class="ot">8,13</span><span class="co">]</span>$ and the basic interval is $<span class="co">[</span><span class="ot">7,12</span><span class="co">]</span>$. Their difference comes from the transformation, not from more data or a different replicate count. With a symmetric, centered normal approximation they can agree at first order; skewness and bias make the distinction more visible.</span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>For **studentization**, calculate an SE in each resample and form $T^*=(\widehat\theta^*-\widehat\theta)/\widehat{\operatorname{SE}}^*$. If $t^*_{.025}$ and $t^*_{.975}$ are its quantiles, inversion gives</span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>\left[\widehat\theta-t^*_{.975}\widehat{\operatorname{SE}},\;</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>\widehat\theta-t^*_{.025}\widehat{\operatorname{SE}}\right].</span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>The final SE here comes from the original study; each starred SE was needed to construct the resampled standardized errors. The procedure requires both the estimator and its variance calculation to behave appropriately under resampling.</span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">boot.ci documentation</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/boot/html/boot.ci.html)</span> also describes BCa intervals. Their corrections and extra accuracy require additional conditions; choosing a sophisticated interval label does not remove those conditions.</span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>q <span class="ot">&lt;-</span> <span class="fu">quantile</span>(boot_mean, <span class="fu">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>), <span class="at">names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">normal =</span> mean_hat <span class="sc">+</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)<span class="sc">*</span><span class="fu">qnorm</span>(<span class="fl">0.975</span>)<span class="sc">*</span><span class="fu">sd</span>(boot_mean),</span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>      <span class="at">percentile =</span> q, <span class="at">basic =</span> <span class="dv">2</span><span class="sc">*</span>mean_hat<span class="sc">-</span><span class="fu">rev</span>(q))</span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>In this particular simulated sample, all three intervals lie above the known mean 2. That is one random noncoverage event; it does not estimate a method’s coverage probability. Assess coverage across independent datasets under stated conditions.</span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a>These are pointwise intervals for one target. They do not automatically provide simultaneous or post-selection coverage for thousands of features. See <span class="co">[</span><span class="ot">Multiple testing when the tests are not independent</span><span class="co">](../analysis-problems/multiple-testing.qmd)</span>.</span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a><span class="fu">## Preserve the independent unit and the target weights</span></span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>For independent people with repeated records, draw people with replacement and carry all of each sampled person's records together. The resampled object should reproduce the sampling design. A bootstrap for a stratified design may need resampling within the original sampling strata; a complex survey or dependence across clusters needs its own scheme.</span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a>Resampling rows independently would break the pattern of shared person effects in the data. Holding people together preserves their joint records. This choice addresses dependence; the statistic recomputed on those records still determines whether the target weights people or records equally.</span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>If the target is the mean of a person's recorded-visit average, first form one summary per person. If it is a record-weighted ratio, retain each person's total and record count and recompute the ratio after resampling. The following **invented** records demonstrate both, using the same resampled people.</span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3102</span>)</span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>G <span class="ot">&lt;-</span> <span class="dv">80</span>; size <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>), G, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(G), size)</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a>values <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">rnorm</span>(G), size) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="fu">sum</span>(size), <span class="at">sd =</span> <span class="fl">0.5</span>)</span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>total <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">rowsum</span>(values, id))</span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a>bootstrap <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">1999</span>, {</span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a>  selected <span class="ot">&lt;-</span> <span class="fu">sample.int</span>(G, G, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">person =</span> <span class="fu">mean</span>(total[selected]<span class="sc">/</span>size[selected]),</span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>    <span class="at">record =</span> <span class="fu">sum</span>(total[selected])<span class="sc">/</span><span class="fu">sum</span>(size[selected]))</span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a><span class="fu">apply</span>(bootstrap, <span class="dv">1</span>, sd)</span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a>Duplicating a person in a bootstrap sample is intentional. If rebuilding a raw-record analysis, give the duplicate cluster copies distinct bootstrap cluster IDs where needed. Do not replace person weighting with row weighting by accident. The <span class="co">[</span><span class="ot">Dependent observations and cluster-aware inference</span><span class="co">](dependent-observations.qmd)</span> page derives the corresponding influence functions and few-cluster limitations.</span>
+<span id="cb9-170"><a href="#cb9-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-171"><a href="#cb9-171" aria-hidden="true" tabindex="-1"></a><span class="fu">## Decide what must be refitted</span></span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a>A full bootstrap statistic repeats the estimator's learned preprocessing, model fitting, selection, tuning, and uncertainty calculation according to its declared algorithm. Holding fitted parts fixed changes what is being approximated; it needs an argument. Repeating the full algorithm is also not sufficient for bootstrap consistency when the target or selection is nonregular.</span>
+<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a>Cross-fitting requires particular care. Copies of an original person's outcomes can leak between training and evaluation if bootstrap duplicates are randomly sent to different folds. Specify a bootstrap weighting/identity and fold scheme whose theory applies to the estimator. Grouping duplicates can prevent that leakage, but does not itself prove conditional remainder control. There is no universal instruction to bootstrap every machine-learning pipeline in the same way.</span>
+<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a><span class="fu">### Later extension: multiplier resampling (optional)</span></span>
+<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a>Return to this extension after learning influence functions. A **multiplier approximation** can avoid nuisance refitting when a valid asymptotically linear representation is already available. If the estimated centered contributions are $\widehat D_i$, independent multipliers $\xi_i$ with mean zero and variance one, also independent of the data, generate</span>
+<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>Z^*=\frac{1}{\sqrt n}\sum_i\xi_i\widehat D_i.</span>
+<span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a>With a valid negligible estimator remainder, consistent contribution/variance estimation, and conditional CLT/non-dominance conditions, this approximates the first-order error law. For Gaussian multipliers and a scalar target it is conditionally normal with variance $n^{-1}\sum_i\widehat D_i^2$; that variance match alone does not prove the estimator's expansion. With independent clusters, use cluster contributions and the cluster count. This construction approximates the first-order fluctuation; it does not measure persistent nuisance bias.</span>
+<span id="cb9-186"><a href="#cb9-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-187"><a href="#cb9-187" aria-hidden="true" tabindex="-1"></a>Conditional on the data, the $\widehat D_i$ are fixed, and independent mean-zero multipliers make the covariance terms vanish. This explains the displayed variance. $Z^*$ is on the **scaled-error** scale of $\sqrt n(\widehat\theta-\theta_0)$; divide it by $\sqrt n$ to approximate an unscaled estimation error. Inference still depends on having correctly derived the original estimator's expansion.</span>
+<span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a><span class="fu">## A concrete failure: estimating a support endpoint</span></span>
+<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a>Let $Y_i$ be i.i.d. uniform on $<span class="co">[</span><span class="ot">0,\theta</span><span class="co">]</span>$ and estimate $\theta$ by the sample maximum $M_n$. Here we study the positive gap $\theta-M_n$ and its bootstrap counterpart $M_n-M_n^*$; both reverse the sign of the earlier estimate-minus-target convention. The scaling is $n$, rather than the usual square root. Define the scaled gap's CDF as $F_n(t)=\Pr<span class="sc">\{</span>n(\theta-M_n)/\theta\le t<span class="sc">\}</span>$. For $0\le t\le n$,</span>
+<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-194"><a href="#cb9-194" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-195"><a href="#cb9-195" aria-hidden="true" tabindex="-1"></a>F_n(t)&amp;=1-(1-t/n)^n<span class="sc">\\</span></span>
+<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a>&amp;\longrightarrow1-e^{-t}.</span>
+<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-199"><a href="#cb9-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-200"><a href="#cb9-200" aria-hidden="true" tabindex="-1"></a>To obtain this, note that $M_n\le x$ requires all $n$ independent observations to be at most $x$, giving probability $(x/\theta)^n$ for $0\le x\le\theta$. The scaled-error event instead asks whether $M_n$ is at least $\theta(1-t/n)$, so taking the complement gives the formula. Its limiting law is exponential, not the mean's normal limit.</span>
+<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-202"><a href="#cb9-202" aria-hidden="true" tabindex="-1"></a>With a unique sample maximum, the ordinary bootstrap maximum equals $M_n$ whenever that observed maximum is selected at least once:</span>
+<span id="cb9-203"><a href="#cb9-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a>\Pr_*(M_n^*=M_n)&amp;=1-(1-1/n)^n<span class="sc">\\</span></span>
+<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a>&amp;\longrightarrow1-e^{-1}.</span>
+<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-210"><a href="#cb9-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-211"><a href="#cb9-211" aria-hidden="true" tabindex="-1"></a>Each draw misses that particular record with probability $1-1/n$; all $n$ draws miss it with probability $(1-1/n)^n$. The bootstrap cannot generate a larger value than the observed maximum. Thus it retains positive probability of exactly zero centered error even as the dataset grows.</span>
+<span id="cb9-212"><a href="#cb9-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-213"><a href="#cb9-213" aria-hidden="true" tabindex="-1"></a>The centered bootstrap error consequently retains an atom at zero, whereas the sampling limit is continuous. Increasing the number of bootstrap replicates estimates the wrong approximation more precisely. An ordinary percentile interval is particularly revealing: both endpoints are at most $M_n&lt;\theta$ almost surely, so it cannot cover the true endpoint. Specialized endpoint procedures require another argument; the failure does not say every resampling procedure fails for every endpoint problem.</span>
+<span id="cb9-214"><a href="#cb9-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-217"><a href="#cb9-217" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-218"><a href="#cb9-218" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-bootstrap-endpoint</span></span>
+<span id="cb9-219"><a href="#cb9-219" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 4.5</span></span>
+<span id="cb9-220"><a href="#cb9-220" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "One uniform(0,1) teaching sample (n=80), with 3,999 ordinary bootstrap maxima. The conditional bootstrap CDF has a large jump at zero; the exact sampling CDF is continuous. This compares endpoint errors on their n scale, not sqrt(n)."</span></span>
+<span id="cb9-221"><a href="#cb9-221" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A step CDF jumps by about 0.63 at zero, while the exact endpoint-error sampling CDF starts continuously from zero."</span></span>
+<span id="cb9-222"><a href="#cb9-222" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3103</span>)</span>
+<span id="cb9-223"><a href="#cb9-223" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">runif</span>(<span class="dv">80</span>); n_endpoint <span class="ot">&lt;-</span> <span class="fu">length</span>(x); maximum <span class="ot">&lt;-</span> <span class="fu">max</span>(x)</span>
+<span id="cb9-224"><a href="#cb9-224" aria-hidden="true" tabindex="-1"></a>boot_max <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">3999</span>, <span class="fu">max</span>(x[<span class="fu">sample.int</span>(n_endpoint, n_endpoint, <span class="at">replace =</span> <span class="cn">TRUE</span>)]))</span>
+<span id="cb9-225"><a href="#cb9-225" aria-hidden="true" tabindex="-1"></a>endpoint_error <span class="ot">&lt;-</span> n_endpoint<span class="sc">*</span>(maximum<span class="sc">-</span>boot_max)<span class="sc">/</span>maximum</span>
+<span id="cb9-226"><a href="#cb9-226" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">ecdf</span>(endpoint_error), <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.2</span>, <span class="dv">5</span>), <span class="at">verticals =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-227"><a href="#cb9-227" aria-hidden="true" tabindex="-1"></a>     <span class="at">do.points =</span> <span class="cn">FALSE</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">main =</span> <span class="st">""</span>,</span>
+<span id="cb9-228"><a href="#cb9-228" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Endpoint error on the n scale"</span>, <span class="at">ylab =</span> <span class="st">"CDF"</span>)</span>
+<span id="cb9-229"><a href="#cb9-229" aria-hidden="true" tabindex="-1"></a>t_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">300</span>)</span>
+<span id="cb9-230"><a href="#cb9-230" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(t_grid, <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1</span><span class="sc">-</span>t_grid<span class="sc">/</span>n_endpoint)<span class="sc">^</span>n_endpoint, <span class="at">col =</span> <span class="st">"#2F80C8"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb9-231"><a href="#cb9-231" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomright"</span>, <span class="fu">c</span>(<span class="st">"Conditional bootstrap"</span>, <span class="st">"Exact sampling law"</span>),</span>
+<span id="cb9-232"><a href="#cb9-232" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#D55E00"</span>, <span class="st">"#2F80C8"</span>), <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb9-233"><a href="#cb9-233" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">empirical_atom =</span> <span class="fu">mean</span>(boot_max <span class="sc">==</span> maximum),</span>
+<span id="cb9-234"><a href="#cb9-234" aria-hidden="true" tabindex="-1"></a>  <span class="at">exact_atom =</span> <span class="dv">1</span><span class="sc">-</span>(<span class="dv">1-1</span><span class="sc">/</span>n_endpoint)<span class="sc">^</span>n_endpoint)</span>
+<span id="cb9-235"><a href="#cb9-235" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-236"><a href="#cb9-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-237"><a href="#cb9-237" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">Bickel and Freedman</span><span class="co">](https://doi.org/10.1214/aos/1176345637)</span> give foundational consistency results and counterexamples. Nonsmooth sample equations are not automatically failures: <span class="co">[</span><span class="ot">Quantiles and local expansions</span><span class="co">](../statistical-models/quantiles-and-local-expansions.qmd)</span> develops the regular positive-density case. Boundary behavior, unstable selection, weak identification, infinite moments, and the bootstrap's own remainder conditions require examination.</span>
+<span id="cb9-238"><a href="#cb9-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-239"><a href="#cb9-239" aria-hidden="true" tabindex="-1"></a><span class="fu">## Separate sampling uncertainty from resampling Monte Carlo error</span></span>
+<span id="cb9-240"><a href="#cb9-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-241"><a href="#cb9-241" aria-hidden="true" tabindex="-1"></a>The dataset size controls information about the population. The replicate count $B$ controls simulation accuracy conditional on that dataset. At a fixed threshold, a bootstrap tail probability estimated from independent replicates has MCSE approximately $\sqrt{p_*(1-p_*)/B}$. An interval endpoint is a quantile; its Monte Carlo error also depends on local density and cannot be read directly from this probability-scale formula.</span>
+<span id="cb9-242"><a href="#cb9-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-243"><a href="#cb9-243" aria-hidden="true" tabindex="-1"></a>For example, if a conditional tail probability is 0.025, 1,999 resamples supply about 50 observations in that tail on average. Increasing $B$ to 19,999 reduces probability-scale Monte Carlo error by about $\sqrt{10}$ while leaving the original study unchanged. It does not divide the study's SE by $\sqrt{10}$. For a cluster bootstrap, the population information is governed by the number and structure of independent clusters, rather than simply the row count.</span>
+<span id="cb9-244"><a href="#cb9-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-245"><a href="#cb9-245" aria-hidden="true" tabindex="-1"></a>Check endpoint stability with independent resampling seeds or a justified quantile-uncertainty calculation. Report the scheme, resampling unit, statistic, refitting/fold rules, replicate count, seed, interval construction, and failed or degenerate replicates. A failed replicate is an outcome to diagnose, not a row to silently discard.</span>
+<span id="cb9-246"><a href="#cb9-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-247"><a href="#cb9-247" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb9-248"><a href="#cb9-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-249"><a href="#cb9-249" aria-hidden="true" tabindex="-1"></a>Try each checkpoint before opening its hint or solution.</span>
+<span id="cb9-250"><a href="#cb9-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-251"><a href="#cb9-251" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-boot-01 .checkpoint}</span>
+<span id="cb9-252"><a href="#cb9-252" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · BOOT-01 — Derive what the bootstrap mean approximates {.unnumbered}</span></span>
+<span id="cb9-253"><a href="#cb9-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-254"><a href="#cb9-254" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and interpretation.</span>
+<span id="cb9-255"><a href="#cb9-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-256"><a href="#cb9-256" aria-hidden="true" tabindex="-1"></a>For i.i.d. scalar observations with finite nonzero variance, derive the conditional mean and variance of the ordinary bootstrap sample mean. Explain the center and scaling of the bootstrap root, construct percentile and basic intervals from bootstrap quantiles, and distinguish n from the replicate count B. State what changes for a mean of person-level visit averages.</span>
+<span id="cb9-257"><a href="#cb9-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-258"><a href="#cb9-258" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can connect the empirical resampling law, the target error distribution, and the independent unit without confusing sampling error with Monte Carlo error.</span>
+<span id="cb9-259"><a href="#cb9-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-260"><a href="#cb9-260" aria-hidden="true" tabindex="-1"></a>**Transfer:** Would holding every fitted nuisance fixed approximate the same finite-sample algorithm as refitting it? When could a first-order multiplier approximation still be justified?</span>
+<span id="cb9-261"><a href="#cb9-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-262"><a href="#cb9-262" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb9-263"><a href="#cb9-263" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb9-264"><a href="#cb9-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-265"><a href="#cb9-265" aria-hidden="true" tabindex="-1"></a>A bootstrap draw is uniform over the n observed values. Conditional on the dataset, the n draws are independent.</span>
+<span id="cb9-266"><a href="#cb9-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-267"><a href="#cb9-267" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb9-268"><a href="#cb9-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-269"><a href="#cb9-269" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb9-270"><a href="#cb9-270" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb9-271"><a href="#cb9-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-272"><a href="#cb9-272" aria-hidden="true" tabindex="-1"></a>The conditional mean is the observed mean and the variance is (n−1)s²/n². The bootstrap root sqrt(n)(mean*−mean) approximates sqrt(n)(mean−μ) under the mean CLT and bootstrap conditions. Percentile endpoints are the estimate quantiles; basic endpoints reverse and reflect them about the observed estimate. Increasing B reduces conditional simulation error, while increasing n adds population information. For equally person-weighted visit averages, resample whole people or their defined summaries and use the person count.</span>
+<span id="cb9-273"><a href="#cb9-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-274"><a href="#cb9-274" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb9-275"><a href="#cb9-275" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-276"><a href="#cb9-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-277"><a href="#cb9-277" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-boot-02 .checkpoint}</span>
+<span id="cb9-278"><a href="#cb9-278" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · BOOT-02 — Prove an ordinary bootstrap failure {.unnumbered}</span></span>
+<span id="cb9-279"><a href="#cb9-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-280"><a href="#cb9-280" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and diagnosis.</span>
+<span id="cb9-281"><a href="#cb9-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-282"><a href="#cb9-282" aria-hidden="true" tabindex="-1"></a>For a continuous uniform sample with a unique maximum, derive the probability that an ordinary bootstrap sample contains that maximum. Compare its limiting atom with the sampling limit of n(θ−M_n)/θ. Explain why an ordinary percentile interval cannot cover θ, and whether increasing B or resampling rows instead of people could repair the respective validity problems.</span>
+<span id="cb9-283"><a href="#cb9-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-284"><a href="#cb9-284" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can diagnose a failure of the resampling approximation separately from limited replicate precision and an incorrect sampling unit.</span>
+<span id="cb9-285"><a href="#cb9-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-286"><a href="#cb9-286" aria-hidden="true" tabindex="-1"></a>**Transfer:** Why does a positive-density sample median require a different diagnosis from a support maximum?</span>
+<span id="cb9-287"><a href="#cb9-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-288"><a href="#cb9-288" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb9-289"><a href="#cb9-289" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb9-290"><a href="#cb9-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-291"><a href="#cb9-291" aria-hidden="true" tabindex="-1"></a>Compute the probability of never drawing the maximum in n draws. Both percentile endpoints must be observed-sample-supported maxima.</span>
+<span id="cb9-292"><a href="#cb9-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-293"><a href="#cb9-293" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb9-294"><a href="#cb9-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-295"><a href="#cb9-295" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb9-296"><a href="#cb9-296" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb9-297"><a href="#cb9-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-298"><a href="#cb9-298" aria-hidden="true" tabindex="-1"></a>The probability is 1−(1−1/n)^n, tending to 1−exp(−1). The bootstrap centered error therefore has a nonvanishing atom at zero, while the sampling endpoint error converges to a continuous exponential law. Percentile endpoints are at most M_n, below θ almost surely, so coverage is zero. More replicates sharpen this invalid approximation; an independent-row bootstrap also cannot reproduce within-person dependence. Each problem requires a different justified procedure.</span>
+<span id="cb9-299"><a href="#cb9-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-300"><a href="#cb9-300" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb9-301"><a href="#cb9-301" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-302"><a href="#cb9-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-303"><a href="#cb9-303" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb9-304"><a href="#cb9-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-305"><a href="#cb9-305" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Use three independent bootstrap seeds with B=199 and B=1999. Compare interval endpoint stability without changing the dataset.</span>
+<span id="cb9-306"><a href="#cb9-306" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Derive the conditional variance of the Gaussian multiplier root and explain why matching it is not a proof of target consistency.</span>
+<span id="cb9-307"><a href="#cb9-307" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Write the full refitting and identity rules for bootstrapping one of your own estimators; identify which step still needs a bootstrap-validity argument.</span>
+<span id="cb9-308"><a href="#cb9-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-309"><a href="#cb9-309" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb9-310"><a href="#cb9-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-311"><a href="#cb9-311" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">R boot documentation</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/boot/html/boot.html)</span>: statistic and resampling interfaces.</span>
+<span id="cb9-312"><a href="#cb9-312" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">R boot.ci documentation</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/boot/html/boot.ci.html)</span>: interval constructions and their inputs.</span>
+<span id="cb9-313"><a href="#cb9-313" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Bickel and Freedman (1981), <span class="co">[</span><span class="ot">Some asymptotic theory for the bootstrap</span><span class="co">](https://doi.org/10.1214/aos/1176345637)</span>.</span>
+<span id="cb9-314"><a href="#cb9-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-315"><a href="#cb9-315" aria-hidden="true" tabindex="-1"></a><span class="fu">## Continue through the guide {#continue-through-the-collection}</span></span>
+<span id="cb9-316"><a href="#cb9-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-317"><a href="#cb9-317" aria-hidden="true" tabindex="-1"></a>Use <span class="co">[</span><span class="ot">Sensitivity analysis for assumptions and research decisions</span><span class="co">](../method-development/sensitivity-analysis.qmd)</span> to investigate assumptions that resampling alone cannot assess. Use the group’s <span class="co">[</span><span class="ot">published manuscripts</span><span class="co">](../../publications.qmd)</span> as case studies for identifying the target and uncertainty argument.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

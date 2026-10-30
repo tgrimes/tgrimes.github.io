@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Network inference from omics data – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/analysis-problems/association-targets-and-bias.html" rel="next">
+<link href="../../guides/analysis-problems/multiple-testing.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Network inference from omics data</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Omics analysis problems</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/differential-expression-and-abundance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Differential expression and abundance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/multiple-testing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multiple testing when the tests are not independent</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/network-inference.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Network inference from omics data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/association-targets-and-bias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Association targets, pooling, and imperfect adjustment</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/jackknife-pseudo-values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Jackknife pseudo-values</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/residual-covariance-and-nuisance-error.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Residual covariance and nuisance-estimation error</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/multivariate-comparisons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multivariate comparisons: permutation and distance-based tests</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/adjusted-expression-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An end-to-end expression analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/residual-network-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An end-to-end residual-network analysis</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#define-the-edge-before-estimating-it" id="toc-define-the-edge-before-estimating-it" class="nav-link active" data-scroll-target="#define-the-edge-before-estimating-it"><span class="header-section-number">1</span> Define the edge before estimating it</a></li>
+  <li><a href="#what-a-co-expression-network-is" id="toc-what-a-co-expression-network-is" class="nav-link" data-scroll-target="#what-a-co-expression-network-is"><span class="header-section-number">2</span> What a co-expression network is</a></li>
+  <li><a href="#association-measures" id="toc-association-measures" class="nav-link" data-scroll-target="#association-measures"><span class="header-section-number">3</span> Association measures</a></li>
+  <li><a href="#marginal-versus-conditional-dependence" id="toc-marginal-versus-conditional-dependence" class="nav-link" data-scroll-target="#marginal-versus-conditional-dependence"><span class="header-section-number">4</span> Marginal versus conditional dependence</a>
+  <ul class="collapse">
+  <li><a href="#zero-covariance-can-hide-dependence" id="toc-zero-covariance-can-hide-dependence" class="nav-link" data-scroll-target="#zero-covariance-can-hide-dependence"><span class="header-section-number">4.1</span> Zero covariance can hide dependence</a></li>
+  <li><a href="#the-p-n-problem" id="toc-the-p-n-problem" class="nav-link" data-scroll-target="#the-p-n-problem"><span class="header-section-number">4.2</span> The <span class="math inline">p &gt; N</span> problem</a></li>
+  </ul></li>
+  <li><a href="#from-weights-to-a-graph-and-the-multiple-testing-problem" id="toc-from-weights-to-a-graph-and-the-multiple-testing-problem" class="nav-link" data-scroll-target="#from-weights-to-a-graph-and-the-multiple-testing-problem"><span class="header-section-number">5</span> From weights to a graph, and the multiple-testing problem</a></li>
+  <li><a href="#differential-networks" id="toc-differential-networks" class="nav-link" data-scroll-target="#differential-networks"><span class="header-section-number">6</span> Differential networks</a></li>
+  <li><a href="#computation" id="toc-computation" class="nav-link" data-scroll-target="#computation"><span class="header-section-number">7</span> Computation</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">8</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-net-01-identify-the-association-represented-by-an-edge" id="toc-checkpoint-net-01-identify-the-association-represented-by-an-edge" class="nav-link" data-scroll-target="#checkpoint-net-01-identify-the-association-represented-by-an-edge">Checkpoint · NET-01 — Identify the association represented by an edge</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">9</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Network inference from omics data</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Define marginal, residual, and graphical edges; assess uncertainty and computational cost</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> Expression matrices, covariance, and estimands; follow influence-function links for sensitivity calculations.</p>
+<section id="define-the-edge-before-estimating-it" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="define-the-edge-before-estimating-it"><span class="header-section-number">1</span> Define the edge before estimating it</h2>
+<p>Let <span class="math inline">X</span> and <span class="math inline">Y</span> be two measured features in a specified population, and let <span class="math inline">Z</span> be a chosen adjustment set. Three targets recur:</p>
+<div class="table-responsive">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Edge target</th>
+<th>Meaning</th>
+<th>What zero does not generally establish</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">\operatorname{Corr}(X,Y)</span></td>
+<td>Marginal association across units in that population</td>
+<td>Independence or absence of a shared driver</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">E[(X-m_X(Z))(Y-m_Y(Z))]</span></td>
+<td>Average conditional covariance after conditional-mean adjustment</td>
+<td>Conditional independence or a direct biological interaction</td>
+</tr>
+<tr class="odd">
+<td>A precision-matrix partial correlation</td>
+<td>Linear residual association after adjusting for the other modeled features</td>
+<td>Conditional independence outside the relevant Gaussian model, or causal regulation</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The normalized version of the second target is a residual correlation, not generally the average of conditional correlations. A differential-network estimand is a contrast between the same edge definition in two specified populations. State the scale, adjustment set, and feature universe before choosing the estimator. The expression examples below transfer only after the measurement assumptions for the new assay have been checked.</p>
+<p>For Pearson correlation, normalization means</p>
+<p><span class="math display">
+\rho=\frac{\operatorname{Cov}(X,Y)}
+{\sqrt{\operatorname{Var}(X)\operatorname{Var}(Y)}}.
+</span></p>
+<p>Covariance retains the measurement units; correlation divides them out using each variable’s spread. Removing a conditional mean changes the variables being related, while normalizing changes their scale. Keep these operations separate. An average residual product, its normalized correlation, and a precision-matrix entry are three different edge definitions even when computed from the same assay.</p>
+</section>
+<section id="what-a-co-expression-network-is" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="what-a-co-expression-network-is"><span class="header-section-number">2</span> What a co-expression network is</h2>
+<p>A gene co-expression network has genes as nodes and, for each pair of genes, an edge weight that measures how strongly the two genes’ expression levels move together <strong>across samples</strong>. That last phrase is the one to hold onto. A population edge is a functional of a specified distribution, estimated from a cohort. Its estimator is not a direct measurement of regulation in an individual cell or molecule. Every property of the network is inherited from the cohort it was computed on, which is why the <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> page applies to networks with full force.</p>
+<p>Three decisions define a network: the association measure, whether edges are marginal or conditional, and how weights become a graph. Each has consequences for what the network can detect, how it behaves under heterogeneity, and what it costs to compute.</p>
+</section>
+<section id="association-measures" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="association-measures"><span class="header-section-number">3</span> Association measures</h2>
+<div class="table-responsive">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Measure</th>
+<th>Main use</th>
+<th>Transformation behavior</th>
+<th>Main caution</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pearson <span class="math inline">r</span></td>
+<td>Linear association</td>
+<td>Unchanged by positive affine rescaling of either variable; a sign reversal flips its sign</td>
+<td>Sensitive to tails, mixtures, and mean shifts</td>
+</tr>
+<tr class="even">
+<td>Spearman <span class="math inline">\rho_S</span></td>
+<td>Rank association</td>
+<td>Unchanged by strictly increasing transformations of each variable</td>
+<td>Subgroup shifts can change pooled ranks</td>
+</tr>
+<tr class="odd">
+<td>Kendall <span class="math inline">\tau</span></td>
+<td>Concordance</td>
+<td>Unchanged by strictly increasing transformations of each variable</td>
+<td>Ties and their handling matter</td>
+</tr>
+<tr class="even">
+<td>Biweight midcorrelation</td>
+<td>Robust association</td>
+<td>Uses robust centering, scaling, and outlier downweighting</td>
+<td>Robustness depends on the definition and nondegenerate scale estimates</td>
+</tr>
+<tr class="odd">
+<td>Distance correlation</td>
+<td>General dependence</td>
+<td>Translation and scalar-rescaling invariant; not invariant to arbitrary affine transformations</td>
+<td>Population zero characterizes independence under moment conditions; finite-sample estimation still needs calibration</td>
+</tr>
+<tr class="even">
+<td>Mutual information</td>
+<td>General dependence</td>
+<td>Population quantity invariant to invertible transformations under suitable conditions</td>
+<td>Estimated values depend on density, binning, and tuning choices</td>
+</tr>
+<tr class="odd">
+<td>Partial correlation</td>
+<td>Linear residual association</td>
+<td>Depends on the conditioning variables and fitted covariance model</td>
+<td>Zero implies conditional independence only in special models such as the Gaussian model</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Two properties matter most for our work.</p>
+<p><strong>Invariance to transformation.</strong> Strictly increasing transformations preserve pooled ranks. A sample-specific normalization, or a shift applied only within one group, need not preserve those ranks. Rank measures can therefore change when group composition changes. Invariance to a common transformation is not robustness to heterogeneity.</p>
+<p><strong>Influence and outliers.</strong> Pearson’s influence function has unbounded local sensitivity, although the correlation itself remains in <span class="math inline">[-1,1]</span>. Rank-based and robust measures offer different forms of protection, but none establishes a biological interaction or removes an incorrect population target. The next example shows a large effect of one outlying pair on Pearson correlation.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); y <span class="ot">&lt;-</span> <span class="fl">0.3</span> <span class="sc">*</span> x <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">6</span>; y[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">6</span>                       <span class="co"># one outlying sample</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">pearson =</span> <span class="fu">cor</span>(x, y), <span class="at">spearman =</span> <span class="fu">cor</span>(x, y, <span class="at">method =</span> <span class="st">"spearman"</span>),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">pearson_without =</span> <span class="fu">cor</span>(x[<span class="sc">-</span><span class="dv">1</span>], y[<span class="sc">-</span><span class="dv">1</span>]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>        pearson        spearman pearson_without 
+      0.5722860       0.1633133       0.2163756 </code></pre>
+</div>
+</div>
+</section>
+<section id="marginal-versus-conditional-dependence" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="marginal-versus-conditional-dependence"><span class="header-section-number">4</span> Marginal versus conditional dependence</h2>
+<p>A Pearson edge between genes A and B is <strong>marginal</strong>: it is nonzero if A and B co-vary for any reason, including both being driven by a third gene C, or by a cell-type proportion, or by batch. A <strong>conditional</strong> edge refers to a specified conditioning set. A full-feature graphical model conditions on the other modeled features; it does not follow that conditioning on every measured variable answers the biological question. Selection variables, mediators, and colliders can change associations. For Gaussian data the conditional edges are the partial correlations, read off the inverse covariance (precision) matrix <span class="math inline">\Omega = \Sigma^{-1}</span>:</p>
+<p><span class="math display">
+\rho_{AB \mid \text{rest}} = -\frac{\Omega_{AB}}{\sqrt{\Omega_{AA}\,\Omega_{BB}}}.
+</span></p>
+<p>A zero partial correlation means conditional independence (under Gaussianity), and the graph of nonzero partial correlations is the <strong>Gaussian graphical model</strong>. Conditioning changes the estimand; it does not automatically make a network sparse or regulatory. Missing common causes, measurement error, selection, and the chosen feature universe can all change the interpretation.</p>
+<p>“Rest” means the same specified set of the other <span class="math inline">p-2</span> features for this pair. If we keep only three genes, the A–B edge conditions on the third. If we add 100 genes, it conditions on a larger set and is a different population quantity. The minus sign in the precision formula comes from inverting the pair’s conditional covariance matrix: for a matrix with entries <span class="math inline">a,c,c,b</span>, the inverse has off-diagonal entry <span class="math inline">-c/(ab-c^2)</span>. Dividing that precision entry by the square root of its two diagonal entries and changing the sign recovers <span class="math inline">c/\sqrt{ab}</span>.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>c_gene <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fl">0.8</span> <span class="sc">*</span> c_gene <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">0.6</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fl">0.8</span> <span class="sc">*</span> c_gene <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">0.6</span>)    <span class="co"># A and B share a driver C, no direct link</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(a, b, c_gene)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(a, b)                                  <span class="co"># marginal: strongly correlated</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.661491</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>Omega <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">cov</span>(X))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span>Omega[<span class="dv">1</span>, <span class="dv">2</span>] <span class="sc">/</span> <span class="fu">sqrt</span>(Omega[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">*</span> Omega[<span class="dv">2</span>, <span class="dv">2</span>])   <span class="co"># partial, given C: about zero</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.002569492</code></pre>
+</div>
+</div>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>))</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(a, b, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">col =</span> <span class="st">"#2F80C866"</span>, <span class="at">xlab =</span> <span class="st">"Feature A"</span>, <span class="at">ylab =</span> <span class="st">"Feature B"</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">"Marginal correlation: %.2f"</span>, <span class="fu">cor</span>(a, b)))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(a <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>c_gene, b <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>c_gene, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">col =</span> <span class="st">"#D55E0066"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"A minus its true conditional mean"</span>, <span class="at">ylab =</span> <span class="st">"B minus its true conditional mean"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Shared driver removed"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-network-shared-driver" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two vertically stacked scatterplots compare marginal feature values with their residuals after subtracting 0.8 times the common driver.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-network-shared-driver-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="network-inference_files/figure-html/fig-network-shared-driver-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: One synthetic shared-driver example. The raw pair is associated across people; removing the true conditional means given C removes that shared component. Zero residual association in this Gaussian construction is not a general independence criterion."><img src="network-inference_files/figure-html/fig-network-shared-driver-1.png" class="img-fluid figure-img" alt="Two vertically stacked scatterplots compare marginal feature values with their residuals after subtracting 0.8 times the common driver." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-network-shared-driver-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: One synthetic shared-driver example. The raw pair is associated across people; removing the true conditional means given C removes that shared component. Zero residual association in this Gaussian construction is not a general independence criterion.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>In this shared-driver generator, A and B each have variance <span class="math inline">0.8^2+0.6^2=1</span>, and their covariance is <span class="math inline">0.8^2\operatorname{Var}(C)=0.64</span>. Their population marginal correlation is therefore 0.64. Subtracting <span class="math inline">0.8C</span> leaves the two independent noise terms, each with SD 0.6, giving residual covariance zero. The plotted sample correlation fluctuates around these population values. The conditional-independence interpretation here follows from the generator’s independent errors and Gaussian model, rather than from the label “adjusted.”</p>
+<section id="zero-covariance-can-hide-dependence" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="zero-covariance-can-hide-dependence"><span class="header-section-number">4.1</span> Zero covariance can hide dependence</h3>
+<p>If <span class="math inline">X</span> is symmetric about zero and <span class="math inline">Y=X^2</span>, then <span class="math inline">E[X]=E[X^3]=0</span> and <span class="math inline">\operatorname{Cov}(X,Y)=0</span>, despite a deterministic relationship. Taking <span class="math inline">Z</span> constant makes this a zero residual-covariance example as well. A zero average conditional covariance can also arise by cancellation of positive and negative conditional covariances across strata. Gaussian conditional independence uses the joint Gaussian model, not zero covariance alone.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="at">length.out =</span> <span class="dv">201</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x_grid, x_grid<span class="sc">^</span><span class="dv">2</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.55</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"X"</span>, <span class="at">ylab =</span> <span class="st">"Y = X squared"</span>, <span class="at">main =</span> <span class="st">"Zero linear covariance; complete nonlinear dependence"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-zero-edge-dependence" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A symmetric parabola shows a deterministic dependent pair with zero linear covariance.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-zero-edge-dependence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="network-inference_files/figure-html/fig-zero-edge-dependence-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: A schematic nonlinear relationship with zero Pearson covariance by symmetry. A missing Pearson edge does not mean the two features are independent. Points are a deterministic grid for illustration, not a random sample for a p-value."><img src="network-inference_files/figure-html/fig-zero-edge-dependence-1.png" class="img-fluid figure-img" alt="A symmetric parabola shows a deterministic dependent pair with zero linear covariance." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-zero-edge-dependence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: A schematic nonlinear relationship with zero Pearson covariance by symmetry. A missing Pearson edge does not mean the two features are independent. Points are a deterministic grid for illustration, not a random sample for a p-value.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="the-p-n-problem" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="the-p-n-problem"><span class="header-section-number">4.2</span> The <span class="math inline">p &gt; N</span> problem</h3>
+<p>Let <span class="math inline">X_c</span> be the centered <span class="math inline">N\times p</span> data matrix. The sample covariance is <span class="math inline">S=X_c^\top X_c/(N-1)</span>. Centering makes the rows sum to zero, so its rank is at most <span class="math inline">N-1</span>. Thus <span class="math inline">S</span> is singular when <span class="math inline">p\ge N</span> (and can be singular earlier through collinearity): there is no unique ordinary inverse to plug into the partial-correlation formula. Three standard approaches add structure:</p>
+<ul>
+<li><strong>Shrinkage</strong> (Schäfer and Strimmer 2005; Ledoit and Wolf 2004): <span class="math inline">\hat\Sigma_\lambda = (1-\lambda)S + \lambda T</span> for a simple target <span class="math inline">T</span>, invertible when the target is positive definite and the shrinkage weight lies in <span class="math inline">(0,1]</span>, under suitable shrinkage estimators. Some targets have analytic tuning rules; other choices require estimation or tuning. The result is generally dense.</li>
+<li><strong>Graphical lasso</strong> (Friedman, Hastie, and Tibshirani 2008): maximize the Gaussian log-likelihood with an <span class="math inline">\ell_1</span> penalty on <span class="math inline">\Omega</span>. Sparse result; the penalty <span class="math inline">\lambda</span> is the sparsity knob, chosen by cross-validation, EBIC, or StARS (Liu, Roeder, and Wasserman 2010). Package <code>glasso</code>, or <code>huge</code> for a wrapper with selection.</li>
+<li><strong>Neighborhood selection</strong> (Meinshausen and Bühlmann 2006): regress each gene on all others with the lasso; the two directional selections are combined with a stated OR or AND rule. This and graphical lasso target related Gaussian conditional-association structures through different optimization problems; they are not algebraically equivalent.</li>
+</ul>
+<p>These methods regularize the estimated covariance, precision matrix, or nodewise regressions. Their tuning affects both weights and selected edges; individual transformed edge weights need not all move toward zero. Comparing two such networks estimated with the same <span class="math inline">\lambda</span> but different sample sizes is not a like-for-like comparison. This is a trap in differential network analysis.</p>
+<p>Regularization makes estimation possible by introducing a target, sparsity, or another structural assumption; it does not recover an arbitrary population precision matrix from insufficient information. A nonzero penalized edge is a model-selection result, not automatically a rejection of a null with a calibrated p-value. Missing values create another issue: computing each pair on a different subset can mix populations and produce a matrix that is not positive semidefinite. State how the common population and covariance estimate are defined before interpreting the graph.</p>
+</section>
+</section>
+<section id="from-weights-to-a-graph-and-the-multiple-testing-problem" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="from-weights-to-a-graph-and-the-multiple-testing-problem"><span class="header-section-number">5</span> From weights to a graph, and the multiple-testing problem</h2>
+<p>An association matrix already defines a weighted network. Three common ways to transform it or select an unweighted graph are:</p>
+<ul>
+<li><strong>Hard threshold:</strong> keep <span class="math inline">|r| &gt; c</span>. Simple; the choice of <span class="math inline">c</span> is arbitrary and changes every downstream summary.</li>
+<li><strong>Soft threshold:</strong> An unsigned WGCNA-style adjacency <span class="math inline">a_{ij}=|r_{ij}|^\beta</span>, with <span class="math inline">\beta</span> chosen for approximate scale-free topology (Langfelder and Horvath 2008; Zhang and Horvath 2005). This maps strong negative and positive correlations to similar positive adjacency weights. Signed variants use different transformations, such as <span class="math inline">\{(1+r_{ij})/2\}^\beta</span>. State which network is being built; a scale-free fit criterion is a modeling heuristic, not proof of biological topology.</li>
+<li><strong>Significance:</strong> test each edge, adjust for <span class="math inline">p(p-1)/2</span> tests, keep the rejections. For i.i.d. bivariate-normal pairs, Fisher’s <span class="math inline">z=\operatorname{atanh}(r)</span> has a familiar large-sample variance approximation <span class="math inline">1/(N-3)</span>. It is not a reference for arbitrary measured features or missing-pair patterns.</li>
+</ul>
+<p>The significance route brings the multiple-testing problem into focus. With <span class="math inline">p = 10{,}000</span> genes there are about <span class="math inline">5 \times 10^7</span> edges. BH needs independence or a suitable PRDS condition for the p-values. Shared-edge dependence need not meet those conditions; its presence alone does not prove they fail either. A permutation calibration can account for joint dependence only when its relabeling is justified by the tested null and study design. Between-group label permutation addresses a group-comparison null; it does not generally test that an individual population correlation is zero. See the <a href="../../guides/analysis-problems/multiple-testing.html">Multiple testing when the tests are not independent</a> page for alternatives and conditions.</p>
+</section>
+<section id="differential-networks" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="differential-networks"><span class="header-section-number">6</span> Differential networks</h2>
+<p>First separate an <strong>edge difference</strong> from a difference in two significance labels. Suppose the estimated Fisher-transformed correlations are 0.30 (SE 0.14) and 0.28 (SE 0.15) in independent groups. Their individual normal-reference p-values are about 0.032 and 0.062: one crosses 0.05 and the other does not. But the estimated difference is only 0.02, with SE <span class="math inline">\sqrt{0.14^2+0.15^2}\approx0.205</span>. There is little evidence of a difference. Testing the contrast directly answers the differential-edge question; subtracting two thresholded graphs does not.</p>
+<p>The question “do the networks differ between patients and controls” has three main formulations, in increasing order of what they demand.</p>
+<p><strong>Edge by edge.</strong> For two independent samples, Fisher’s <span class="math inline">z</span> difference,</p>
+<p><span class="math display">
+\begin{aligned}
+d_z&amp;=\operatorname{atanh}(r_1)-\operatorname{atanh}(r_2),\\
+v_z&amp;=\frac1{N_1-3}+\frac1{N_2-3},\\
+T_z&amp;=d_z/\sqrt{v_z}\\
+&amp;\approx\ N(0,1),
+\end{aligned}
+</span></p>
+<p>tests one edge. The displayed reference is for independent i.i.d. samples from nondegenerate bivariate-normal populations under the equal-correlation null. Under other distributions its variance approximation can fail; equal group means or Gaussian marginals alone do not establish joint bivariate normality. Use an appropriate influence-function or bootstrap variance, or a permutation scheme justified for the actual null. Equal correlations alone do not make group labels exchangeable.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>FisherZTest <span class="ot">&lt;-</span> <span class="cf">function</span>(r1, n1, r2, n2) {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(n1 <span class="sc">&gt;</span> <span class="dv">3</span>, n2 <span class="sc">&gt;</span> <span class="dv">3</span>, <span class="fu">abs</span>(r1) <span class="sc">&lt;</span> <span class="dv">1</span>, <span class="fu">abs</span>(r2) <span class="sc">&lt;</span> <span class="dv">1</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> (<span class="fu">atanh</span>(r1) <span class="sc">-</span> <span class="fu">atanh</span>(r2)) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> (n1 <span class="sc">-</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> (n2 <span class="sc">-</span> <span class="dv">3</span>))</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">z =</span> z, <span class="at">p =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="sc">-</span><span class="fu">abs</span>(z)))</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">FisherZTest</span>(<span class="at">r1 =</span> <span class="fl">0.6</span>, <span class="at">n1 =</span> <span class="dv">40</span>, <span class="at">r2 =</span> <span class="fl">0.2</span>, <span class="at">n2 =</span> <span class="dv">60</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         z          p 
+2.32293885 0.02018244 </code></pre>
+</div>
+</div>
+<p><strong>Whole precision matrix.</strong> Methods that estimate the difference <span class="math inline">\Omega_1 - \Omega_2</span> directly (Zhao, Cai, and Li 2014) or test it entry-wise with a valid multiple-testing procedure (Xia, Cai, and Cai 2015). Direct difference estimation changes the estimation problem, but still requires tuning, sparsity/model assumptions, and an evaluation design appropriate to unequal sample sizes.</p>
+<p><strong>Sample-specific networks</strong> (the <a href="../../guides/analysis-problems/jackknife-pseudo-values.html">Jackknife pseudo-values</a> page). Construct observation-indexed summaries and define the population contrast they are intended to estimate. Cohort-derived pseudo-values share estimated quantities, so treating them as independent raw measurements in a t-test or limma is not automatically valid. An inferential argument must handle their expansion, centering, and shared estimation, in addition to the mean/variance artifacts discussed in the linked guide.</p>
+<p>Within-group sample correlations already center and scale within each group, so different group means alone do not create a difference between those correlations. Pooled pseudo-value constructions can inherit between-group shifts, as the <a href="../../guides/analysis-problems/jackknife-pseudo-values.html">Jackknife pseudo-values</a> page demonstrates. Precision-matrix contrasts, correlation contrasts, and contrasts of observation-level network summaries are distinct targets; assess each on its own definition and assumptions.</p>
+</section>
+<section id="computation" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="computation"><span class="header-section-number">7</span> Computation</h2>
+<p>The numbers you should know before planning an analysis.</p>
+<p><strong>Edges scale as <span class="math inline">p^2</span>.</strong> A network on <span class="math inline">p</span> genes has <span class="math inline">p(p-1)/2</span> edges: 499,500 for <span class="math inline">p = 1000</span>, <span class="math inline">2 \times 10^8</span> for <span class="math inline">p = 20{,}000</span>. One dense network of 20,000 genes in double precision is 3.2 decimal GB (about 2.98 GiB), before temporary arrays; the unique upper-triangle entries require about 1.6 GB. Retaining one per person rapidly multiplies that cost. Restricting the feature universe changes the target graph and tested family; outcome-dependent filtering needs an inferential justification. Prespecified pathways or streaming edge summaries can reduce computation.</p>
+<p><strong>One correlation matrix is cheap.</strong> <code>cor()</code> on an <span class="math inline">N \times p</span> matrix costs <span class="math inline">O(N p^2)</span> and is dominated by matrix cross-products and associated centering/scaling operations.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">100</span>; p <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(N <span class="sc">*</span> p), N, p)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(R_all <span class="ot">&lt;-</span> <span class="fu">cor</span>(X))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  0.029   0.001   0.030 </code></pre>
+</div>
+</div>
+<p><strong>Sample-specific networks the naive way are <span class="math inline">N</span> times that,</strong> and the leave-one-out recomputation is wasteful: each <code>cor(X[-i, ])</code> recomputes a cross-product that differs from the full one by a single rank-one term. Update the sufficient statistics instead.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Leave-one-out correlation matrices for the rows in `idx`, from one cross-product,</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="co"># by rank-one updates. Assumes N &gt; 2 and no constant columns.</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>LooCorAll <span class="ot">&lt;-</span> <span class="cf">function</span>(X, <span class="at">idx =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(X))) {</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">is.matrix</span>(X), <span class="fu">all</span>(<span class="fu">is.finite</span>(X)), <span class="fu">nrow</span>(X) <span class="sc">&gt;</span> <span class="dv">2</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            <span class="fu">length</span>(idx) <span class="sc">&gt;=</span> <span class="dv">1</span>, <span class="fu">all</span>(idx <span class="sc">==</span> <span class="fu">as.integer</span>(idx)), <span class="fu">all</span>(idx <span class="sc">&gt;=</span> <span class="dv">1</span>), <span class="fu">all</span>(idx <span class="sc">&lt;=</span> <span class="fu">nrow</span>(X)))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(X)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">sweep</span>(X, <span class="dv">2</span>, <span class="fu">colMeans</span>(X))  <span class="co"># translation preserves LOO correlations; reduces cancellation</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">colSums</span>(X); C <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(X)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(idx, <span class="cf">function</span>(i) {</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    s_i <span class="ot">&lt;-</span> s <span class="sc">-</span> X[i, ]</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    C_i <span class="ot">&lt;-</span> C <span class="sc">-</span> <span class="fu">tcrossprod</span>(X[i, ])</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    V <span class="ot">&lt;-</span> (C_i <span class="sc">-</span> <span class="fu">tcrossprod</span>(s_i) <span class="sc">/</span> (n <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">/</span> (n <span class="sc">-</span> <span class="dv">2</span>)       <span class="co"># leave-one-out covariance</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">any</span>(<span class="sc">!</span><span class="fu">is.finite</span>(V)) <span class="sc">||</span> <span class="fu">any</span>(<span class="fu">diag</span>(V) <span class="sc">&lt;=</span> <span class="dv">0</span>)) <span class="fu">stop</span>(<span class="st">"Degenerate leave-one-out variance"</span>)</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    V <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">tcrossprod</span>(<span class="fu">diag</span>(V)))                          <span class="co"># to correlation</span></span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">LooCorAll</span>(X[, <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>], <span class="at">idx =</span> i)[[<span class="dv">1</span>]], <span class="fu">cor</span>(X[<span class="sc">-</span>i, <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]), <span class="at">check.attributes =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep this teaching benchmark small; storing many full large-feature matrices costs substantial memory.</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>X_bench <span class="ot">&lt;-</span> X[, <span class="dv">1</span><span class="sc">:</span><span class="dv">250</span>]</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(loo_naive  <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="cf">function</span>(i) <span class="fu">cor</span>(X_bench[<span class="sc">-</span>i, ])))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  0.038   0.001   0.039 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(loo_update <span class="ot">&lt;-</span> <span class="fu">LooCorAll</span>(X_bench, <span class="at">idx =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  0.011   0.006   0.014 </code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(loo_naive[[<span class="dv">1</span>]], loo_update[[<span class="dv">1</span>]], <span class="at">check.attributes =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>For the same 20 matrices the update version avoids repeated full-data cross-products; compare the timings on your machine rather than assuming a fixed speedup. The LIONESS network for sample <span class="math inline">i</span> is then <code>N * R_all - (N - 1) * loo[[i]]</code>, computed and summarized one sample at a time (call <code>LooCorAll()</code> with one <code>idx</code> at a time) so the number of retained dense matrices does not grow with the number of people. Cross-products, full estimates, updates, and temporary arrays still require several dense matrices; streaming is <span class="math inline">O(p^2)</span> working memory, not literally one matrix. The update version is still <span class="math inline">O(p^2)</span> per sample, which is the floor; it just avoids the factor of <span class="math inline">N</span> from redoing the cross-product.</p>
+<p><strong>Permutation references multiply everything.</strong> A permutation test with <span class="math inline">B</span> permutations costs <span class="math inline">B</span> times the analysis. For a whole-network statistic on filtered genes this is routine; for per-edge permutation p-values across <span class="math inline">10^7</span> edges it is not, and you need either a parametric reference you have checked by simulation or another calibrated approximation. Pooling edges requires assumptions about their null distributions and does not automatically solve the computational or inferential problem.</p>
+<p>Follow the complete calculation in <a href="../../guides/analysis-problems/residual-network-case-study.html">An end-to-end residual-network analysis</a>, from a prespecified edge family and nuisance fits through uncertainty, multiplicity, and simulation evaluation.</p>
+</section>
+<section id="exercises" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="exercises"><span class="header-section-number">8</span> Exercises</h2>
+<p><strong>Checkpoints are completion targets for this page. Additional practice below is optional.</strong> Each checkpoint gives a completion standard, a hint, and a solution outline.</p>
+<div id="checkpoint-net-01" class="checkpoint">
+<section id="checkpoint-net-01-identify-the-association-represented-by-an-edge" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-net-01-identify-the-association-represented-by-an-edge">Checkpoint · NET-01 — Identify the association represented by an edge</h3>
+<p><strong>Task type:</strong> Derivation and interpretation.</p>
+<p>Let <span class="math inline">Z,U,V</span> be independent standard normals, with <span class="math inline">X=Z+U</span> and <span class="math inline">Y=Z+V</span>. Calculate the marginal correlation and the covariance after subtracting <span class="math inline">E[X\mid Z]</span> and <span class="math inline">E[Y\mid Z]</span>. Explain the shared driver and why a marginal edge does not establish direct regulation. Give a dependent nonlinear pair with zero covariance. Is zero average residual covariance alone a general conditional-independence criterion?</p>
+<p><strong>Ready to continue when:</strong> you can distinguish marginal and residual targets and describe what the edge does and does not establish.</p>
+<p><strong>Transfer:</strong> What changes if <span class="math inline">U</span> and <span class="math inline">V</span> have covariance 0.3 instead of being independent?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Both marginal variances are 2. The conditional-mean residuals are <span class="math inline">U</span> and <span class="math inline">V</span>.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The covariance of <span class="math inline">X</span> and <span class="math inline">Y</span> is 1 and each variance is 2, so the marginal correlation is <span class="math inline">1/2</span>. After subtracting <span class="math inline">Z</span>, the residual covariance is <span class="math inline">E[UV]=0</span>. Shared variation in <span class="math inline">Z</span> explains the marginal edge. In this constructed model the independent errors also imply conditional independence, but a zero average residual covariance does not establish it in general; conditional covariances can cancel, or dependence can be nonlinear. For example, a centered symmetric normal <span class="math inline">X</span> and <span class="math inline">Y=X^2</span> are dependent with <span class="math inline">E[X^3]=0</span>, hence zero covariance; take <span class="math inline">Z</span> constant for a residual-covariance example.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<p>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</p>
+<ol type="1">
+<li>Simulate two genes with a strong monotone but nonlinear relationship (<span class="math inline">y = \exp(x)</span> plus noise). Compare Pearson, Spearman, and distance correlation (package <code>energy</code>). Then add a mean shift to half the samples and see which measures move.</li>
+<li>Generate data from a sparse Gaussian graphical model with <span class="math inline">p = 50</span> and <span class="math inline">N = 40</span> (package <code>huge</code> has generators). Estimate the partial correlation network with shrinkage and with the graphical lasso at two values of <span class="math inline">\lambda</span>. Count true and false edges.</li>
+<li>Take the LIONESS computation above and add within-group centering as a preprocessing step for a two-group <code>X</code>. Start with equal within-group correlations and equal within-group variances and check the group contrast. Then change the variance of one gene in one group while keeping its correlation fixed. Does centering alone still remove the artifact?</li>
+<li>Estimate how much memory and time a LIONESS analysis of 200 samples by 15,000 genes would need if you stored every network, and then redesign it so that you store only the per-edge <span class="math inline">t</span>-statistics between two groups.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="reading"><span class="header-section-number">9</span> Reading</h2>
+<p>The original <a href="https://doi.org/10.1186/1471-2105-9-559">WGCNA paper</a> describes network construction choices.</p>
+<ul>
+<li>Langfelder, P. and Horvath, S. (2008). WGCNA: an R package for weighted correlation network analysis. <em>BMC Bioinformatics</em>, 9, 559.</li>
+<li>Schäfer, J. and Strimmer, K. (2005). A shrinkage approach to large-scale covariance matrix estimation and implications for functional genomics. <em>Statistical Applications in Genetics and Molecular Biology</em>, 4(1), Article 32.</li>
+<li>Friedman, J., Hastie, T., and Tibshirani, R. (2008). Sparse inverse covariance estimation with the graphical lasso. <em>Biostatistics</em>, 9(3), 432 to 441.</li>
+<li>Meinshausen, N. and Bühlmann, P. (2006). High-dimensional graphs and variable selection with the lasso. <em>Annals of Statistics</em>, 34(3), 1436 to 1462.</li>
+<li>de la Fuente, A. (2010). From “differential expression” to “differential networking”: identification of dysfunctional regulatory networks in diseases. <em>Trends in Genetics</em>, 26(7), 326 to 333.</li>
+<li>Xia, Y., Cai, T., and Cai, T. T. (2015). Testing differential networks with applications to the detection of gene-gene interactions. <em>Biometrika</em>, 102(2), 247 to 266.</li>
+<li>Kuijjer, M. L., Tung, M. G., Yuan, G., Quackenbush, J., and Glass, K. (2019). Estimating sample-specific regulatory networks. <em>iScience</em>, 14, 226 to 240.</li>
+<li>Székely, G. J., Rizzo, M. L., and Bakirov, N. K. (2007). Measuring and testing dependence by correlation of distances. <em>Annals of Statistics</em>, 35(6), 2769 to 2794.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/analysis-problems/multiple-testing.html" class="pagination-link" aria-label="Multiple testing when the tests are not independent">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Multiple testing when the tests are not independent</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/analysis-problems/association-targets-and-bias.html" class="pagination-link" aria-label="Association targets, pooling, and imperfect adjustment">
+        <span class="nav-page-text">Association targets, pooling, and imperfect adjustment</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Network inference from omics data"</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Define marginal, residual, and graphical edges; assess uncertainty and computational cost"</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="an">aliases:</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/statistical-background/08-network-inference.html"</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/statistical-background/07-network-inference.html"</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>**Before reading:** Expression matrices, covariance, and estimands; follow influence-function links for sensitivity calculations.</span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a><span class="fu">## Define the edge before estimating it</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>Let $X$ and $Y$ be two measured features in a specified population, and let $Z$ be a chosen adjustment set. Three targets recur:</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>::: {.table-responsive}</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Edge target <span class="pp">|</span> Meaning <span class="pp">|</span> What zero does not generally establish <span class="pp">|</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $\operatorname{Corr}(X,Y)$ <span class="pp">|</span> Marginal association across units in that population <span class="pp">|</span> Independence or absence of a shared driver <span class="pp">|</span></span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $E<span class="co">[</span><span class="ot">(X-m_X(Z))(Y-m_Y(Z))</span><span class="co">]</span>$ <span class="pp">|</span> Average conditional covariance after conditional-mean adjustment <span class="pp">|</span> Conditional independence or a direct biological interaction <span class="pp">|</span></span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> A precision-matrix partial correlation <span class="pp">|</span> Linear residual association after adjusting for the other modeled features <span class="pp">|</span> Conditional independence outside the relevant Gaussian model, or causal regulation <span class="pp">|</span></span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>The normalized version of the second target is a residual correlation, not generally the average of conditional correlations. A differential-network estimand is a contrast between the same edge definition in two specified populations. State the scale, adjustment set, and feature universe before choosing the estimator. The expression examples below transfer only after the measurement assumptions for the new assay have been checked.</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>For Pearson correlation, normalization means</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>\rho=\frac{\operatorname{Cov}(X,Y)}</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a> {\sqrt{\operatorname{Var}(X)\operatorname{Var}(Y)}}.</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>Covariance retains the measurement units; correlation divides them out using each variable's spread. Removing a conditional mean changes the variables being related, while normalizing changes their scale. Keep these operations separate. An average residual product, its normalized correlation, and a precision-matrix entry are three different edge definitions even when computed from the same assay.</span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## What a co-expression network is</span></span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>A gene co-expression network has genes as nodes and, for each pair of genes, an edge weight that measures how strongly the two genes' expression levels move together **across samples**. That last phrase is the one to hold onto. A population edge is a functional of a specified distribution, estimated from a cohort. Its estimator is not a direct measurement of regulation in an individual cell or molecule. Every property of the network is inherited from the cohort it was computed on, which is why the <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span> page applies to networks with full force.</span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a>Three decisions define a network: the association measure, whether edges are marginal or conditional, and how weights become a graph. Each has consequences for what the network can detect, how it behaves under heterogeneity, and what it costs to compute.</span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## Association measures</span></span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>::: {.table-responsive}</span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Measure <span class="pp">|</span> Main use <span class="pp">|</span> Transformation behavior <span class="pp">|</span> Main caution <span class="pp">|</span></span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Pearson $r$ <span class="pp">|</span> Linear association <span class="pp">|</span> Unchanged by positive affine rescaling of either variable; a sign reversal flips its sign <span class="pp">|</span> Sensitive to tails, mixtures, and mean shifts <span class="pp">|</span></span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Spearman $\rho_S$ <span class="pp">|</span> Rank association <span class="pp">|</span> Unchanged by strictly increasing transformations of each variable <span class="pp">|</span> Subgroup shifts can change pooled ranks <span class="pp">|</span></span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Kendall $\tau$ <span class="pp">|</span> Concordance <span class="pp">|</span> Unchanged by strictly increasing transformations of each variable <span class="pp">|</span> Ties and their handling matter <span class="pp">|</span></span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Biweight midcorrelation <span class="pp">|</span> Robust association <span class="pp">|</span> Uses robust centering, scaling, and outlier downweighting <span class="pp">|</span> Robustness depends on the definition and nondegenerate scale estimates <span class="pp">|</span></span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Distance correlation <span class="pp">|</span> General dependence <span class="pp">|</span> Translation and scalar-rescaling invariant; not invariant to arbitrary affine transformations <span class="pp">|</span> Population zero characterizes independence under moment conditions; finite-sample estimation still needs calibration <span class="pp">|</span></span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Mutual information <span class="pp">|</span> General dependence <span class="pp">|</span> Population quantity invariant to invertible transformations under suitable conditions <span class="pp">|</span> Estimated values depend on density, binning, and tuning choices <span class="pp">|</span></span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Partial correlation <span class="pp">|</span> Linear residual association <span class="pp">|</span> Depends on the conditioning variables and fitted covariance model <span class="pp">|</span> Zero implies conditional independence only in special models such as the Gaussian model <span class="pp">|</span></span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>Two properties matter most for our work.</span>
+<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>**Invariance to transformation.** Strictly increasing transformations preserve pooled ranks. A sample-specific normalization, or a shift applied only within one group, need not preserve those ranks. Rank measures can therefore change when group composition changes. Invariance to a common transformation is not robustness to heterogeneity.</span>
+<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a>**Influence and outliers.** Pearson's influence function has unbounded local sensitivity, although the correlation itself remains in $<span class="co">[</span><span class="ot">-1,1</span><span class="co">]</span>$. Rank-based and robust measures offer different forms of protection, but none establishes a biological interaction or removes an incorrect population target. The next example shows a large effect of one outlying pair on Pearson correlation.</span>
+<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">50</span></span>
+<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); y <span class="ot">&lt;-</span> <span class="fl">0.3</span> <span class="sc">*</span> x <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>x[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">6</span>; y[<span class="dv">1</span>] <span class="ot">&lt;-</span> <span class="dv">6</span>                       <span class="co"># one outlying sample</span></span>
+<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">pearson =</span> <span class="fu">cor</span>(x, y), <span class="at">spearman =</span> <span class="fu">cor</span>(x, y, <span class="at">method =</span> <span class="st">"spearman"</span>),</span>
+<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a>  <span class="at">pearson_without =</span> <span class="fu">cor</span>(x[<span class="sc">-</span><span class="dv">1</span>], y[<span class="sc">-</span><span class="dv">1</span>]))</span>
+<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a><span class="fu">## Marginal versus conditional dependence</span></span>
+<span id="cb21-78"><a href="#cb21-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-79"><a href="#cb21-79" aria-hidden="true" tabindex="-1"></a>A Pearson edge between genes A and B is **marginal**: it is nonzero if A and B co-vary for any reason, including both being driven by a third gene C, or by a cell-type proportion, or by batch. A **conditional** edge refers to a specified conditioning set. A full-feature graphical model conditions on the other modeled features; it does not follow that conditioning on every measured variable answers the biological question. Selection variables, mediators, and colliders can change associations. For Gaussian data the conditional edges are the partial correlations, read off the inverse covariance (precision) matrix $\Omega = \Sigma^{-1}$:</span>
+<span id="cb21-80"><a href="#cb21-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-81"><a href="#cb21-81" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb21-82"><a href="#cb21-82" aria-hidden="true" tabindex="-1"></a>\rho_{AB \mid \text{rest}} = -\frac{\Omega_{AB}}{\sqrt{\Omega_{AA}\,\Omega_{BB}}}.</span>
+<span id="cb21-83"><a href="#cb21-83" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb21-84"><a href="#cb21-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-85"><a href="#cb21-85" aria-hidden="true" tabindex="-1"></a>A zero partial correlation means conditional independence (under Gaussianity), and the graph of nonzero partial correlations is the **Gaussian graphical model**. Conditioning changes the estimand; it does not automatically make a network sparse or regulatory. Missing common causes, measurement error, selection, and the chosen feature universe can all change the interpretation.</span>
+<span id="cb21-86"><a href="#cb21-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-87"><a href="#cb21-87" aria-hidden="true" tabindex="-1"></a>“Rest” means the same specified set of the other $p-2$ features for this pair. If we keep only three genes, the A–B edge conditions on the third. If we add 100 genes, it conditions on a larger set and is a different population quantity. The minus sign in the precision formula comes from inverting the pair's conditional covariance matrix: for a matrix with entries $a,c,c,b$, the inverse has off-diagonal entry $-c/(ab-c^2)$. Dividing that precision entry by the square root of its two diagonal entries and changing the sign recovers $c/\sqrt{ab}$.</span>
+<span id="cb21-88"><a href="#cb21-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-91"><a href="#cb21-91" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-92"><a href="#cb21-92" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb21-93"><a href="#cb21-93" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb21-94"><a href="#cb21-94" aria-hidden="true" tabindex="-1"></a>c_gene <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb21-95"><a href="#cb21-95" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fl">0.8</span> <span class="sc">*</span> c_gene <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">0.6</span>)</span>
+<span id="cb21-96"><a href="#cb21-96" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fl">0.8</span> <span class="sc">*</span> c_gene <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">0.6</span>)    <span class="co"># A and B share a driver C, no direct link</span></span>
+<span id="cb21-97"><a href="#cb21-97" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(a, b, c_gene)</span>
+<span id="cb21-98"><a href="#cb21-98" aria-hidden="true" tabindex="-1"></a><span class="fu">cor</span>(a, b)                                  <span class="co"># marginal: strongly correlated</span></span>
+<span id="cb21-99"><a href="#cb21-99" aria-hidden="true" tabindex="-1"></a>Omega <span class="ot">&lt;-</span> <span class="fu">solve</span>(<span class="fu">cov</span>(X))</span>
+<span id="cb21-100"><a href="#cb21-100" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span>Omega[<span class="dv">1</span>, <span class="dv">2</span>] <span class="sc">/</span> <span class="fu">sqrt</span>(Omega[<span class="dv">1</span>, <span class="dv">1</span>] <span class="sc">*</span> Omega[<span class="dv">2</span>, <span class="dv">2</span>])   <span class="co"># partial, given C: about zero</span></span>
+<span id="cb21-101"><a href="#cb21-101" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-102"><a href="#cb21-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-105"><a href="#cb21-105" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-106"><a href="#cb21-106" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-network-shared-driver</span></span>
+<span id="cb21-107"><a href="#cb21-107" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 6.5</span></span>
+<span id="cb21-108"><a href="#cb21-108" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "One synthetic shared-driver example. The raw pair is associated across people; removing the true conditional means given C removes that shared component. Zero residual association in this Gaussian construction is not a general independence criterion."</span></span>
+<span id="cb21-109"><a href="#cb21-109" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Two vertically stacked scatterplots compare marginal feature values with their residuals after subtracting 0.8 times the common driver."</span></span>
+<span id="cb21-110"><a href="#cb21-110" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">1</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">2</span>, <span class="dv">1</span>))</span>
+<span id="cb21-111"><a href="#cb21-111" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(a, b, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">col =</span> <span class="st">"#2F80C866"</span>, <span class="at">xlab =</span> <span class="st">"Feature A"</span>, <span class="at">ylab =</span> <span class="st">"Feature B"</span>,</span>
+<span id="cb21-112"><a href="#cb21-112" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="fu">sprintf</span>(<span class="st">"Marginal correlation: %.2f"</span>, <span class="fu">cor</span>(a, b)))</span>
+<span id="cb21-113"><a href="#cb21-113" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(a <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>c_gene, b <span class="sc">-</span> <span class="fl">0.8</span><span class="sc">*</span>c_gene, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.5</span>, <span class="at">col =</span> <span class="st">"#D55E0066"</span>,</span>
+<span id="cb21-114"><a href="#cb21-114" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"A minus its true conditional mean"</span>, <span class="at">ylab =</span> <span class="st">"B minus its true conditional mean"</span>,</span>
+<span id="cb21-115"><a href="#cb21-115" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Shared driver removed"</span>)</span>
+<span id="cb21-116"><a href="#cb21-116" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-117"><a href="#cb21-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-118"><a href="#cb21-118" aria-hidden="true" tabindex="-1"></a>In this shared-driver generator, A and B each have variance $0.8^2+0.6^2=1$, and their covariance is $0.8^2\operatorname{Var}(C)=0.64$. Their population marginal correlation is therefore 0.64. Subtracting $0.8C$ leaves the two independent noise terms, each with SD 0.6, giving residual covariance zero. The plotted sample correlation fluctuates around these population values. The conditional-independence interpretation here follows from the generator's independent errors and Gaussian model, rather than from the label “adjusted.”</span>
+<span id="cb21-119"><a href="#cb21-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-120"><a href="#cb21-120" aria-hidden="true" tabindex="-1"></a><span class="fu">### Zero covariance can hide dependence</span></span>
+<span id="cb21-121"><a href="#cb21-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-122"><a href="#cb21-122" aria-hidden="true" tabindex="-1"></a>If $X$ is symmetric about zero and $Y=X^2$, then $E<span class="co">[</span><span class="ot">X</span><span class="co">]</span>=E<span class="co">[</span><span class="ot">X^3</span><span class="co">]</span>=0$ and $\operatorname{Cov}(X,Y)=0$, despite a deterministic relationship. Taking $Z$ constant makes this a zero residual-covariance example as well. A zero average conditional covariance can also arise by cancellation of positive and negative conditional covariances across strata. Gaussian conditional independence uses the joint Gaussian model, not zero covariance alone.</span>
+<span id="cb21-123"><a href="#cb21-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-126"><a href="#cb21-126" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-127"><a href="#cb21-127" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-zero-edge-dependence</span></span>
+<span id="cb21-128"><a href="#cb21-128" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "A schematic nonlinear relationship with zero Pearson covariance by symmetry. A missing Pearson edge does not mean the two features are independent. Points are a deterministic grid for illustration, not a random sample for a p-value."</span></span>
+<span id="cb21-129"><a href="#cb21-129" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A symmetric parabola shows a deterministic dependent pair with zero linear covariance."</span></span>
+<span id="cb21-130"><a href="#cb21-130" aria-hidden="true" tabindex="-1"></a>x_grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="dv">2</span>, <span class="dv">2</span>, <span class="at">length.out =</span> <span class="dv">201</span>)</span>
+<span id="cb21-131"><a href="#cb21-131" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(x_grid, x_grid<span class="sc">^</span><span class="dv">2</span>, <span class="at">pch =</span> <span class="dv">16</span>, <span class="at">cex =</span> <span class="fl">0.55</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>,</span>
+<span id="cb21-132"><a href="#cb21-132" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"X"</span>, <span class="at">ylab =</span> <span class="st">"Y = X squared"</span>, <span class="at">main =</span> <span class="st">"Zero linear covariance; complete nonlinear dependence"</span>)</span>
+<span id="cb21-133"><a href="#cb21-133" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-134"><a href="#cb21-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-135"><a href="#cb21-135" aria-hidden="true" tabindex="-1"></a><span class="fu">### The $p &gt; N$ problem</span></span>
+<span id="cb21-136"><a href="#cb21-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-137"><a href="#cb21-137" aria-hidden="true" tabindex="-1"></a>Let $X_c$ be the centered $N\times p$ data matrix. The sample covariance is $S=X_c^\top X_c/(N-1)$. Centering makes the rows sum to zero, so its rank is at most $N-1$. Thus $S$ is singular when $p\ge N$ (and can be singular earlier through collinearity): there is no unique ordinary inverse to plug into the partial-correlation formula. Three standard approaches add structure:</span>
+<span id="cb21-138"><a href="#cb21-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-139"><a href="#cb21-139" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Shrinkage** (Schäfer and Strimmer 2005; Ledoit and Wolf 2004): $\hat\Sigma_\lambda = (1-\lambda)S + \lambda T$ for a simple target $T$, invertible when the target is positive definite and the shrinkage weight lies in $(0,1]$, under suitable shrinkage estimators. Some targets have analytic tuning rules; other choices require estimation or tuning. The result is generally dense.</span>
+<span id="cb21-140"><a href="#cb21-140" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Graphical lasso** (Friedman, Hastie, and Tibshirani 2008): maximize the Gaussian log-likelihood with an $\ell_1$ penalty on $\Omega$. Sparse result; the penalty $\lambda$ is the sparsity knob, chosen by cross-validation, EBIC, or StARS (Liu, Roeder, and Wasserman 2010). Package <span class="in">`glasso`</span>, or <span class="in">`huge`</span> for a wrapper with selection.</span>
+<span id="cb21-141"><a href="#cb21-141" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Neighborhood selection** (Meinshausen and Bühlmann 2006): regress each gene on all others with the lasso; the two directional selections are combined with a stated OR or AND rule. This and graphical lasso target related Gaussian conditional-association structures through different optimization problems; they are not algebraically equivalent.</span>
+<span id="cb21-142"><a href="#cb21-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-143"><a href="#cb21-143" aria-hidden="true" tabindex="-1"></a>These methods regularize the estimated covariance, precision matrix, or nodewise regressions. Their tuning affects both weights and selected edges; individual transformed edge weights need not all move toward zero. Comparing two such networks estimated with the same $\lambda$ but different sample sizes is not a like-for-like comparison. This is a trap in differential network analysis.</span>
+<span id="cb21-144"><a href="#cb21-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-145"><a href="#cb21-145" aria-hidden="true" tabindex="-1"></a>Regularization makes estimation possible by introducing a target, sparsity, or another structural assumption; it does not recover an arbitrary population precision matrix from insufficient information. A nonzero penalized edge is a model-selection result, not automatically a rejection of a null with a calibrated p-value. Missing values create another issue: computing each pair on a different subset can mix populations and produce a matrix that is not positive semidefinite. State how the common population and covariance estimate are defined before interpreting the graph.</span>
+<span id="cb21-146"><a href="#cb21-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-147"><a href="#cb21-147" aria-hidden="true" tabindex="-1"></a><span class="fu">## From weights to a graph, and the multiple-testing problem</span></span>
+<span id="cb21-148"><a href="#cb21-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-149"><a href="#cb21-149" aria-hidden="true" tabindex="-1"></a>An association matrix already defines a weighted network. Three common ways to transform it or select an unweighted graph are:</span>
+<span id="cb21-150"><a href="#cb21-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-151"><a href="#cb21-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Hard threshold:** keep $|r| &gt; c$. Simple; the choice of $c$ is arbitrary and changes every downstream summary.</span>
+<span id="cb21-152"><a href="#cb21-152" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Soft threshold:** An unsigned WGCNA-style adjacency $a_{ij}=|r_{ij}|^\beta$, with $\beta$ chosen for approximate scale-free topology (Langfelder and Horvath 2008; Zhang and Horvath 2005). This maps strong negative and positive correlations to similar positive adjacency weights. Signed variants use different transformations, such as $\{(1+r_{ij})/2<span class="sc">\}</span>^\beta$. State which network is being built; a scale-free fit criterion is a modeling heuristic, not proof of biological topology.</span>
+<span id="cb21-153"><a href="#cb21-153" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Significance:** test each edge, adjust for $p(p-1)/2$ tests, keep the rejections. For i.i.d. bivariate-normal pairs, Fisher's $z=\operatorname{atanh}(r)$ has a familiar large-sample variance approximation $1/(N-3)$. It is not a reference for arbitrary measured features or missing-pair patterns.</span>
+<span id="cb21-154"><a href="#cb21-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-155"><a href="#cb21-155" aria-hidden="true" tabindex="-1"></a>The significance route brings the multiple-testing problem into focus. With $p = 10{,}000$ genes there are about $5 \times 10^7$ edges. BH needs independence or a suitable PRDS condition for the p-values. Shared-edge dependence need not meet those conditions; its presence alone does not prove they fail either. A permutation calibration can account for joint dependence only when its relabeling is justified by the tested null and study design. Between-group label permutation addresses a group-comparison null; it does not generally test that an individual population correlation is zero. See the <span class="co">[</span><span class="ot">Multiple testing when the tests are not independent</span><span class="co">](multiple-testing.qmd)</span> page for alternatives and conditions.</span>
+<span id="cb21-156"><a href="#cb21-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-157"><a href="#cb21-157" aria-hidden="true" tabindex="-1"></a><span class="fu">## Differential networks</span></span>
+<span id="cb21-158"><a href="#cb21-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-159"><a href="#cb21-159" aria-hidden="true" tabindex="-1"></a>First separate an **edge difference** from a difference in two significance labels. Suppose the estimated Fisher-transformed correlations are 0.30 (SE 0.14) and 0.28 (SE 0.15) in independent groups. Their individual normal-reference p-values are about 0.032 and 0.062: one crosses 0.05 and the other does not. But the estimated difference is only 0.02, with SE $\sqrt{0.14^2+0.15^2}\approx0.205$. There is little evidence of a difference. Testing the contrast directly answers the differential-edge question; subtracting two thresholded graphs does not.</span>
+<span id="cb21-160"><a href="#cb21-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-161"><a href="#cb21-161" aria-hidden="true" tabindex="-1"></a>The question "do the networks differ between patients and controls" has three main formulations, in increasing order of what they demand.</span>
+<span id="cb21-162"><a href="#cb21-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-163"><a href="#cb21-163" aria-hidden="true" tabindex="-1"></a>**Edge by edge.** For two independent samples, Fisher's $z$ difference,</span>
+<span id="cb21-164"><a href="#cb21-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-165"><a href="#cb21-165" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb21-166"><a href="#cb21-166" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb21-167"><a href="#cb21-167" aria-hidden="true" tabindex="-1"></a>d_z&amp;=\operatorname{atanh}(r_1)-\operatorname{atanh}(r_2),<span class="sc">\\</span></span>
+<span id="cb21-168"><a href="#cb21-168" aria-hidden="true" tabindex="-1"></a>v_z&amp;=\frac1{N_1-3}+\frac1{N_2-3},<span class="sc">\\</span></span>
+<span id="cb21-169"><a href="#cb21-169" aria-hidden="true" tabindex="-1"></a>T_z&amp;=d_z/\sqrt{v_z}<span class="sc">\\</span></span>
+<span id="cb21-170"><a href="#cb21-170" aria-hidden="true" tabindex="-1"></a>&amp;\approx\ N(0,1),</span>
+<span id="cb21-171"><a href="#cb21-171" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb21-172"><a href="#cb21-172" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb21-173"><a href="#cb21-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-174"><a href="#cb21-174" aria-hidden="true" tabindex="-1"></a>tests one edge. The displayed reference is for independent i.i.d. samples from nondegenerate bivariate-normal populations under the equal-correlation null. Under other distributions its variance approximation can fail; equal group means or Gaussian marginals alone do not establish joint bivariate normality. Use an appropriate influence-function or bootstrap variance, or a permutation scheme justified for the actual null. Equal correlations alone do not make group labels exchangeable.</span>
+<span id="cb21-175"><a href="#cb21-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-178"><a href="#cb21-178" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-179"><a href="#cb21-179" aria-hidden="true" tabindex="-1"></a>FisherZTest <span class="ot">&lt;-</span> <span class="cf">function</span>(r1, n1, r2, n2) {</span>
+<span id="cb21-180"><a href="#cb21-180" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(n1 <span class="sc">&gt;</span> <span class="dv">3</span>, n2 <span class="sc">&gt;</span> <span class="dv">3</span>, <span class="fu">abs</span>(r1) <span class="sc">&lt;</span> <span class="dv">1</span>, <span class="fu">abs</span>(r2) <span class="sc">&lt;</span> <span class="dv">1</span>)</span>
+<span id="cb21-181"><a href="#cb21-181" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> (<span class="fu">atanh</span>(r1) <span class="sc">-</span> <span class="fu">atanh</span>(r2)) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> (n1 <span class="sc">-</span> <span class="dv">3</span>) <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> (n2 <span class="sc">-</span> <span class="dv">3</span>))</span>
+<span id="cb21-182"><a href="#cb21-182" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">z =</span> z, <span class="at">p =</span> <span class="dv">2</span> <span class="sc">*</span> <span class="fu">pnorm</span>(<span class="sc">-</span><span class="fu">abs</span>(z)))</span>
+<span id="cb21-183"><a href="#cb21-183" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-184"><a href="#cb21-184" aria-hidden="true" tabindex="-1"></a><span class="fu">FisherZTest</span>(<span class="at">r1 =</span> <span class="fl">0.6</span>, <span class="at">n1 =</span> <span class="dv">40</span>, <span class="at">r2 =</span> <span class="fl">0.2</span>, <span class="at">n2 =</span> <span class="dv">60</span>)</span>
+<span id="cb21-185"><a href="#cb21-185" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-186"><a href="#cb21-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-187"><a href="#cb21-187" aria-hidden="true" tabindex="-1"></a>**Whole precision matrix.** Methods that estimate the difference $\Omega_1 - \Omega_2$ directly (Zhao, Cai, and Li 2014) or test it entry-wise with a valid multiple-testing procedure (Xia, Cai, and Cai 2015). Direct difference estimation changes the estimation problem, but still requires tuning, sparsity/model assumptions, and an evaluation design appropriate to unequal sample sizes.</span>
+<span id="cb21-188"><a href="#cb21-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-189"><a href="#cb21-189" aria-hidden="true" tabindex="-1"></a>**Sample-specific networks** (the <span class="co">[</span><span class="ot">Jackknife pseudo-values</span><span class="co">](jackknife-pseudo-values.qmd)</span> page). Construct observation-indexed summaries and define the population contrast they are intended to estimate. Cohort-derived pseudo-values share estimated quantities, so treating them as independent raw measurements in a t-test or limma is not automatically valid. An inferential argument must handle their expansion, centering, and shared estimation, in addition to the mean/variance artifacts discussed in the linked guide.</span>
+<span id="cb21-190"><a href="#cb21-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-191"><a href="#cb21-191" aria-hidden="true" tabindex="-1"></a>Within-group sample correlations already center and scale within each group, so different group means alone do not create a difference between those correlations. Pooled pseudo-value constructions can inherit between-group shifts, as the <span class="co">[</span><span class="ot">Jackknife pseudo-values</span><span class="co">](jackknife-pseudo-values.qmd)</span> page demonstrates. Precision-matrix contrasts, correlation contrasts, and contrasts of observation-level network summaries are distinct targets; assess each on its own definition and assumptions.</span>
+<span id="cb21-192"><a href="#cb21-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-193"><a href="#cb21-193" aria-hidden="true" tabindex="-1"></a><span class="fu">## Computation</span></span>
+<span id="cb21-194"><a href="#cb21-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-195"><a href="#cb21-195" aria-hidden="true" tabindex="-1"></a>The numbers you should know before planning an analysis.</span>
+<span id="cb21-196"><a href="#cb21-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-197"><a href="#cb21-197" aria-hidden="true" tabindex="-1"></a>**Edges scale as $p^2$.** A network on $p$ genes has $p(p-1)/2$ edges: 499,500 for $p = 1000$, $2 \times 10^8$ for $p = 20{,}000$. One dense network of 20,000 genes in double precision is 3.2 decimal GB (about 2.98 GiB), before temporary arrays; the unique upper-triangle entries require about 1.6 GB. Retaining one per person rapidly multiplies that cost. Restricting the feature universe changes the target graph and tested family; outcome-dependent filtering needs an inferential justification. Prespecified pathways or streaming edge summaries can reduce computation.</span>
+<span id="cb21-198"><a href="#cb21-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-199"><a href="#cb21-199" aria-hidden="true" tabindex="-1"></a>**One correlation matrix is cheap.** <span class="in">`cor()`</span> on an $N \times p$ matrix costs $O(N p^2)$ and is dominated by matrix cross-products and associated centering/scaling operations.</span>
+<span id="cb21-200"><a href="#cb21-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-203"><a href="#cb21-203" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-204"><a href="#cb21-204" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">3</span>)</span>
+<span id="cb21-205"><a href="#cb21-205" aria-hidden="true" tabindex="-1"></a>N <span class="ot">&lt;-</span> <span class="dv">100</span>; p <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb21-206"><a href="#cb21-206" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(N <span class="sc">*</span> p), N, p)</span>
+<span id="cb21-207"><a href="#cb21-207" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(R_all <span class="ot">&lt;-</span> <span class="fu">cor</span>(X))</span>
+<span id="cb21-208"><a href="#cb21-208" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-209"><a href="#cb21-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-210"><a href="#cb21-210" aria-hidden="true" tabindex="-1"></a>**Sample-specific networks the naive way are $N$ times that,** and the leave-one-out recomputation is wasteful: each <span class="in">`cor(X[-i, ])`</span> recomputes a cross-product that differs from the full one by a single rank-one term. Update the sufficient statistics instead.</span>
+<span id="cb21-211"><a href="#cb21-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-214"><a href="#cb21-214" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb21-215"><a href="#cb21-215" aria-hidden="true" tabindex="-1"></a><span class="co"># Leave-one-out correlation matrices for the rows in `idx`, from one cross-product,</span></span>
+<span id="cb21-216"><a href="#cb21-216" aria-hidden="true" tabindex="-1"></a><span class="co"># by rank-one updates. Assumes N &gt; 2 and no constant columns.</span></span>
+<span id="cb21-217"><a href="#cb21-217" aria-hidden="true" tabindex="-1"></a>LooCorAll <span class="ot">&lt;-</span> <span class="cf">function</span>(X, <span class="at">idx =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(X))) {</span>
+<span id="cb21-218"><a href="#cb21-218" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">is.matrix</span>(X), <span class="fu">all</span>(<span class="fu">is.finite</span>(X)), <span class="fu">nrow</span>(X) <span class="sc">&gt;</span> <span class="dv">2</span>,</span>
+<span id="cb21-219"><a href="#cb21-219" aria-hidden="true" tabindex="-1"></a>            <span class="fu">length</span>(idx) <span class="sc">&gt;=</span> <span class="dv">1</span>, <span class="fu">all</span>(idx <span class="sc">==</span> <span class="fu">as.integer</span>(idx)), <span class="fu">all</span>(idx <span class="sc">&gt;=</span> <span class="dv">1</span>), <span class="fu">all</span>(idx <span class="sc">&lt;=</span> <span class="fu">nrow</span>(X)))</span>
+<span id="cb21-220"><a href="#cb21-220" aria-hidden="true" tabindex="-1"></a>  n <span class="ot">&lt;-</span> <span class="fu">nrow</span>(X)</span>
+<span id="cb21-221"><a href="#cb21-221" aria-hidden="true" tabindex="-1"></a>  X <span class="ot">&lt;-</span> <span class="fu">sweep</span>(X, <span class="dv">2</span>, <span class="fu">colMeans</span>(X))  <span class="co"># translation preserves LOO correlations; reduces cancellation</span></span>
+<span id="cb21-222"><a href="#cb21-222" aria-hidden="true" tabindex="-1"></a>  s <span class="ot">&lt;-</span> <span class="fu">colSums</span>(X); C <span class="ot">&lt;-</span> <span class="fu">crossprod</span>(X)</span>
+<span id="cb21-223"><a href="#cb21-223" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(idx, <span class="cf">function</span>(i) {</span>
+<span id="cb21-224"><a href="#cb21-224" aria-hidden="true" tabindex="-1"></a>    s_i <span class="ot">&lt;-</span> s <span class="sc">-</span> X[i, ]</span>
+<span id="cb21-225"><a href="#cb21-225" aria-hidden="true" tabindex="-1"></a>    C_i <span class="ot">&lt;-</span> C <span class="sc">-</span> <span class="fu">tcrossprod</span>(X[i, ])</span>
+<span id="cb21-226"><a href="#cb21-226" aria-hidden="true" tabindex="-1"></a>    V <span class="ot">&lt;-</span> (C_i <span class="sc">-</span> <span class="fu">tcrossprod</span>(s_i) <span class="sc">/</span> (n <span class="sc">-</span> <span class="dv">1</span>)) <span class="sc">/</span> (n <span class="sc">-</span> <span class="dv">2</span>)       <span class="co"># leave-one-out covariance</span></span>
+<span id="cb21-227"><a href="#cb21-227" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> (<span class="fu">any</span>(<span class="sc">!</span><span class="fu">is.finite</span>(V)) <span class="sc">||</span> <span class="fu">any</span>(<span class="fu">diag</span>(V) <span class="sc">&lt;=</span> <span class="dv">0</span>)) <span class="fu">stop</span>(<span class="st">"Degenerate leave-one-out variance"</span>)</span>
+<span id="cb21-228"><a href="#cb21-228" aria-hidden="true" tabindex="-1"></a>    V <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">tcrossprod</span>(<span class="fu">diag</span>(V)))                          <span class="co"># to correlation</span></span>
+<span id="cb21-229"><a href="#cb21-229" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb21-230"><a href="#cb21-230" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb21-231"><a href="#cb21-231" aria-hidden="true" tabindex="-1"></a>i <span class="ot">&lt;-</span> <span class="dv">7</span></span>
+<span id="cb21-232"><a href="#cb21-232" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(<span class="fu">LooCorAll</span>(X[, <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>], <span class="at">idx =</span> i)[[<span class="dv">1</span>]], <span class="fu">cor</span>(X[<span class="sc">-</span>i, <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span>]), <span class="at">check.attributes =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb21-233"><a href="#cb21-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-234"><a href="#cb21-234" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep this teaching benchmark small; storing many full large-feature matrices costs substantial memory.</span></span>
+<span id="cb21-235"><a href="#cb21-235" aria-hidden="true" tabindex="-1"></a>X_bench <span class="ot">&lt;-</span> X[, <span class="dv">1</span><span class="sc">:</span><span class="dv">250</span>]</span>
+<span id="cb21-236"><a href="#cb21-236" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(loo_naive  <span class="ot">&lt;-</span> <span class="fu">lapply</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>, <span class="cf">function</span>(i) <span class="fu">cor</span>(X_bench[<span class="sc">-</span>i, ])))</span>
+<span id="cb21-237"><a href="#cb21-237" aria-hidden="true" tabindex="-1"></a><span class="fu">system.time</span>(loo_update <span class="ot">&lt;-</span> <span class="fu">LooCorAll</span>(X_bench, <span class="at">idx =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>))</span>
+<span id="cb21-238"><a href="#cb21-238" aria-hidden="true" tabindex="-1"></a><span class="fu">all.equal</span>(loo_naive[[<span class="dv">1</span>]], loo_update[[<span class="dv">1</span>]], <span class="at">check.attributes =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb21-239"><a href="#cb21-239" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb21-240"><a href="#cb21-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-241"><a href="#cb21-241" aria-hidden="true" tabindex="-1"></a>For the same 20 matrices the update version avoids repeated full-data cross-products; compare the timings on your machine rather than assuming a fixed speedup. The LIONESS network for sample $i$ is then <span class="in">`N * R_all - (N - 1) * loo[[i]]`</span>, computed and summarized one sample at a time (call <span class="in">`LooCorAll()`</span> with one <span class="in">`idx`</span> at a time) so the number of retained dense matrices does not grow with the number of people. Cross-products, full estimates, updates, and temporary arrays still require several dense matrices; streaming is $O(p^2)$ working memory, not literally one matrix. The update version is still $O(p^2)$ per sample, which is the floor; it just avoids the factor of $N$ from redoing the cross-product.</span>
+<span id="cb21-242"><a href="#cb21-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-243"><a href="#cb21-243" aria-hidden="true" tabindex="-1"></a>**Permutation references multiply everything.** A permutation test with $B$ permutations costs $B$ times the analysis. For a whole-network statistic on filtered genes this is routine; for per-edge permutation p-values across $10^7$ edges it is not, and you need either a parametric reference you have checked by simulation or another calibrated approximation. Pooling edges requires assumptions about their null distributions and does not automatically solve the computational or inferential problem.</span>
+<span id="cb21-244"><a href="#cb21-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-245"><a href="#cb21-245" aria-hidden="true" tabindex="-1"></a>Follow the complete calculation in <span class="co">[</span><span class="ot">An end-to-end residual-network analysis</span><span class="co">](residual-network-case-study.qmd)</span>, from a prespecified edge family and nuisance fits through uncertainty, multiplicity, and simulation evaluation.</span>
+<span id="cb21-246"><a href="#cb21-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-247"><a href="#cb21-247" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb21-248"><a href="#cb21-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-249"><a href="#cb21-249" aria-hidden="true" tabindex="-1"></a>**Checkpoints are completion targets for this page. Additional practice below is optional.** Each checkpoint gives a completion standard, a hint, and a solution outline.</span>
+<span id="cb21-250"><a href="#cb21-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-251"><a href="#cb21-251" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-net-01 .checkpoint}</span>
+<span id="cb21-252"><a href="#cb21-252" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · NET-01 — Identify the association represented by an edge {.unnumbered}</span></span>
+<span id="cb21-253"><a href="#cb21-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-254"><a href="#cb21-254" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and interpretation.</span>
+<span id="cb21-255"><a href="#cb21-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-256"><a href="#cb21-256" aria-hidden="true" tabindex="-1"></a>Let $Z,U,V$ be independent standard normals, with $X=Z+U$ and $Y=Z+V$. Calculate the marginal correlation and the covariance after subtracting $E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span>$ and $E<span class="co">[</span><span class="ot">Y\mid Z</span><span class="co">]</span>$. Explain the shared driver and why a marginal edge does not establish direct regulation. Give a dependent nonlinear pair with zero covariance. Is zero average residual covariance alone a general conditional-independence criterion?</span>
+<span id="cb21-257"><a href="#cb21-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-258"><a href="#cb21-258" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can distinguish marginal and residual targets and describe what the edge does and does not establish.</span>
+<span id="cb21-259"><a href="#cb21-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-260"><a href="#cb21-260" aria-hidden="true" tabindex="-1"></a>**Transfer:** What changes if $U$ and $V$ have covariance 0.3 instead of being independent?</span>
+<span id="cb21-261"><a href="#cb21-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-262"><a href="#cb21-262" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb21-263"><a href="#cb21-263" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb21-264"><a href="#cb21-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-265"><a href="#cb21-265" aria-hidden="true" tabindex="-1"></a>Both marginal variances are 2. The conditional-mean residuals are $U$ and $V$.</span>
+<span id="cb21-266"><a href="#cb21-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-267"><a href="#cb21-267" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb21-268"><a href="#cb21-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-269"><a href="#cb21-269" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb21-270"><a href="#cb21-270" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb21-271"><a href="#cb21-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-272"><a href="#cb21-272" aria-hidden="true" tabindex="-1"></a>The covariance of $X$ and $Y$ is 1 and each variance is 2, so the marginal correlation is $1/2$. After subtracting $Z$, the residual covariance is $E<span class="co">[</span><span class="ot">UV</span><span class="co">]</span>=0$. Shared variation in $Z$ explains the marginal edge. In this constructed model the independent errors also imply conditional independence, but a zero average residual covariance does not establish it in general; conditional covariances can cancel, or dependence can be nonlinear. For example, a centered symmetric normal $X$ and $Y=X^2$ are dependent with $E<span class="co">[</span><span class="ot">X^3</span><span class="co">]</span>=0$, hence zero covariance; take $Z$ constant for a residual-covariance example.</span>
+<span id="cb21-273"><a href="#cb21-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-274"><a href="#cb21-274" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb21-275"><a href="#cb21-275" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb21-276"><a href="#cb21-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-277"><a href="#cb21-277" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb21-278"><a href="#cb21-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-279"><a href="#cb21-279" aria-hidden="true" tabindex="-1"></a>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</span>
+<span id="cb21-280"><a href="#cb21-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-281"><a href="#cb21-281" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Simulate two genes with a strong monotone but nonlinear relationship ($y = \exp(x)$ plus noise). Compare Pearson, Spearman, and distance correlation (package <span class="in">`energy`</span>). Then add a mean shift to half the samples and see which measures move.</span>
+<span id="cb21-282"><a href="#cb21-282" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Generate data from a sparse Gaussian graphical model with $p = 50$ and $N = 40$ (package <span class="in">`huge`</span> has generators). Estimate the partial correlation network with shrinkage and with the graphical lasso at two values of $\lambda$. Count true and false edges.</span>
+<span id="cb21-283"><a href="#cb21-283" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Take the LIONESS computation above and add within-group centering as a preprocessing step for a two-group <span class="in">`X`</span>. Start with equal within-group correlations and equal within-group variances and check the group contrast. Then change the variance of one gene in one group while keeping its correlation fixed. Does centering alone still remove the artifact?</span>
+<span id="cb21-284"><a href="#cb21-284" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Estimate how much memory and time a LIONESS analysis of 200 samples by 15,000 genes would need if you stored every network, and then redesign it so that you store only the per-edge $t$-statistics between two groups.</span>
+<span id="cb21-285"><a href="#cb21-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-286"><a href="#cb21-286" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb21-287"><a href="#cb21-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-288"><a href="#cb21-288" aria-hidden="true" tabindex="-1"></a>The original <span class="co">[</span><span class="ot">WGCNA paper</span><span class="co">](https://doi.org/10.1186/1471-2105-9-559)</span> describes network construction choices.</span>
+<span id="cb21-289"><a href="#cb21-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-290"><a href="#cb21-290" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Langfelder, P. and Horvath, S. (2008). WGCNA: an R package for weighted correlation network analysis. *BMC Bioinformatics*, 9, 559.</span>
+<span id="cb21-291"><a href="#cb21-291" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Schäfer, J. and Strimmer, K. (2005). A shrinkage approach to large-scale covariance matrix estimation and implications for functional genomics. *Statistical Applications in Genetics and Molecular Biology*, 4(1), Article 32.</span>
+<span id="cb21-292"><a href="#cb21-292" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Friedman, J., Hastie, T., and Tibshirani, R. (2008). Sparse inverse covariance estimation with the graphical lasso. *Biostatistics*, 9(3), 432 to 441.</span>
+<span id="cb21-293"><a href="#cb21-293" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Meinshausen, N. and Bühlmann, P. (2006). High-dimensional graphs and variable selection with the lasso. *Annals of Statistics*, 34(3), 1436 to 1462.</span>
+<span id="cb21-294"><a href="#cb21-294" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>de la Fuente, A. (2010). From "differential expression" to "differential networking": identification of dysfunctional regulatory networks in diseases. *Trends in Genetics*, 26(7), 326 to 333.</span>
+<span id="cb21-295"><a href="#cb21-295" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Xia, Y., Cai, T., and Cai, T. T. (2015). Testing differential networks with applications to the detection of gene-gene interactions. *Biometrika*, 102(2), 247 to 266.</span>
+<span id="cb21-296"><a href="#cb21-296" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kuijjer, M. L., Tung, M. G., Yuan, G., Quackenbush, J., and Glass, K. (2019). Estimating sample-specific regulatory networks. *iScience*, 14, 226 to 240.</span>
+<span id="cb21-297"><a href="#cb21-297" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Székely, G. J., Rizzo, M. L., and Bakirov, N. K. (2007). Measuring and testing dependence by correlation of distances. *Annals of Statistics*, 35(6), 2769 to 2794.</span>
+<span id="cb21-298"><a href="#cb21-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-299"><a href="#cb21-299" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

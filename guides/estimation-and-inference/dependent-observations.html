@@ -1,0 +1,1627 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Dependent observations and cluster-aware inference – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/estimation-and-inference/bootstrap-and-resampling.html" rel="next">
+<link href="../../guides/estimation-and-inference/uncertainty-and-interpretation.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Dependent observations and cluster-aware inference</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimation and uncertainty</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/large-sample-reasoning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Large-sample reasoning for methods research</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/estimating-equations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimating equations and asymptotic linearity</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/uncertainty-and-interpretation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Uncertainty, confidence intervals, and tests</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Extensions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/dependent-observations.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Dependent observations and cluster-aware inference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/bootstrap-and-resampling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bootstrap and resampling for statistical inference</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Reference</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/mathematics-statistics-bridge.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">A bridge between mathematics and statistical inference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/estimation-and-inference/checkpoints.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Completion checkpoints</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#count-the-independent-draws-before-counting-rows" id="toc-count-the-independent-draws-before-counting-rows" class="nav-link active" data-scroll-target="#count-the-independent-draws-before-counting-rows"><span class="header-section-number">1</span> Count the independent draws before counting rows</a></li>
+  <li><a href="#two-means-two-cluster-contributions" id="toc-two-means-two-cluster-contributions" class="nav-link" data-scroll-target="#two-means-two-cluster-contributions"><span class="header-section-number">2</span> Two means, two cluster contributions</a></li>
+  <li><a href="#estimate-variance-across-cluster-contributions" id="toc-estimate-variance-across-cluster-contributions" class="nav-link" data-scroll-target="#estimate-variance-across-cluster-contributions"><span class="header-section-number">3</span> Estimate variance across cluster contributions</a></li>
+  <li><a href="#why-extra-records-do-not-supply-extra-independent-people" id="toc-why-extra-records-do-not-supply-extra-independent-people" class="nav-link" data-scroll-target="#why-extra-records-do-not-supply-extra-independent-people"><span class="header-section-number">4</span> Why extra records do not supply extra independent people</a></li>
+  <li><a href="#the-cluster-sandwich-is-the-same-linearization-at-a-different-unit" id="toc-the-cluster-sandwich-is-the-same-linearization-at-a-different-unit" class="nav-link" data-scroll-target="#the-cluster-sandwich-is-the-same-linearization-at-a-different-unit"><span class="header-section-number">5</span> The cluster sandwich is the same linearization at a different unit</a></li>
+  <li><a href="#cross-fitting-and-resampling-must-preserve-clusters" id="toc-cross-fitting-and-resampling-must-preserve-clusters" class="nav-link" data-scroll-target="#cross-fitting-and-resampling-must-preserve-clusters"><span class="header-section-number">6</span> Cross-fitting and resampling must preserve clusters</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">7</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-cl-01-derive-the-cluster-contribution-for-the-chosen-target" id="toc-checkpoint-cl-01-derive-the-cluster-contribution-for-the-chosen-target" class="nav-link" data-scroll-target="#checkpoint-cl-01-derive-the-cluster-contribution-for-the-chosen-target">Checkpoint · CL-01 — Derive the cluster contribution for the chosen target</a></li>
+  <li><a href="#checkpoint-cl-02-construct-a-valid-fold-and-variance-argument" id="toc-checkpoint-cl-02-construct-a-valid-fold-and-variance-argument" class="nav-link" data-scroll-target="#checkpoint-cl-02-construct-a-valid-fold-and-variance-argument">Checkpoint · CL-02 — Construct a valid fold and variance argument</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">8</span> Reading</a></li>
+  <li><a href="#continue-through-the-collection" id="toc-continue-through-the-collection" class="nav-link" data-scroll-target="#continue-through-the-collection"><span class="header-section-number">9</span> Continue through the guide</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Dependent observations and cluster-aware inference</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Targets, influence contributions, and the independent unit</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> <a href="../../guides/questions-and-design/units-and-study-design.html">Units of analysis, replication, and study design</a>, means, and variances. Start with the person-summary examples; <a href="../../guides/statistical-models/influence-functions.html">Influence functions</a> and <a href="../../guides/estimation-and-inference/estimating-equations.html">Estimating equations and asymptotic linearity</a> support the contribution and sandwich derivations when you return to those sections.</p>
+<section id="count-the-independent-draws-before-counting-rows" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="count-the-independent-draws-before-counting-rows"><span class="header-section-number">1</span> Count the independent draws before counting rows</h2>
+<p>Repeated specimens, cells nested within people, technical replicates, and samples grouped by collection site can be correlated. A sandwich formula using one row at a time only addresses dependence if those rows are the independent units required by its argument.</p>
+<p>This page uses <strong>independently sampled clusters</strong>, typically people. Within a cluster, observations may be dependent. Let <span class="math inline">G</span> be the number of clusters and <span class="math inline">M_i</span> the number of records in cluster <span class="math inline">i</span>. Large-cluster-count asymptotics send <span class="math inline">G</span> to infinity, with moment and non-dominance conditions; merely collecting many records from a fixed small number of people does not invoke that theorem. Dependence across people, such as family or site effects, may require a larger cluster unit or another framework.</p>
+<p>Think of one statistical observation as the whole record <span class="math inline">C_i=(M_i,Y_{i1},\ldots,Y_{iM_i})</span>. In the basic setup, these cluster records are i.i.d. The total row count <span class="math inline">N=\sum_iM_i</span> may be much larger than <span class="math inline">G</span>, but the LLN and CLT are applied to averages of functions of the <span class="math inline">G</span> independent cluster records. Within-person correlation is preserved inside each function.</p>
+<p>Read <a href="../../guides/questions-and-design/units-and-study-design.html">Units of analysis, replication, and study design</a> first for target weighting. This page supplies the uncertainty calculation and its connection to influence functions. <a href="https://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015.pdf">Cameron and Miller</a> discuss practical cluster-inference limitations, including few clusters and multiple clustering dimensions.</p>
+</section>
+<section id="two-means-two-cluster-contributions" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="two-means-two-cluster-contributions"><span class="header-section-number">2</span> Two means, two cluster contributions</h2>
+<p>Let <span class="math inline">T_i=\sum_{j=1}^{M_i}Y_{ij}</span> and <span class="math inline">\bar Y_i=T_i/M_i</span>, with <span class="math inline">M_i\geq1</span>. A randomly sampled person’s mean record outcome has target</p>
+<p><span class="math display">
+\begin{aligned}
+\mu_P&amp;=E[\bar Y_i],\\
+\widehat\mu_P&amp;=G^{-1}\sum_i\bar Y_i.
+\end{aligned}
+</span></p>
+<p>A record-weighted target is instead a ratio over the same cluster population:</p>
+<p><span class="math display">
+\begin{aligned}
+\mu_R&amp;=\frac{E[T_i]}{E[M_i]},\\
+\widehat\mu_R&amp;=\frac{\sum_i T_i}{\sum_i M_i}.
+\end{aligned}
+</span></p>
+<p>Their cluster-level influence functions are</p>
+<p><span class="math display">
+\begin{aligned}
+D_{P,i}&amp;=\bar Y_i-\mu_P,\\
+D_{R,i}&amp;=\frac{T_i-\mu_R M_i}{E[M_i]}.
+\end{aligned}
+</span></p>
+<p>The weighting difference can be seen at the row level. In <span class="math inline">\widehat\mu_P</span>, each row from person <span class="math inline">i</span> has weight <span class="math inline">1/(GM_i)</span>: the person’s total weight is <span class="math inline">1/G</span>. In <span class="math inline">\widehat\mu_R</span>, every row has weight <span class="math inline">1/N</span>, so people with more records contribute more weight. The two targets can therefore differ when record count and outcomes are associated.</p>
+<p><span id="fig-cluster-targets"></span></p>
+<p>For a concrete population, suppose half the people have one record with outcome 0 and half have five records, each with outcome 3. Then <span class="math inline">E[\bar Y_i]=(0+3)/2=1.5</span>, while <span class="math inline">E[T_i]=7.5</span> and <span class="math inline">E[M_i]=3</span>, giving <span class="math inline">\mu_R=2.5</span>. Both targets concern the same population of people; they answer different averaging questions.</p>
+<p>To derive the contributions, first apply the cluster LLN to <span class="math inline">\bar Y_i</span>, <span class="math inline">T_i</span>, and <span class="math inline">M_i</span>, under the required integrability conditions. The person estimator is an ordinary mean of person summaries. For the record estimator, write <span class="math inline">\bar M=G^{-1}\sum_iM_i</span> and use the exact identity</p>
+<p><span class="math display">
+\widehat\mu_R-\mu_R
+=\frac{G^{-1}\sum_i(T_i-\mu_RM_i)}{\bar M}.
+</span></p>
+<p>The numerator is an average of mean-zero cluster quantities. If <span class="math inline">E[M_i]&lt;\infty</span>, the LLN gives <span class="math inline">\bar M\xrightarrow{p}E[M_i]&gt;0</span>. With finite variance for <span class="math inline">T_i-\mu_RM_i</span>, the CLT and Slutsky allow replacement of <span class="math inline">\bar M</span> by <span class="math inline">E[M_i]</span> at first order, giving <span class="math inline">D_{R,i}</span> above. This is the ratio rule from <a href="../../guides/statistical-models/influence-functions.html#checkpoint-sp-05">Checkpoint SP-05</a>, now applied to a person’s totals and counts.</p>
+<p>Each contribution is one random <strong>cluster</strong>, even for the record-weighted target. Correcting an SE changes uncertainty about the selected target; it does not change the target weights.</p>
+<p>Neither is intrinsically correct for every study. Irregular visits can be informative, and an observed-record mean is not automatically an outcome at a fixed scheduled time. Dropout and measurement timing may require identification assumptions before either target answers the intended longitudinal question.</p>
+</section>
+<section id="estimate-variance-across-cluster-contributions" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="estimate-variance-across-cluster-contributions"><span class="header-section-number">3</span> Estimate variance across cluster contributions</h2>
+<p>For an estimator with expansion</p>
+<p><span class="math display">
+\widehat\theta-\theta_0
+=G^{-1}\sum_{i=1}^G D_i+o_p(G^{-1/2}),
+</span></p>
+<p>a cluster CLT gives <span class="math inline">\sqrt G(\widehat\theta-\theta_0)\xrightarrow{d}N(0,V_C)</span> when <span class="math inline">E[D_i]=0</span> and <span class="math inline">0&lt;V_C=\operatorname{Var}(D_i)&lt;\infty</span>. The estimator’s first-order variance is <span class="math inline">V_C/G</span>.</p>
+<p>Estimate <span class="math inline">V_C</span> by the variance of the estimated <strong>cluster contributions</strong>:</p>
+<p><span class="math display">
+\begin{aligned}
+s_D^2&amp;=\frac1{G-1}\sum_{i=1}^G(\widehat D_i-\overline{\widehat D})^2,\\
+\widehat{\operatorname{SE}}(\widehat\theta)&amp;=\frac{s_D}{\sqrt G}.
+\end{aligned}
+</span></p>
+<p>This is the same logic as the sample-mean SE, with the random object changed from a row to a cluster. Consistency of the estimated contribution variance and a negligible remainder justify studentization. When cluster sizes grow with the study, extra moment and non-dominance conditions are needed so one large cluster cannot supply most of the fluctuation. A normal interval remains an asymptotic statement about increasing independent cluster counts.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ClusterMean <span class="ot">&lt;-</span> <span class="cf">function</span>(y, id, <span class="at">target =</span> <span class="fu">c</span>(<span class="st">"person"</span>, <span class="st">"record"</span>)) {</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  target <span class="ot">&lt;-</span> <span class="fu">match.arg</span>(target)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">is.numeric</span>(y), <span class="fu">length</span>(y) <span class="sc">==</span> <span class="fu">length</span>(id),</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>            <span class="fu">all</span>(<span class="fu">is.finite</span>(y)), <span class="sc">!</span><span class="fu">anyNA</span>(id))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  totals <span class="ot">&lt;-</span> <span class="fu">rowsum</span>(<span class="fu">cbind</span>(<span class="at">total =</span> y, <span class="at">size =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(y))), id, <span class="at">reorder =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  G <span class="ot">&lt;-</span> <span class="fu">nrow</span>(totals); <span class="fu">stopifnot</span>(G <span class="sc">&gt;=</span> <span class="dv">2</span>)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">&lt;-</span> totals[, <span class="st">"total"</span>]; M <span class="ot">&lt;-</span> totals[, <span class="st">"size"</span>]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  estimate <span class="ot">&lt;-</span> <span class="cf">if</span> (target <span class="sc">==</span> <span class="st">"person"</span>) <span class="fu">mean</span>(T<span class="sc">/</span>M) <span class="cf">else</span> <span class="fu">sum</span>(T)<span class="sc">/</span><span class="fu">sum</span>(M)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  D <span class="ot">&lt;-</span> <span class="cf">if</span> (target <span class="sc">==</span> <span class="st">"person"</span>) T<span class="sc">/</span>M <span class="sc">-</span> estimate <span class="cf">else</span> (T <span class="sc">-</span> estimate<span class="sc">*</span>M)<span class="sc">/</span><span class="fu">mean</span>(M)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">estimate =</span> estimate, <span class="at">SE =</span> <span class="fu">sd</span>(D)<span class="sc">/</span><span class="fu">sqrt</span>(G), <span class="at">clusters =</span> G, <span class="at">records =</span> <span class="fu">length</span>(y))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">rep</span>(<span class="dv">3</span>, <span class="dv">5</span>)); id <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"short"</span>, <span class="fu">rep</span>(<span class="st">"long"</span>, <span class="dv">5</span>))</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">person =</span> <span class="fu">ClusterMean</span>(y, id, <span class="st">"person"</span>), <span class="at">record =</span> <span class="fu">ClusterMean</span>(y, id, <span class="st">"record"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>       estimate        SE clusters records
+person      1.5 1.5000000        2       6
+record      2.5 0.8333333        2       6</code></pre>
+</div>
+</div>
+<p>The two-cluster output demonstrates the formulas, not trustworthy normal inference from two people. For the person mean, the SE is simply the SE of the person summaries. For the record target, the varying denominator enters the influence function. Using the row SD divided by the square root of the row count ignores within-person covariance.</p>
+</section>
+<section id="why-extra-records-do-not-supply-extra-independent-people" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="why-extra-records-do-not-supply-extra-independent-people"><span class="header-section-number">4</span> Why extra records do not supply extra independent people</h2>
+<p>Take a balanced random-intercept model <span class="math inline">Y_{ij}=\mu+B_i+\epsilon_{ij}</span>, with independent zero-mean components, <span class="math inline">\operatorname{Var}(B_i)=\tau^2</span>, and <span class="math inline">\operatorname{Var}(\epsilon_{ij})=\sigma^2</span>. There are <span class="math inline">m</span> records per person. Write the grand mean’s error as</p>
+<p><span class="math display">
+\widehat\mu-\mu
+=\frac1G\sum_iB_i
++\frac1{Gm}\sum_i\sum_j\epsilon_{ij}.
+</span></p>
+<p>The shared person component <span class="math inline">B_i</span> appears once in every record from that person, so averaging their records does not remove it. Its variance contribution is <span class="math inline">\tau^2/G</span>. The independent record noise contributes <span class="math inline">\sigma^2/(Gm)</span>. Adding them gives</p>
+<p><span class="math display">
+\begin{aligned}
+\operatorname{Var}(\widehat\mu)
+&amp;=\frac{\tau^2+\sigma^2/m}{G},\\
+\text{design effect}
+&amp;=1+(m-1)\rho,\\
+\rho&amp;=\frac{\tau^2}{\tau^2+\sigma^2}.
+\end{aligned}
+</span></p>
+<p>Two records from the same person have covariance <span class="math inline">\tau^2</span>, so <span class="math inline">\rho</span> is their intraclass correlation. Treating all <span class="math inline">Gm</span> rows as independent would use variance <span class="math inline">(\tau^2+\sigma^2)/(Gm)</span>. Dividing the correct variance by that calculation gives the displayed <strong>design effect</strong>. Its square root is the corresponding SE inflation.</p>
+<p>For <span class="math inline">G=100</span>, <span class="math inline">m=4</span>, <span class="math inline">\tau^2=0.8</span>, and <span class="math inline">\sigma^2=0.2</span>, the correct variance is 0.0085 and SE about 0.0922. The independent-row calculation gives variance 0.0025 and SE 0.05. The variance ratio is 3.4; the SE ratio is <span class="math inline">\sqrt{3.4}\approx1.84</span>.</p>
+<p>With <span class="math inline">G</span> fixed, increasing <span class="math inline">m</span> leaves a variance floor <span class="math inline">\tau^2/G</span> when <span class="math inline">\tau^2&gt;0</span>. Additional records reduce measurement noise, but estimating the population mean consistently in this model requires more independent people. This design-effect formula belongs to the stated balanced model; other weighting schemes or cluster structures need their own variance calculation.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>m_grid <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>; G <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>correct <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((<span class="fl">0.8</span> <span class="sc">+</span> <span class="fl">0.2</span><span class="sc">/</span>m_grid)<span class="sc">/</span>G)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>naive <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">/</span>(G<span class="sc">*</span>m_grid))</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(m_grid, correct, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.11</span>),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Records per person"</span>, <span class="at">ylab =</span> <span class="st">"SE of the grand mean"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(m_grid, naive, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fu">sqrt</span>(<span class="fl">0.8</span><span class="sc">/</span>G), <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"right"</span>, <span class="fu">c</span>(<span class="st">"Cluster model"</span>, <span class="st">"Independent-row calculation"</span>, <span class="st">"Person-variance floor"</span>),</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"black"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-cluster-information" class="quarto-float quarto-figure quarto-figure-center anchored" alt="The correct SE decreases toward a positive floor as records per person increase, while the independent-row calculation continues toward zero.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cluster-information-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="dependent-observations_files/figure-html/fig-cluster-information-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Exact SEs in a balanced random-intercept model with 100 people, person variance 0.8, and record-noise variance 0.2. Additional records reduce noise but do not remove the person component."><img src="dependent-observations_files/figure-html/fig-cluster-information-1.png" class="img-fluid figure-img" alt="The correct SE decreases toward a positive floor as records per person increase, while the independent-row calculation continues toward zero." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cluster-information-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Exact SEs in a balanced random-intercept model with 100 people, person variance 0.8, and record-noise variance 0.2. Additional records reduce noise but do not remove the person component.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Now check coverage under this explicitly Gaussian, balanced generator. There are 500 independent simulated datasets, each with 100 people and four records. Both estimators have the same point estimate; the SE calculation differs. Monte Carlo SE describes uncertainty in the estimated coverage, not uncertainty in one study’s mean.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2701</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>coverage <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">500</span>, {</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(<span class="dv">100</span>), <span class="at">each =</span> <span class="dv">4</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(<span class="fl">0.8</span>)), <span class="at">each =</span> <span class="dv">4</span>) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">400</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(<span class="fl">0.2</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">ClusterMean</span>(y, id)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  se <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">row =</span> <span class="fu">sd</span>(y)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="fu">length</span>(y)), <span class="at">cluster =</span> <span class="fu">unname</span>(fit[<span class="st">'SE'</span>]))</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abs</span>(<span class="fu">mean</span>(y)) <span class="sc">&lt;=</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>) <span class="sc">*</span> se</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>coverage_rate <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(coverage)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">method =</span> <span class="fu">names</span>(coverage_rate), <span class="at">coverage =</span> coverage_rate,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">MCSE =</span> <span class="fu">sqrt</span>(coverage_rate <span class="sc">*</span> (<span class="dv">1</span><span class="sc">-</span>coverage_rate)<span class="sc">/</span><span class="fu">ncol</span>(coverage)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         method coverage       MCSE
+row         row    0.750 0.01936492
+cluster cluster    0.948 0.00992935</code></pre>
+</div>
+</div>
+</section>
+<section id="the-cluster-sandwich-is-the-same-linearization-at-a-different-unit" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="the-cluster-sandwich-is-the-same-linearization-at-a-different-unit"><span class="header-section-number">5</span> The cluster sandwich is the same linearization at a different unit</h2>
+<p>Suppose <span class="math inline">\widehat\theta</span> solves <span class="math inline">G^{-1}\sum_i S_i(\theta)=0</span>, where <span class="math inline">S_i</span> is the whole-cluster score. If <span class="math inline">A=E[\partial S_i(\theta_0)/\partial\theta^T]</span> is nonsingular and consistency, a CLT, differentiability, and remainder control hold, then</p>
+<p><span class="math display">
+\begin{aligned}
+D_i&amp;=-A^{-1}S_i(\theta_0),\\
+\widehat{\operatorname{Var}}(\widehat\theta)
+&amp;=G^{-1}\widehat A^{-1}
+  \widehat{\operatorname{Cov}}(S_i)
+  \widehat A^{-T}.
+\end{aligned}
+</span></p>
+<p>Here <span class="math inline">A^{-T}=(A^{-1})^\top</span>. Evaluate the cluster scores and their derivatives at <span class="math inline">\widehat\theta</span> to estimate the covariance and <span class="math inline">A</span>, with consistency justified by the corresponding LLNs. For OLS, <span class="math inline">S_i=\sum_j X_{ij}(Y_{ij}-X_{ij}^\top\beta)</span>. Writing each row contribution as <span class="math inline">\psi_{ij}</span> shows what changes in the variance calculation:</p>
+<p><span class="math display">
+S_iS_i^\top=\sum_j\sum_\ell\psi_{ij}\psi_{i\ell}^\top.
+</span></p>
+<p>The terms with <span class="math inline">j\ne\ell</span> retain covariance between records from the same person. A rowwise sandwich uses only the same-record terms and therefore can miss the shared variation. The derivative and variance factors must both use the same whole-cluster normalization.</p>
+<p>The point estimate still targets the selected regression equation. If each row enters equally, people with more rows contribute more to that equation. A cluster variance correction preserves those weights and the target they define. Omitted confounding and a rank-deficient design require separate arguments.</p>
+</section>
+<section id="cross-fitting-and-resampling-must-preserve-clusters" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="cross-fitting-and-resampling-must-preserve-clusters"><span class="header-section-number">6</span> Cross-fitting and resampling must preserve clusters</h2>
+<p>Place every record from a person in the same fold when people are independent. Train preprocessing, tuning, feature selection, and nuisance fits within training clusters. Otherwise the held-out record can still share a person’s outcome information with its training records. With fixed <span class="math inline">K</span> folds, condition on training clusters and apply the same held-out empirical-term argument as in <a href="../../guides/semiparametric-methods/influence-function-to-estimator.html#checkpoint-sp-12">SP-12</a>, now to whole-cluster contributions. Appropriate cluster-level L2/product-remainder and variance conditions remain necessary.</p>
+<p>In the random-intercept example, a learner trained on one record can gain information about that person’s <span class="math inline">B_i</span>. Another record from the same person is consequently not a fresh independent validation draw conditional on the training data. Holding out the whole person restores the intended separation under independent-person sampling. It does not by itself make the fitted nuisance functions accurate enough for inference.</p>
+<p>For a cluster bootstrap, resample people with replacement and carry all their records together. Give repeated copies distinct bootstrap cluster IDs if refitting. Whether nuisance fits should be recomputed depends on the inferential procedure; a shortcut must be justified rather than assumed. A valid permutation scheme instead follows the assignment or exchangeability design, which may differ from a bootstrap. See the <a href="../../guides/analysis-problems/multivariate-comparisons.html">Multivariate comparisons: permutation and distance-based tests</a> page.</p>
+<p>With few clusters, highly unequal leverage, one dominant person/site, cross-cluster dependence, or few clusters per treatment group, the normal approximation may fail. Small-sample corrections and specialized bootstrap/randomization methods require their own assumptions; no single cluster-count threshold validates them all. Report the cluster definition, count and size distribution, target weights, fold/resampling scheme, and variance method.</p>
+</section>
+<section id="exercises" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="exercises"><span class="header-section-number">7</span> Exercises</h2>
+<p>Try each checkpoint before opening its hint or solution.</p>
+<div id="checkpoint-cl-01" class="checkpoint">
+<section id="checkpoint-cl-01-derive-the-cluster-contribution-for-the-chosen-target" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-cl-01-derive-the-cluster-contribution-for-the-chosen-target">Checkpoint · CL-01 — Derive the cluster contribution for the chosen target</h3>
+<p><strong>Task type:</strong> Derivation and interpretation.</p>
+<p>Let T be a person’s outcome sum and M≥1 their record count. Derive influence functions for E[T/M] and E[T]/E[M] under independent person sampling. For equally common types (M,Y)=(1,0) and (5,3), calculate both targets and explain why replacing only the SE does not change the point target.</p>
+<p><strong>Ready to continue when:</strong> you can derive both cluster-level contributions and connect target weighting to the independent-unit variance.</p>
+<p><strong>Transfer:</strong> If visit frequency depends on disease severity, which target would a scheduled-time scientific question require?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Use the mean derivative for the first target and the ratio rule for the second.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The contributions are T/M−μ_P and (T−μ_R M)/E[M]. The targets are 1.5 and 2.5. Their variance is calculated across independent people, but they average different quantities. A covariance correction changes uncertainty, not the equation defining the point estimate.</p>
+</details>
+</section>
+</div>
+<div id="checkpoint-cl-02" class="checkpoint">
+<section id="checkpoint-cl-02-construct-a-valid-fold-and-variance-argument" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-cl-02-construct-a-valid-fold-and-variance-argument">Checkpoint · CL-02 — Construct a valid fold and variance argument</h3>
+<p><strong>Task type:</strong> Derivation and diagnosis.</p>
+<p>In the balanced random-intercept model, derive Var(grand mean) and the design effect. Use G=100, m=4, τ²=0.8, σ²=0.2. Then explain why random row folds and a row bootstrap are inappropriate for an estimator trained on repeated person outcomes.</p>
+<p><strong>Ready to continue when:</strong> you can account for the shared component and preserve the independent unit in training, uncertainty, and resampling.</p>
+<p><strong>Transfer:</strong> If people are nested in a small number of sites with shared errors, is person-level independence still defensible?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Average the person intercept once per person and the record noise over all records.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The variance is (0.8+0.2/4)/100=0.0085 and SE≈0.0922. The independent-row variance would be 1/400=0.0025; the design effect is 3.4. Row folds can put one person in both training and validation; row resampling breaks their joint record distribution. Use person folds and person contributions/resampling under independent-person sampling, with the requisite asymptotic and nuisance conditions.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Vary the cluster size distribution in the two-type example and compare person and record targets.</li>
+<li>Repeat the coverage simulation with larger G and with larger m; separate Monte Carlo variation from the predicted SE behavior.</li>
+<li>Write whole-cluster scores for a prespecified covariate-adjusted regression and identify its weighting and rank conditions.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="reading"><span class="header-section-number">8</span> Reading</h2>
+<ul>
+<li>Cameron and Miller, <a href="https://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015.pdf">A practitioner’s guide to cluster-robust inference</a>: cluster variance and practical limitations.</li>
+</ul>
+</section>
+<section id="continue-through-the-collection" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="continue-through-the-collection"><span class="header-section-number">9</span> Continue through the guide</h2>
+<p>Apply the independent-unit argument to <a href="../../guides/analysis-problems/multivariate-comparisons.html">Multivariate comparisons: permutation and distance-based tests</a> and <a href="../../guides/analysis-problems/residual-network-case-study.html">An end-to-end residual-network analysis</a>.</p>
+<p>Continue to <a href="../../guides/estimation-and-inference/bootstrap-and-resampling.html">Bootstrap and resampling for statistical inference</a> for a worked whole-person bootstrap and the conditions behind resampling approximations.</p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/estimation-and-inference/uncertainty-and-interpretation.html" class="pagination-link" aria-label="Uncertainty, confidence intervals, and tests">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Uncertainty, confidence intervals, and tests</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/estimation-and-inference/bootstrap-and-resampling.html" class="pagination-link" aria-label="Bootstrap and resampling for statistical inference">
+        <span class="nav-page-text">Bootstrap and resampling for statistical inference</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Dependent observations and cluster-aware inference"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Targets, influence contributions, and the independent unit"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>**Before reading:** <span class="co">[</span><span class="ot">Units of analysis, replication, and study design</span><span class="co">](../questions-and-design/units-and-study-design.qmd)</span>, means, and variances. Start with the person-summary examples; <span class="co">[</span><span class="ot">Influence functions</span><span class="co">](../statistical-models/influence-functions.qmd)</span> and <span class="co">[</span><span class="ot">Estimating equations and asymptotic linearity</span><span class="co">](estimating-equations.qmd)</span> support the contribution and sandwich derivations when you return to those sections.</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Count the independent draws before counting rows</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>Repeated specimens, cells nested within people, technical replicates, and samples grouped by collection site can be correlated. A sandwich formula using one row at a time only addresses dependence if those rows are the independent units required by its argument.</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>This page uses **independently sampled clusters**, typically people. Within a cluster, observations may be dependent. Let $G$ be the number of clusters and $M_i$ the number of records in cluster $i$. Large-cluster-count asymptotics send $G$ to infinity, with moment and non-dominance conditions; merely collecting many records from a fixed small number of people does not invoke that theorem. Dependence across people, such as family or site effects, may require a larger cluster unit or another framework.</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>Think of one statistical observation as the whole record $C_i=(M_i,Y_{i1},\ldots,Y_{iM_i})$. In the basic setup, these cluster records are i.i.d. The total row count $N=\sum_iM_i$ may be much larger than $G$, but the LLN and CLT are applied to averages of functions of the $G$ independent cluster records. Within-person correlation is preserved inside each function.</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>Read <span class="co">[</span><span class="ot">Units of analysis, replication, and study design</span><span class="co">](../questions-and-design/units-and-study-design.qmd)</span> first for target weighting. This page supplies the uncertainty calculation and its connection to influence functions. <span class="co">[</span><span class="ot">Cameron and Miller</span><span class="co">](https://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015.pdf)</span> discuss practical cluster-inference limitations, including few clusters and multiple clustering dimensions.</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## Two means, two cluster contributions</span></span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>Let $T_i=\sum_{j=1}^{M_i}Y_{ij}$ and $\bar Y_i=T_i/M_i$, with $M_i\geq1$. A randomly sampled person's mean record outcome has target</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>\mu_P&amp;=E<span class="co">[</span><span class="ot">\bar Y_i</span><span class="co">]</span>,<span class="sc">\\</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>\widehat\mu_P&amp;=G^{-1}\sum_i\bar Y_i.</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>A record-weighted target is instead a ratio over the same cluster population:</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>\mu_R&amp;=\frac{E<span class="co">[</span><span class="ot">T_i</span><span class="co">]</span>}{E<span class="co">[</span><span class="ot">M_i</span><span class="co">]</span>},<span class="sc">\\</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>\widehat\mu_R&amp;=\frac{\sum_i T_i}{\sum_i M_i}.</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>Their cluster-level influence functions are</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>D_{P,i}&amp;=\bar Y_i-\mu_P,<span class="sc">\\</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>D_{R,i}&amp;=\frac{T_i-\mu_R M_i}{E<span class="co">[</span><span class="ot">M_i</span><span class="co">]</span>}.</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>The weighting difference can be seen at the row level. In $\widehat\mu_P$, each row from person $i$ has weight $1/(GM_i)$: the person's total weight is $1/G$. In $\widehat\mu_R$, every row has weight $1/N$, so people with more records contribute more weight. The two targets can therefore differ when record count and outcomes are associated.</span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"fig-cluster-targets"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>For a concrete population, suppose half the people have one record with outcome 0 and half have five records, each with outcome 3. Then $E<span class="co">[</span><span class="ot">\bar Y_i</span><span class="co">]</span>=(0+3)/2=1.5$, while $E<span class="co">[</span><span class="ot">T_i</span><span class="co">]</span>=7.5$ and $E<span class="co">[</span><span class="ot">M_i</span><span class="co">]</span>=3$, giving $\mu_R=2.5$. Both targets concern the same population of people; they answer different averaging questions.</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>To derive the contributions, first apply the cluster LLN to $\bar Y_i$, $T_i$, and $M_i$, under the required integrability conditions. The person estimator is an ordinary mean of person summaries. For the record estimator, write $\bar M=G^{-1}\sum_iM_i$ and use the exact identity</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>\widehat\mu_R-\mu_R</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a>=\frac{G^{-1}\sum_i(T_i-\mu_RM_i)}{\bar M}.</span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>The numerator is an average of mean-zero cluster quantities. If $E<span class="co">[</span><span class="ot">M_i</span><span class="co">]</span>&lt;\infty$, the LLN gives $\bar M\xrightarrow{p}E<span class="co">[</span><span class="ot">M_i</span><span class="co">]</span>&gt;0$. With finite variance for $T_i-\mu_RM_i$, the CLT and Slutsky allow replacement of $\bar M$ by $E<span class="co">[</span><span class="ot">M_i</span><span class="co">]</span>$ at first order, giving $D_{R,i}$ above. This is the ratio rule from <span class="co">[</span><span class="ot">Checkpoint SP-05</span><span class="co">](../statistical-models/influence-functions.qmd#checkpoint-sp-05)</span>, now applied to a person's totals and counts.</span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>Each contribution is one random **cluster**, even for the record-weighted target. Correcting an SE changes uncertainty about the selected target; it does not change the target weights.</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a>Neither is intrinsically correct for every study. Irregular visits can be informative, and an observed-record mean is not automatically an outcome at a fixed scheduled time. Dropout and measurement timing may require identification assumptions before either target answers the intended longitudinal question.</span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a><span class="fu">## Estimate variance across cluster contributions</span></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a>For an estimator with expansion</span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>\widehat\theta-\theta_0</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a>=G^{-1}\sum_{i=1}^G D_i+o_p(G^{-1/2}),</span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a>a cluster CLT gives $\sqrt G(\widehat\theta-\theta_0)\xrightarrow{d}N(0,V_C)$ when $E<span class="co">[</span><span class="ot">D_i</span><span class="co">]</span>=0$ and $0&lt;V_C=\operatorname{Var}(D_i)&lt;\infty$. The estimator's first-order variance is $V_C/G$.</span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>Estimate $V_C$ by the variance of the estimated **cluster contributions**:</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>s_D^2&amp;=\frac1{G-1}\sum_{i=1}^G(\widehat D_i-\overline{\widehat D})^2,<span class="sc">\\</span></span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a>\widehat{\operatorname{SE}}(\widehat\theta)&amp;=\frac{s_D}{\sqrt G}.</span>
+<span id="cb6-85"><a href="#cb6-85" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-86"><a href="#cb6-86" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a>This is the same logic as the sample-mean SE, with the random object changed from a row to a cluster. Consistency of the estimated contribution variance and a negligible remainder justify studentization. When cluster sizes grow with the study, extra moment and non-dominance conditions are needed so one large cluster cannot supply most of the fluctuation. A normal interval remains an asymptotic statement about increasing independent cluster counts.</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>ClusterMean <span class="ot">&lt;-</span> <span class="cf">function</span>(y, id, <span class="at">target =</span> <span class="fu">c</span>(<span class="st">"person"</span>, <span class="st">"record"</span>)) {</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>  target <span class="ot">&lt;-</span> <span class="fu">match.arg</span>(target)</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">is.numeric</span>(y), <span class="fu">length</span>(y) <span class="sc">==</span> <span class="fu">length</span>(id),</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>            <span class="fu">all</span>(<span class="fu">is.finite</span>(y)), <span class="sc">!</span><span class="fu">anyNA</span>(id))</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>  totals <span class="ot">&lt;-</span> <span class="fu">rowsum</span>(<span class="fu">cbind</span>(<span class="at">total =</span> y, <span class="at">size =</span> <span class="fu">rep</span>(<span class="dv">1</span>, <span class="fu">length</span>(y))), id, <span class="at">reorder =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>  G <span class="ot">&lt;-</span> <span class="fu">nrow</span>(totals); <span class="fu">stopifnot</span>(G <span class="sc">&gt;=</span> <span class="dv">2</span>)</span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>  T <span class="ot">&lt;-</span> totals[, <span class="st">"total"</span>]; M <span class="ot">&lt;-</span> totals[, <span class="st">"size"</span>]</span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>  estimate <span class="ot">&lt;-</span> <span class="cf">if</span> (target <span class="sc">==</span> <span class="st">"person"</span>) <span class="fu">mean</span>(T<span class="sc">/</span>M) <span class="cf">else</span> <span class="fu">sum</span>(T)<span class="sc">/</span><span class="fu">sum</span>(M)</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>  D <span class="ot">&lt;-</span> <span class="cf">if</span> (target <span class="sc">==</span> <span class="st">"person"</span>) T<span class="sc">/</span>M <span class="sc">-</span> estimate <span class="cf">else</span> (T <span class="sc">-</span> estimate<span class="sc">*</span>M)<span class="sc">/</span><span class="fu">mean</span>(M)</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">estimate =</span> estimate, <span class="at">SE =</span> <span class="fu">sd</span>(D)<span class="sc">/</span><span class="fu">sqrt</span>(G), <span class="at">clusters =</span> G, <span class="at">records =</span> <span class="fu">length</span>(y))</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fu">rep</span>(<span class="dv">3</span>, <span class="dv">5</span>)); id <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"short"</span>, <span class="fu">rep</span>(<span class="st">"long"</span>, <span class="dv">5</span>))</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">person =</span> <span class="fu">ClusterMean</span>(y, id, <span class="st">"person"</span>), <span class="at">record =</span> <span class="fu">ClusterMean</span>(y, id, <span class="st">"record"</span>))</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>The two-cluster output demonstrates the formulas, not trustworthy normal inference from two people. For the person mean, the SE is simply the SE of the person summaries. For the record target, the varying denominator enters the influence function. Using the row SD divided by the square root of the row count ignores within-person covariance.</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a><span class="fu">## Why extra records do not supply extra independent people</span></span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>Take a balanced random-intercept model $Y_{ij}=\mu+B_i+\epsilon_{ij}$, with independent zero-mean components, $\operatorname{Var}(B_i)=\tau^2$, and $\operatorname{Var}(\epsilon_{ij})=\sigma^2$. There are $m$ records per person. Write the grand mean's error as</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a>\widehat\mu-\mu</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a>=\frac1G\sum_iB_i</span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a>+\frac1{Gm}\sum_i\sum_j\epsilon_{ij}.</span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>The shared person component $B_i$ appears once in every record from that person, so averaging their records does not remove it. Its variance contribution is $\tau^2/G$. The independent record noise contributes $\sigma^2/(Gm)$. Adding them gives</span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-122"><a href="#cb6-122" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-123"><a href="#cb6-123" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}(\widehat\mu)</span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a>&amp;=\frac{\tau^2+\sigma^2/m}{G},<span class="sc">\\</span></span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a>\text{design effect}</span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a>&amp;=1+(m-1)\rho,<span class="sc">\\</span></span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a>\rho&amp;=\frac{\tau^2}{\tau^2+\sigma^2}.</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>Two records from the same person have covariance $\tau^2$, so $\rho$ is their intraclass correlation. Treating all $Gm$ rows as independent would use variance $(\tau^2+\sigma^2)/(Gm)$. Dividing the correct variance by that calculation gives the displayed **design effect**. Its square root is the corresponding SE inflation.</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>For $G=100$, $m=4$, $\tau^2=0.8$, and $\sigma^2=0.2$, the correct variance is 0.0085 and SE about 0.0922. The independent-row calculation gives variance 0.0025 and SE 0.05. The variance ratio is 3.4; the SE ratio is $\sqrt{3.4}\approx1.84$.</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a>With $G$ fixed, increasing $m$ leaves a variance floor $\tau^2/G$ when $\tau^2&gt;0$. Additional records reduce measurement noise, but estimating the population mean consistently in this model requires more independent people. This design-effect formula belongs to the stated balanced model; other weighting schemes or cluster structures need their own variance calculation.</span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-cluster-information</span></span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 4.5</span></span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Exact SEs in a balanced random-intercept model with 100 people, person variance 0.8, and record-noise variance 0.2. Additional records reduce noise but do not remove the person component."</span></span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "The correct SE decreases toward a positive floor as records per person increase, while the independent-row calculation continues toward zero."</span></span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>m_grid <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>; G <span class="ot">&lt;-</span> <span class="dv">100</span></span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a>correct <span class="ot">&lt;-</span> <span class="fu">sqrt</span>((<span class="fl">0.8</span> <span class="sc">+</span> <span class="fl">0.2</span><span class="sc">/</span>m_grid)<span class="sc">/</span>G)</span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a>naive <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span><span class="sc">/</span>(G<span class="sc">*</span>m_grid))</span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(m_grid, correct, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>, <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.11</span>),</span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Records per person"</span>, <span class="at">ylab =</span> <span class="st">"SE of the grand mean"</span>)</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(m_grid, naive, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fu">sqrt</span>(<span class="fl">0.8</span><span class="sc">/</span>G), <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"right"</span>, <span class="fu">c</span>(<span class="st">"Cluster model"</span>, <span class="st">"Independent-row calculation"</span>, <span class="st">"Person-variance floor"</span>),</span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"black"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>Now check coverage under this explicitly Gaussian, balanced generator. There are 500 independent simulated datasets, each with 100 people and four records. Both estimators have the same point estimate; the SE calculation differs. Monte Carlo SE describes uncertainty in the estimated coverage, not uncertainty in one study's mean.</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2701</span>)</span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>coverage <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">500</span>, {</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a>  id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(<span class="dv">100</span>), <span class="at">each =</span> <span class="dv">4</span>)</span>
+<span id="cb6-164"><a href="#cb6-164" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">rnorm</span>(<span class="dv">100</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(<span class="fl">0.8</span>)), <span class="at">each =</span> <span class="dv">4</span>) <span class="sc">+</span> <span class="fu">rnorm</span>(<span class="dv">400</span>, <span class="at">sd =</span> <span class="fu">sqrt</span>(<span class="fl">0.2</span>))</span>
+<span id="cb6-165"><a href="#cb6-165" aria-hidden="true" tabindex="-1"></a>  fit <span class="ot">&lt;-</span> <span class="fu">ClusterMean</span>(y, id)</span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a>  se <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="at">row =</span> <span class="fu">sd</span>(y)<span class="sc">/</span><span class="fu">sqrt</span>(<span class="fu">length</span>(y)), <span class="at">cluster =</span> <span class="fu">unname</span>(fit[<span class="st">'SE'</span>]))</span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abs</span>(<span class="fu">mean</span>(y)) <span class="sc">&lt;=</span> <span class="fu">qnorm</span>(<span class="fl">0.975</span>) <span class="sc">*</span> se</span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a>coverage_rate <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(coverage)</span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">method =</span> <span class="fu">names</span>(coverage_rate), <span class="at">coverage =</span> coverage_rate,</span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a>           <span class="at">MCSE =</span> <span class="fu">sqrt</span>(coverage_rate <span class="sc">*</span> (<span class="dv">1</span><span class="sc">-</span>coverage_rate)<span class="sc">/</span><span class="fu">ncol</span>(coverage)))</span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a><span class="fu">## The cluster sandwich is the same linearization at a different unit</span></span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a>Suppose $\widehat\theta$ solves $G^{-1}\sum_i S_i(\theta)=0$, where $S_i$ is the whole-cluster score. If $A=E<span class="co">[</span><span class="ot">\partial S_i(\theta_0)/\partial\theta^T</span><span class="co">]</span>$ is nonsingular and consistency, a CLT, differentiability, and remainder control hold, then</span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a>D_i&amp;=-A^{-1}S_i(\theta_0),<span class="sc">\\</span></span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a>\widehat{\operatorname{Var}}(\widehat\theta)</span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a>&amp;=G^{-1}\widehat A^{-1}</span>
+<span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a>  \widehat{\operatorname{Cov}}(S_i)</span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a>  \widehat A^{-T}.</span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a>Here $A^{-T}=(A^{-1})^\top$. Evaluate the cluster scores and their derivatives at $\widehat\theta$ to estimate the covariance and $A$, with consistency justified by the corresponding LLNs. For OLS, $S_i=\sum_j X_{ij}(Y_{ij}-X_{ij}^\top\beta)$. Writing each row contribution as $\psi_{ij}$ shows what changes in the variance calculation:</span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a>S_iS_i^\top=\sum_j\sum_\ell\psi_{ij}\psi_{i\ell}^\top.</span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a>The terms with $j\ne\ell$ retain covariance between records from the same person. A rowwise sandwich uses only the same-record terms and therefore can miss the shared variation. The derivative and variance factors must both use the same whole-cluster normalization.</span>
+<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a>The point estimate still targets the selected regression equation. If each row enters equally, people with more rows contribute more to that equation. A cluster variance correction preserves those weights and the target they define. Omitted confounding and a rank-deficient design require separate arguments.</span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cross-fitting and resampling must preserve clusters</span></span>
+<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a>Place every record from a person in the same fold when people are independent. Train preprocessing, tuning, feature selection, and nuisance fits within training clusters. Otherwise the held-out record can still share a person's outcome information with its training records. With fixed $K$ folds, condition on training clusters and apply the same held-out empirical-term argument as in <span class="co">[</span><span class="ot">SP-12</span><span class="co">](../semiparametric-methods/influence-function-to-estimator.qmd#checkpoint-sp-12)</span>, now to whole-cluster contributions. Appropriate cluster-level L2/product-remainder and variance conditions remain necessary.</span>
+<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-202"><a href="#cb6-202" aria-hidden="true" tabindex="-1"></a>In the random-intercept example, a learner trained on one record can gain information about that person's $B_i$. Another record from the same person is consequently not a fresh independent validation draw conditional on the training data. Holding out the whole person restores the intended separation under independent-person sampling. It does not by itself make the fitted nuisance functions accurate enough for inference.</span>
+<span id="cb6-203"><a href="#cb6-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-204"><a href="#cb6-204" aria-hidden="true" tabindex="-1"></a>For a cluster bootstrap, resample people with replacement and carry all their records together. Give repeated copies distinct bootstrap cluster IDs if refitting. Whether nuisance fits should be recomputed depends on the inferential procedure; a shortcut must be justified rather than assumed. A valid permutation scheme instead follows the assignment or exchangeability design, which may differ from a bootstrap. See the <span class="co">[</span><span class="ot">Multivariate comparisons: permutation and distance-based tests</span><span class="co">](../analysis-problems/multivariate-comparisons.qmd)</span> page.</span>
+<span id="cb6-205"><a href="#cb6-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-206"><a href="#cb6-206" aria-hidden="true" tabindex="-1"></a>With few clusters, highly unequal leverage, one dominant person/site, cross-cluster dependence, or few clusters per treatment group, the normal approximation may fail. Small-sample corrections and specialized bootstrap/randomization methods require their own assumptions; no single cluster-count threshold validates them all. Report the cluster definition, count and size distribution, target weights, fold/resampling scheme, and variance method.</span>
+<span id="cb6-207"><a href="#cb6-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-208"><a href="#cb6-208" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb6-209"><a href="#cb6-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-210"><a href="#cb6-210" aria-hidden="true" tabindex="-1"></a>Try each checkpoint before opening its hint or solution.</span>
+<span id="cb6-211"><a href="#cb6-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-212"><a href="#cb6-212" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-cl-01 .checkpoint}</span>
+<span id="cb6-213"><a href="#cb6-213" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · CL-01 — Derive the cluster contribution for the chosen target {.unnumbered}</span></span>
+<span id="cb6-214"><a href="#cb6-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-215"><a href="#cb6-215" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and interpretation.</span>
+<span id="cb6-216"><a href="#cb6-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-217"><a href="#cb6-217" aria-hidden="true" tabindex="-1"></a>Let T be a person's outcome sum and M≥1 their record count. Derive influence functions for E<span class="co">[</span><span class="ot">T/M</span><span class="co">]</span> and E<span class="co">[</span><span class="ot">T</span><span class="co">]</span>/E<span class="co">[</span><span class="ot">M</span><span class="co">]</span> under independent person sampling. For equally common types (M,Y)=(1,0) and (5,3), calculate both targets and explain why replacing only the SE does not change the point target.</span>
+<span id="cb6-218"><a href="#cb6-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-219"><a href="#cb6-219" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can derive both cluster-level contributions and connect target weighting to the independent-unit variance.</span>
+<span id="cb6-220"><a href="#cb6-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-221"><a href="#cb6-221" aria-hidden="true" tabindex="-1"></a>**Transfer:** If visit frequency depends on disease severity, which target would a scheduled-time scientific question require?</span>
+<span id="cb6-222"><a href="#cb6-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-223"><a href="#cb6-223" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb6-224"><a href="#cb6-224" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb6-225"><a href="#cb6-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-226"><a href="#cb6-226" aria-hidden="true" tabindex="-1"></a>Use the mean derivative for the first target and the ratio rule for the second.</span>
+<span id="cb6-227"><a href="#cb6-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-228"><a href="#cb6-228" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb6-229"><a href="#cb6-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-230"><a href="#cb6-230" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb6-231"><a href="#cb6-231" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb6-232"><a href="#cb6-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-233"><a href="#cb6-233" aria-hidden="true" tabindex="-1"></a>The contributions are T/M−μ_P and (T−μ_R M)/E<span class="co">[</span><span class="ot">M</span><span class="co">]</span>. The targets are 1.5 and 2.5. Their variance is calculated across independent people, but they average different quantities. A covariance correction changes uncertainty, not the equation defining the point estimate.</span>
+<span id="cb6-234"><a href="#cb6-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-235"><a href="#cb6-235" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb6-236"><a href="#cb6-236" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-237"><a href="#cb6-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-238"><a href="#cb6-238" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-cl-02 .checkpoint}</span>
+<span id="cb6-239"><a href="#cb6-239" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · CL-02 — Construct a valid fold and variance argument {.unnumbered}</span></span>
+<span id="cb6-240"><a href="#cb6-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-241"><a href="#cb6-241" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and diagnosis.</span>
+<span id="cb6-242"><a href="#cb6-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-243"><a href="#cb6-243" aria-hidden="true" tabindex="-1"></a>In the balanced random-intercept model, derive Var(grand mean) and the design effect. Use G=100, m=4, τ²=0.8, σ²=0.2. Then explain why random row folds and a row bootstrap are inappropriate for an estimator trained on repeated person outcomes.</span>
+<span id="cb6-244"><a href="#cb6-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-245"><a href="#cb6-245" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can account for the shared component and preserve the independent unit in training, uncertainty, and resampling.</span>
+<span id="cb6-246"><a href="#cb6-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-247"><a href="#cb6-247" aria-hidden="true" tabindex="-1"></a>**Transfer:** If people are nested in a small number of sites with shared errors, is person-level independence still defensible?</span>
+<span id="cb6-248"><a href="#cb6-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-249"><a href="#cb6-249" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb6-250"><a href="#cb6-250" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb6-251"><a href="#cb6-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-252"><a href="#cb6-252" aria-hidden="true" tabindex="-1"></a>Average the person intercept once per person and the record noise over all records.</span>
+<span id="cb6-253"><a href="#cb6-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-254"><a href="#cb6-254" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb6-255"><a href="#cb6-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-256"><a href="#cb6-256" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb6-257"><a href="#cb6-257" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb6-258"><a href="#cb6-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-259"><a href="#cb6-259" aria-hidden="true" tabindex="-1"></a>The variance is (0.8+0.2/4)/100=0.0085 and SE≈0.0922. The independent-row variance would be 1/400=0.0025; the design effect is 3.4. Row folds can put one person in both training and validation; row resampling breaks their joint record distribution. Use person folds and person contributions/resampling under independent-person sampling, with the requisite asymptotic and nuisance conditions.</span>
+<span id="cb6-260"><a href="#cb6-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-261"><a href="#cb6-261" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb6-262"><a href="#cb6-262" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-263"><a href="#cb6-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-264"><a href="#cb6-264" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb6-265"><a href="#cb6-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-266"><a href="#cb6-266" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Vary the cluster size distribution in the two-type example and compare person and record targets.</span>
+<span id="cb6-267"><a href="#cb6-267" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Repeat the coverage simulation with larger G and with larger m; separate Monte Carlo variation from the predicted SE behavior.</span>
+<span id="cb6-268"><a href="#cb6-268" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Write whole-cluster scores for a prespecified covariate-adjusted regression and identify its weighting and rank conditions.</span>
+<span id="cb6-269"><a href="#cb6-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-270"><a href="#cb6-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb6-271"><a href="#cb6-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-272"><a href="#cb6-272" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Cameron and Miller, <span class="co">[</span><span class="ot">A practitioner’s guide to cluster-robust inference</span><span class="co">](https://cameron.econ.ucdavis.edu/research/Cameron_Miller_JHR_2015.pdf)</span>: cluster variance and practical limitations.</span>
+<span id="cb6-273"><a href="#cb6-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-274"><a href="#cb6-274" aria-hidden="true" tabindex="-1"></a><span class="fu">## Continue through the guide {#continue-through-the-collection}</span></span>
+<span id="cb6-275"><a href="#cb6-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-276"><a href="#cb6-276" aria-hidden="true" tabindex="-1"></a>Apply the independent-unit argument to <span class="co">[</span><span class="ot">Multivariate comparisons: permutation and distance-based tests</span><span class="co">](../analysis-problems/multivariate-comparisons.qmd)</span> and <span class="co">[</span><span class="ot">An end-to-end residual-network analysis</span><span class="co">](../analysis-problems/residual-network-case-study.qmd)</span>.</span>
+<span id="cb6-277"><a href="#cb6-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-278"><a href="#cb6-278" aria-hidden="true" tabindex="-1"></a>Continue to <span class="co">[</span><span class="ot">Bootstrap and resampling for statistical inference</span><span class="co">](bootstrap-and-resampling.qmd)</span> for a worked whole-person bootstrap and the conditions behind resampling approximations.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

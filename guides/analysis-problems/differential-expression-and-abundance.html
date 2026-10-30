@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Differential expression and abundance – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/analysis-problems/multiple-testing.html" rel="next">
+<link href="../../guides/analysis-problems/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Differential expression and abundance</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Omics analysis problems</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/differential-expression-and-abundance.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Differential expression and abundance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/multiple-testing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multiple testing when the tests are not independent</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/network-inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Network inference from omics data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/association-targets-and-bias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Association targets, pooling, and imperfect adjustment</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/jackknife-pseudo-values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Jackknife pseudo-values</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/residual-covariance-and-nuisance-error.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Residual covariance and nuisance-estimation error</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/multivariate-comparisons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multivariate comparisons: permutation and distance-based tests</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/adjusted-expression-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An end-to-end expression analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/residual-network-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An end-to-end residual-network analysis</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#start-with-a-feature-level-contrast" id="toc-start-with-a-feature-level-contrast" class="nav-link active" data-scroll-target="#start-with-a-feature-level-contrast"><span class="header-section-number">1</span> Start with a feature-level contrast</a></li>
+  <li><a href="#one-regression-per-gene" id="toc-one-regression-per-gene" class="nav-link" data-scroll-target="#one-regression-per-gene"><span class="header-section-number">2</span> One regression per gene</a></li>
+  <li><a href="#the-design-matrix-is-the-analysis" id="toc-the-design-matrix-is-the-analysis" class="nav-link" data-scroll-target="#the-design-matrix-is-the-analysis"><span class="header-section-number">3</span> The design matrix is the analysis</a></li>
+  <li><a href="#what-limma-adds-borrowing-strength-across-genes" id="toc-what-limma-adds-borrowing-strength-across-genes" class="nav-link" data-scroll-target="#what-limma-adds-borrowing-strength-across-genes"><span class="header-section-number">4</span> What limma adds: borrowing strength across genes</a>
+  <ul class="collapse">
+  <li><a href="#run-the-actual-log-expression-workflow" id="toc-run-the-actual-log-expression-workflow" class="nav-link" data-scroll-target="#run-the-actual-log-expression-workflow"><span class="header-section-number">4.1</span> Run the actual log-expression workflow</a></li>
+  <li><a href="#a-separate-raw-count-example-with-voom" id="toc-a-separate-raw-count-example-with-voom" class="nav-link" data-scroll-target="#a-separate-raw-count-example-with-voom"><span class="header-section-number">4.2</span> A separate raw-count example with voom</a></li>
+  </ul></li>
+  <li><a href="#what-limma-assumes-and-when-it-breaks" id="toc-what-limma-assumes-and-when-it-breaks" class="nav-link" data-scroll-target="#what-limma-assumes-and-when-it-breaks"><span class="header-section-number">5</span> What limma assumes, and when it breaks</a></li>
+  <li><a href="#repeated-samples-per-subject" id="toc-repeated-samples-per-subject" class="nav-link" data-scroll-target="#repeated-samples-per-subject"><span class="header-section-number">6</span> Repeated samples per subject</a></li>
+  <li><a href="#check-the-inference-before-interpreting-the-list" id="toc-check-the-inference-before-interpreting-the-list" class="nav-link" data-scroll-target="#check-the-inference-before-interpreting-the-list"><span class="header-section-number">7</span> Check the inference before interpreting the list</a></li>
+  <li><a href="#where-this-connects" id="toc-where-this-connects" class="nav-link" data-scroll-target="#where-this-connects"><span class="header-section-number">8</span> Where this connects</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">9</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-de-01-write-an-estimable-contrast" id="toc-checkpoint-de-01-write-an-estimable-contrast" class="nav-link" data-scroll-target="#checkpoint-de-01-write-an-estimable-contrast">Checkpoint · DE-01 — Write an estimable contrast</a></li>
+  <li><a href="#checkpoint-de-02-explain-what-variance-moderation-changes" id="toc-checkpoint-de-02-explain-what-variance-moderation-changes" class="nav-link" data-scroll-target="#checkpoint-de-02-explain-what-variance-moderation-changes">Checkpoint · DE-02 — Explain what variance moderation changes</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">10</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Differential expression and abundance</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Define the contrast, build the design, and understand variance moderation; limma as a worked expression-data method.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> The relevant assay primer in <a href="../../guides/data-and-measurement/index.html">Omics data and measurement</a>, basic regression, and the distinction between an estimand and a model coefficient. The worked examples use gene expression; transferring the design and contrast ideas to another assay requires its own measurement and variance assumptions.</p>
+<p>For a population-standardized contrast with covariate-varying group differences and missing assays, see <a href="../../guides/analysis-problems/adjusted-expression-case-study.html">An end-to-end expression analysis</a>. Its target and assumptions differ from a constant linear-model contrast; the examples are not a blanket ranking of procedures.</p>
+<section id="start-with-a-feature-level-contrast" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="start-with-a-feature-level-contrast"><span class="header-section-number">1</span> Start with a feature-level contrast</h2>
+<p>For a feature <span class="math inline">g</span> measured on a stated scale, an unadjusted group contrast is <span class="math inline">\Delta_g=E[Y_g\mid A=1]-E[Y_g\mid A=0]</span>. If adjustment is needed, define the conditional contrast or specify a common covariate distribution <span class="math inline">Q</span> over which to average it. The corresponding standardized contrast is <span class="math inline">\int\{E[Y_g\mid A=1,Z=z]-E[Y_g\mid A=0,Z=z]\}\,dQ(z)</span>. These targets need not equal a coefficient in an arbitrary regression.</p>
+<p>Decide which units are independent, which design supports the contrast, and which preprocessing created <span class="math inline">Y_g</span>. Here the worked method is limma for log-expression, with a common linear contrast across the modeled covariates. Applying a similar workflow to proteins, metabolites, or relative microbial abundances requires assay-appropriate measurement and observation models. A difference on the log scale is not a difference in mean abundance on the original scale.</p>
+<p>The <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> page explains interpretation under misspecification; the <a href="../../guides/data-and-measurement/index.html">Omics data and measurement</a> overview compares the available assay primers and the assumptions that differ across them.</p>
+</section>
+<section id="one-regression-per-gene" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="one-regression-per-gene"><span class="header-section-number">2</span> One regression per gene</h2>
+<p>The standard analysis of an expression matrix fits the same linear model to every gene. For gene <span class="math inline">g</span> with expression <span class="math inline">y_{gi}</span> in sample <span class="math inline">i</span> (on the log scale),</p>
+<p><span class="math display">
+\begin{aligned}
+y_{gi}&amp;= \mathbf{x}_i^\top \boldsymbol\beta_g + \varepsilon_{gi},\\
+\varepsilon_{gi}&amp;\sim N(0, \sigma_g^2),
+\end{aligned}
+</span></p>
+<p>where independent-person errors are assumed in this unweighted teaching model. The vector <span class="math inline">\mathbf{x}_i</span> records sample <span class="math inline">i</span>’s group and covariates. It is the same row of the <strong>design matrix</strong> for every gene; the coefficient vector <span class="math inline">\boldsymbol\beta_g</span> and residual variance <span class="math inline">\sigma_g^2</span> are gene-specific. With 15,000 genes this is 15,000 regressions sharing one design, not 15,000 independent people.</p>
+<p>Let <span class="math inline">X</span> have <span class="math inline">N</span> rows and <span class="math inline">r</span> linearly independent columns. Choose a fixed contrast vector <span class="math inline">c</span>: for example, a vector that selects the patient coefficient, or subtracts the control mean coefficient from the patient mean coefficient. The model contrast and ordinary least-squares uncertainty are</p>
+<p><span class="math display">
+\begin{aligned}
+\theta_g&amp;=c^\top\boldsymbol\beta_g,\\
+\hat\theta_g&amp;=c^\top\hat{\boldsymbol\beta}_g,\\
+\operatorname{Var}(\hat\theta_g\mid X)
+&amp;=\sigma_g^2\,c^\top(X^\top X)^{-1}c,\\
+\widehat{\operatorname{SE}}_g
+&amp;=s_g\sqrt{c^\top(X^\top X)^{-1}c}.
+\end{aligned}
+</span></p>
+<p>The design factor describes how much information this study provides about the chosen contrast. The residual SD <span class="math inline">s_g</span> describes feature-specific noise after fitting the mean. Their product is the contrast’s SE; neither alone is the SE. Dividing <span class="math inline">\hat\theta_g-\theta_{g,0}</span> by that SE gives an ordinary t-statistic for the specified null value. Under this Gaussian, constant-variance, independent-error model its reference has <span class="math inline">N-r</span> residual degrees of freedom.</p>
+<p>Everything you know about linear regression applies, per gene. What is new is that the number of samples is small (often 10 to 50), the number of genes is large, and the questions are asked across genes. Those three facts are what limma (Smyth 2004; Ritchie et al.&nbsp;2015) is built around.</p>
+</section>
+<section id="the-design-matrix-is-the-analysis" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="the-design-matrix-is-the-analysis"><span class="header-section-number">3</span> The design matrix is the analysis</h2>
+<p>Students arriving from a regression course know <code>lm(y ~ group)</code>. In expression work you write the design matrix explicitly, once, and hand it to every gene.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>group <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"control"</span>, <span class="st">"patient"</span>), <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">10</span>)))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>batch <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"b1"</span>, <span class="st">"b2"</span>), <span class="dv">8</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>sex   <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">replace</span>(<span class="fu">rep</span>(<span class="st">"F"</span>, <span class="dv">16</span>), <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">11</span>), <span class="st">"M"</span>))   <span class="co"># two males, fixed so the page renders the same every time</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> group <span class="sc">+</span> batch <span class="sc">+</span> sex)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(X)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  (Intercept) grouppatient batchb2 sexM
+1           1            0       0    0
+2           1            0       1    0
+3           1            0       0    0
+4           1            0       1    1
+5           1            0       0    0
+6           1            0       1    0</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(X)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "(Intercept)"  "grouppatient" "batchb2"      "sexM"        </code></pre>
+</div>
+</div>
+<p>Reading it: the intercept is the control, batch 1, female baseline; <code>grouppatient</code> is the patient-minus-control difference <em>at fixed batch and sex under the stated common-contrast model</em>; <code>batchb2</code> and <code>sexM</code> are adjustments. Adding a covariate to the design is what “adjusting for” means in practice, and the <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> page says what that buys: the coefficient on <code>group</code> is the group difference within levels of the covariates, which is the estimand you want only if the covariates are the right ones and enter correctly (a continuous composition score entered linearly is a linear adjustment; the group’s research on cell-composition adjustment is about what that leaves behind).</p>
+<p>Two design decisions that come up constantly:</p>
+<ul>
+<li><strong>Group-means parameterization.</strong> <code>model.matrix(~ 0 + group)</code> gives one column per group and you then form contrasts (<code>patient - control</code>). Equivalent fits, often clearer when there are three or more groups.</li>
+<li><strong>Interactions.</strong> <code>~ group * sex</code> lets the group difference differ by sex. Use interactions when the target permits group differences to vary across the covariate. Without them, a common-contrast assumption is being imposed; their value is not decided by available degrees of freedom alone.</li>
+</ul>
+<p>For a continuous covariate <span class="math inline">Z</span>, a model containing <span class="math inline">A</span>, <span class="math inline">Z</span>, and <span class="math inline">AZ</span> has conditional group contrast <span class="math inline">\beta_{A,g}+\beta_{AZ,g}z</span>. The coefficient on <span class="math inline">A</span> alone is the contrast at <span class="math inline">z=0</span>. Averaging over a specified covariate population gives <span class="math inline">\beta_{A,g}+\beta_{AZ,g}E[Z]</span>. These coincide only in special cases. Always translate the proposed contrast into words before fitting it.</p>
+<p>The inverse above also needs full column rank. If every patient is in batch 2 and every control is in batch 1, separate group and batch effects cannot be learned from this design. Software cannot recover the missing comparison by adding both columns. Even with full rank, limited overlap can make the contrast imprecise or dependent on extrapolation of the mean model.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">qr</span>(X)<span class="sc">$</span>rank <span class="sc">==</span> <span class="fu">ncol</span>(X))</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(<span class="fu">seq_len</span>(<span class="fu">ncol</span>(X)), <span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), <span class="fu">t</span>(X[<span class="fu">nrow</span>(X)<span class="sc">:</span><span class="dv">1</span>, ]),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"#2F80C8"</span>), <span class="at">zlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">xaxt =</span> <span class="st">"n"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"Design column"</span>, <span class="at">ylab =</span> <span class="st">"Specimen"</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Intercept"</span>, <span class="st">"Patient"</span>, <span class="st">"Batch 2"</span>, <span class="st">"Male"</span>), <span class="at">cex.axis =</span> <span class="fl">0.8</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>, <span class="at">labels =</span> <span class="dv">16</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">cex.axis =</span> <span class="fl">0.65</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-expression-design" class="quarto-float quarto-figure quarto-figure-center anchored" alt="A heat map shows intercept, patient, batch-2, and male indicator columns for the 16 samples.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-expression-design-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="differential-expression-and-abundance_files/figure-html/fig-expression-design-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: The shared design has 16 specimens and four columns. Group and batch overlap, and both groups contain the sex categories; the rank check matters more than the visual appearance alone. Rows are not automatically independent people."><img src="differential-expression-and-abundance_files/figure-html/fig-expression-design-1.png" class="img-fluid figure-img" alt="A heat map shows intercept, patient, batch-2, and male indicator columns for the 16 samples." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-expression-design-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: The shared design has 16 specimens and four columns. Group and batch overlap, and both groups contain the sex categories; the rank check matters more than the visual appearance alone. Rows are not automatically independent people.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The design matrix specifies mean contrasts; the covariance model and variance calculation specify how dependence is handled. An ordinary independent-error fit with one row per specimen is inadequate when repeated specimens from one subject remain correlated. The repeated-measures section below discusses alternatives.</p>
+</section>
+<section id="what-limma-adds-borrowing-strength-across-genes" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="what-limma-adds-borrowing-strength-across-genes"><span class="header-section-number">4</span> What limma adds: borrowing strength across genes</h2>
+<p>With <span class="math inline">N=16</span> and four linearly independent design columns, fitting the mean uses four dimensions, leaving <span class="math inline">16-4=12</span> residual degrees of freedom. The estimate is <span class="math inline">s_g^2=\mathrm{RSS}_g/12</span>. Across hypothetical repetitions, a gene’s variance estimate can be too small or too large relative to its true variance. An accidentally small denominator can inflate a t-statistic, although a large statistic can also reflect a large numerator; the top-ranked genes need not have the smallest absolute variances.</p>
+<p>limma’s empirical Bayes step assumes the true variances across genes are drawn from a common prior, a scaled inverse chi-square with <span class="math inline">d_0</span> degrees of freedom and scale <span class="math inline">s_0^2</span>, and forms a moderated variance estimate</p>
+<p><span class="math display">
+\tilde s_g^2 = \frac{d_0\, s_0^2 + d_g\, s_g^2}{d_0 + d_g}.
+</span></p>
+<p>Each gene’s variance is pulled toward the common value <span class="math inline">s_0^2</span>, by an amount that depends on how informative the prior is (<span class="math inline">d_0</span>) relative to the data (<span class="math inline">d_g</span>). In the ideal known-prior model, the <strong>moderated t</strong> uses <span class="math inline">\tilde s_g</span> in the denominator and has a marginal <span class="math inline">t_{d_0+d_g}</span> reference. This is calibration over the stated hierarchical variance distribution, not an exact conditional-on-every-fixed-variance theorem. In the implementation the hyperparameters are estimated, residual degrees of freedom can vary, and the total degrees of freedom are also constrained by available information. The formula is the simple constant-prior teaching case. <span class="math inline">d_0</span> and <span class="math inline">s_0^2</span> are estimated from the spread of the observed <span class="math inline">s_g^2</span> across genes (Smyth 2004, Section 6), so the shrinkage is data-driven: if gene variances really vary a lot, <span class="math inline">d_0</span> is small and little shrinkage happens.</p>
+<p>The formula is a weighted average: the prior scale gets weight <span class="math inline">d_0/(d_0+d_g)</span> and the observed variance gets weight <span class="math inline">d_g/(d_0+d_g)</span>. With <span class="math inline">d_0=4</span>, <span class="math inline">d_g=12</span>, and <span class="math inline">s_0^2=1</span>, an observed variance of 2 becomes 1.75, while an observed variance of 0.1 becomes 0.325. Moderation can move a variance <strong>up or down</strong>. The added prior degrees of freedom represent information borrowed through the variance model, not four additional people.</p>
+<p>The moderated statistic replaces <span class="math inline">s_g</span> by <span class="math inline">\tilde s_g</span> in the SE formula above; it leaves the fitted contrast in the numerator unchanged. This is why understanding the ordinary regression calculation first makes moderation easier to interpret.</p>
+<p>Here is the effect with a known prior, which is a simplified version of what <code>eBayes()</code> estimates. This separate simulation uses only two group means and no batch/sex adjustment, so its design has rank 2 and residual degrees of freedom <span class="math inline">16-2=14</span>, rather than the earlier design’s 12.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>G <span class="ot">&lt;-</span> <span class="dv">5000</span>; n1 <span class="ot">&lt;-</span> <span class="dv">8</span>; n2 <span class="ot">&lt;-</span> <span class="dv">8</span>; d_g <span class="ot">&lt;-</span> n1 <span class="sc">+</span> n2 <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">rgamma</span>(G, <span class="at">shape =</span> <span class="dv">2</span>, <span class="at">rate =</span> <span class="dv">2</span>)        <span class="co"># inverse-chi-square scale 1, df 4; mean 2</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>Y1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(G <span class="sc">*</span> n1, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2)), G)   <span class="co"># control; no true differences</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>Y2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(G <span class="sc">*</span> n2, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2)), G)   <span class="co"># patient</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>diff <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(Y2) <span class="sc">-</span> <span class="fu">rowMeans</span>(Y1)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> (<span class="fu">rowSums</span>((Y1 <span class="sc">-</span> <span class="fu">rowMeans</span>(Y1))<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> <span class="fu">rowSums</span>((Y2 <span class="sc">-</span> <span class="fu">rowMeans</span>(Y2))<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">/</span> d_g</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>se_factor <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> n1 <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> n2)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>t_ord <span class="ot">&lt;-</span> diff <span class="sc">/</span> (<span class="fu">sqrt</span>(s2) <span class="sc">*</span> se_factor)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>d0 <span class="ot">&lt;-</span> <span class="dv">4</span>; s0_2 <span class="ot">&lt;-</span> <span class="dv">1</span>                                   <span class="co"># true prior scale here; limma estimates it</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>s2_mod <span class="ot">&lt;-</span> (d0 <span class="sc">*</span> s0_2 <span class="sc">+</span> d_g <span class="sc">*</span> s2) <span class="sc">/</span> (d0 <span class="sc">+</span> d_g)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>t_mod <span class="ot">&lt;-</span> diff <span class="sc">/</span> (<span class="fu">sqrt</span>(s2_mod) <span class="sc">*</span> se_factor)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Assess noise relative to each gene's own known variance, not absolute s2.</span></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>top_ord <span class="ot">&lt;-</span> <span class="fu">order</span>(<span class="sc">-</span><span class="fu">abs</span>(t_ord))[<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">all_genes =</span> <span class="fu">quantile</span>(s2 <span class="sc">/</span> sigma2), <span class="at">top_ordinary_t =</span> <span class="fu">quantile</span>((s2 <span class="sc">/</span> sigma2)[top_ord]))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                      0%       25%       50%       75%     100%
+all_genes      0.1372922 0.7155509 0.9485540 1.2208810 3.160393
+top_ordinary_t 0.2766340 0.4472796 0.4822695 0.5507113 0.639766</code></pre>
+</div>
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The moderated reference here is marginal under this known-prior generator.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">ordinary =</span> <span class="fu">mean</span>(<span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_ord), d_g) <span class="sc">&lt;</span> <span class="fl">0.05</span>),</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">moderated =</span> <span class="fu">mean</span>(<span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_mod), d0 <span class="sc">+</span> d_g) <span class="sc">&lt;</span> <span class="fl">0.05</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> ordinary moderated 
+   0.0570    0.0548 </code></pre>
+</div>
+</div>
+<p>Moderation borrows information about variances; it does not shrink the fitted group coefficient in this workflow. It can improve power and stability under suitable variance models, but cannot guarantee superiority for every feature or population. Compare the simulated rejection fractions with binomial MCSEs if assessing calibration across independently generated genes; that calculation is specific to this simulation.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>observed_s2 <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.05</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">200</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>residual_df <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">14</span>, <span class="dv">60</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>curves <span class="ot">&lt;-</span> <span class="fu">sapply</span>(residual_df, <span class="cf">function</span>(d) (<span class="dv">4</span> <span class="sc">+</span> d <span class="sc">*</span> observed_s2)<span class="sc">/</span>(<span class="dv">4</span> <span class="sc">+</span> d))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(observed_s2, curves, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#009E73"</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Observed residual variance"</span>, <span class="at">ylab =</span> <span class="st">"Moderated variance"</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"gray65"</span>); <span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"gray65"</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="fu">paste</span>(<span class="st">"Residual df"</span>, residual_df), <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#009E73"</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-variance-moderation" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Moderated variance curves lie between the observed variance and prior scale, with stronger shrinkage at fewer residual degrees of freedom.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-variance-moderation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="differential-expression-and-abundance_files/figure-html/fig-variance-moderation-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: Known-prior variance moderation toward scale 1. Smaller residual degrees of freedom give more shrinkage. The horizontal reference is a prior scale, not a known variance for every gene or the prior mean."><img src="differential-expression-and-abundance_files/figure-html/fig-variance-moderation-1.png" class="img-fluid figure-img" alt="Moderated variance curves lie between the observed variance and prior scale, with stronger shrinkage at fewer residual degrees of freedom." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-variance-moderation-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Known-prior variance moderation toward scale 1. Smaller residual degrees of freedom give more shrinkage. The horizontal reference is a prior scale, not a known variance for every gene or the prior mean.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<section id="run-the-actual-log-expression-workflow" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="run-the-actual-log-expression-workflow"><span class="header-section-number">4.1</span> Run the actual log-expression workflow</h3>
+<p>This executable example uses <strong>synthetic log2 expression</strong> and the design above. It requires <code>limma</code> and its dependencies. Normalization is not learned in this generator. Feature and sample identifiers remain explicit.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">81</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>G_demo <span class="ot">&lt;-</span> <span class="dv">600</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">rep</span>(<span class="dv">6</span>, G_demo), <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">0.7</span>, <span class="dv">40</span>), <span class="fu">rep</span>(<span class="dv">0</span>, G_demo <span class="sc">-</span> <span class="dv">40</span>)),</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rep</span>(<span class="fl">0.2</span>, G_demo), <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">0.1</span>, G_demo))</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>variance_demo <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">rgamma</span>(G_demo, <span class="at">shape =</span> <span class="dv">3</span>, <span class="at">rate =</span> <span class="dv">2</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(X) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"sample_"</span>, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)))</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>logexpr <span class="ot">&lt;-</span> <span class="fu">t</span>(beta) <span class="sc">%*%</span> <span class="fu">t</span>(X) <span class="sc">+</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(<span class="fu">rnorm</span>(G_demo <span class="sc">*</span> <span class="fu">nrow</span>(X), <span class="at">sd =</span> <span class="fu">sqrt</span>(variance_demo)), G_demo)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="fu">dimnames</span>(logexpr) <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">paste0</span>(<span class="st">"gene_"</span>, <span class="fu">seq_len</span>(G_demo)), <span class="fu">rownames</span>(X))</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(<span class="fu">colnames</span>(logexpr), <span class="fu">rownames</span>(X)), <span class="fu">qr</span>(X)<span class="sc">$</span>rank <span class="sc">==</span> <span class="fu">ncol</span>(X))</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">lmFit</span>(logexpr, <span class="at">design =</span> X)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">eBayes</span>(fit, <span class="at">trend =</span> <span class="cn">TRUE</span>, <span class="at">robust =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>limma<span class="sc">::</span><span class="fu">topTable</span>(fit, <span class="at">coef =</span> <span class="st">"grouppatient"</span>, <span class="at">number =</span> <span class="dv">6</span>, <span class="at">sort.by =</span> <span class="st">"none"</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>                <span class="at">adjust.method =</span> <span class="st">"BH"</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>           logFC        CI.L     CI.R  AveExpr         t    P.Value adj.P.Val
+gene_1 1.2892346  0.02388089 2.554588 6.671780 2.1314114 0.04622597 0.7279598
+gene_2 0.4471484 -0.27250627 1.166803 6.612031 1.2997948 0.20910203 0.8822209
+gene_3 0.9675962  0.19992238 1.735270 6.378689 2.6367241 0.01618878 0.6938047
+gene_4 0.5053150 -0.35739531 1.368025 6.607921 1.2253057 0.23531913 0.8910985
+gene_5 0.3058001 -0.46693483 1.078535 6.559685 0.8278551 0.41795165 0.9485920
+gene_6 0.4880086 -0.42329154 1.399309 6.509791 1.1202457 0.27646401 0.9327088
+               B
+gene_1 -3.738763
+gene_2 -4.618358
+gene_3 -3.099279
+gene_4 -4.681857
+gene_5 -4.966327
+gene_6 -4.766199</code></pre>
+</div>
+</div>
+<p>The output is a six-row display from the full 600-feature family. <code>number = 6</code> limits printing; it does not mean that only six hypotheses received the multiplicity adjustment. The model contrast is the constant patient–control difference at the same batch/sex levels. Report <code>logFC</code>, its scale, uncertainty, and the hypothesis family. The moderation and estimated hyperparameters are part of the inference model. BH still needs valid individual tests and the appropriate dependence conditions; its adjusted p-values do not make the displayed intervals simultaneous or selection-adjusted. See the <a href="../../guides/analysis-problems/multiple-testing.html">Multiple testing when the tests are not independent</a> page.</p>
+</section>
+<section id="a-separate-raw-count-example-with-voom" class="level3" data-number="4.2">
+<h3 data-number="4.2" class="anchored" data-anchor-id="a-separate-raw-count-example-with-voom"><span class="header-section-number">4.2</span> A separate raw-count example with voom</h3>
+<p>Do not feed raw counts into the unweighted log-expression model. This separate synthetic count example uses edgeR’s filtering and normalization factors, then voom’s observation-level precision weights. The resulting modeled scale and assumptions must be stated; it is not an absolute-abundance analysis or a validation of every real RNA-seq pipeline.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">82</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>expected_counts <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">^</span>(<span class="fu">t</span>(beta) <span class="sc">%*%</span> <span class="fu">t</span>(X)) <span class="sc">*</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">outer</span>(<span class="fu">rep</span>(<span class="dv">1</span>, G_demo), <span class="fu">exp</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="at">length.out =</span> <span class="fu">nrow</span>(X))))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnbinom</span>(<span class="fu">length</span>(expected_counts), <span class="at">mu =</span> <span class="fu">as.vector</span>(expected_counts), <span class="at">size =</span> <span class="dv">10</span>),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>                 G_demo, <span class="at">dimnames =</span> <span class="fu">dimnames</span>(logexpr))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> edgeR<span class="sc">::</span><span class="fu">DGEList</span>(counts)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> edgeR<span class="sc">::</span><span class="fu">filterByExpr</span>(dge, <span class="at">design =</span> X)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> dge[keep, , keep.lib.sizes <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> edgeR<span class="sc">::</span><span class="fu">calcNormFactors</span>(dge)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">voom</span>(dge, <span class="at">design =</span> X, <span class="at">plot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>count_fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">eBayes</span>(limma<span class="sc">::</span><span class="fu">lmFit</span>(v, <span class="at">design =</span> X))</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">tested_features =</span> <span class="fu">nrow</span>(v), <span class="at">independent_people =</span> <span class="fu">ncol</span>(v))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>   tested_features independent_people 
+               600                 16 </code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-voom-weights" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Voom plots estimated variability against average log-count size and a fitted smooth trend used to obtain precision weights.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-voom-weights-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="differential-expression-and-abundance_files/figure-html/fig-voom-weights-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-3" title="Figure&nbsp;3: The voom mean–variance trend in a separate synthetic count example. The fitted trend generates observation-level precision weights; it does not change the number of independent biological units."><img src="differential-expression-and-abundance_files/figure-html/fig-voom-weights-1.png" class="img-fluid figure-img" alt="Voom plots estimated variability against average log-count size and a fitted smooth trend used to obtain precision weights." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-voom-weights-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3: The voom mean–variance trend in a separate synthetic count example. The fitted trend generates observation-level precision weights; it does not change the number of independent biological units.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Filtering defines the tested feature set and needs the workflow’s null-calibration justification. Keep the original counts and record filtering, normalization, design, and weighting decisions. <code>trend=TRUE</code> moderates variances with an intensity trend; voom models observation-level precision. They are not identical operations. The official <a href="https://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/intro.html">limma documentation</a> and <a href="https://doi.org/10.1186/gb-2014-15-2-r29">voom paper</a> describe the implementations.</p>
+<p>A voom weight is approximately an inverse variance for a log-expression observation: a noisier observation receives less weight in fitting its gene’s mean model. It is not a count of additional biological replicates. Normalization factors address the modeled library scale, precision weights address variability on that scale, and variance moderation borrows information about residual variances. Understanding their separate roles helps diagnose which part of a workflow needs attention.</p>
+</section>
+</section>
+<section id="what-limma-assumes-and-when-it-breaks" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="what-limma-assumes-and-when-it-breaks"><span class="header-section-number">5</span> What limma assumes, and when it breaks</h2>
+<p>The empirical Bayes step buys power with assumptions. Know them.</p>
+<p><strong>One residual variance per gene, shared across groups.</strong> The linear model has a single <span class="math inline">\sigma_g^2</span> for all samples, so patients and controls are assumed equally variable. When they are not, the moderated <span class="math inline">t</span> inherits the behavior of the pooled-variance <span class="math inline">t</span>-test, which depends on which group is more variable and which is larger. The simple unweighted variance model has the same vulnerability as a pooled two-sample t-test. Welch addresses unequal variances for independent observations; it does not repair dependence from cohort-derived pseudo-values or network scores. See the variance issue on independently generated observations:</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>Level <span class="ot">&lt;-</span> <span class="cf">function</span>(n1, n2, sd1, sd2, <span class="at">R =</span> <span class="dv">2000</span>) {</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">replicate</span>(R, {</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n1, <span class="at">sd =</span> sd1); b <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n2, <span class="at">sd =</span> sd2)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="at">pooled =</span> <span class="fu">t.test</span>(a, b, <span class="at">var.equal =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>p.value, <span class="at">welch =</span> <span class="fu">t.test</span>(a, b)<span class="sc">$</span>p.value)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  rate <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(p <span class="sc">&lt;=</span> <span class="fl">0.05</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(n1, n2, sd1, sd2, <span class="at">method =</span> <span class="fu">rownames</span>(p), <span class="at">rejection =</span> rate,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>             <span class="at">MCSE =</span> <span class="fu">sqrt</span>(rate <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> rate) <span class="sc">/</span> R), <span class="at">row.names =</span> <span class="cn">NULL</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="st">`</span><span class="at">5 vs 15, small group more variable</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">Level</span>(<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">5 vs 15, small group less variable</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">Level</span>(<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">10 vs 10, unequal variances</span><span class="st">`</span>        <span class="ot">=</span> <span class="fu">Level</span>(<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">2</span>, <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                                     n1 n2 sd1 sd2 method rejection        MCSE
+5 vs 15, small group more variable.1  5 15   2   1 pooled    0.1475 0.007929179
+5 vs 15, small group more variable.2  5 15   2   1  welch    0.0490 0.004826956
+5 vs 15, small group less variable.1  5 15   1   2 pooled    0.0100 0.002224860
+5 vs 15, small group less variable.2  5 15   1   2  welch    0.0430 0.004536022
+10 vs 10, unequal variances.1        10 10   2   1 pooled    0.0570 0.005184159
+10 vs 10, unequal variances.2        10 10   2   1  welch    0.0515 0.004942052</code></pre>
+</div>
+</div>
+<p>Check the simulated rates and their Monte Carlo uncertainty. The pooled test is anti-conservative when the smaller group is more variable and can be conservative in the reverse configuration. Balance reduces this particular distortion but does not establish exact validity under unequal variances. Welch usually improves calibration here; very small samples still require scrutiny. The result concerns this synthetic configuration. Weighted limma models instead allow <span class="math inline">\operatorname{Var}(\varepsilon_{gi})=\sigma_g^2/w_{gi}</span> for supplied or estimated precision weights. <code>arrayWeights()</code> and <code>voomWithQualityWeights()</code> address particular sample/observation precision structures. The weights and correlation model still need justification for the assay and design; the unweighted example does not describe every weighting option.</p>
+<p><strong>Genes share a variance distribution.</strong> Borrowing variance information trades conditional bias against variability under the variance model. A feature far from the bulk can be affected differently from a typical feature. <code>trend=TRUE</code> allows an intensity-dependent prior scale, and <code>robust=TRUE</code> robustifies hyperparameter estimation against outlying variances; neither proves that every feature satisfies the model.</p>
+<p><strong>Normality on the log scale, and independence across samples.</strong> A transformation does not prove normality or control extreme tails. The exact small-sample reference uses its distributional assumptions; residual diagnostics and suitable large-sample arguments have their own scope. Dependence across samples requires a design-appropriate covariance calculation. Correlated genes do not by themselves create additional independent people.</p>
+</section>
+<section id="repeated-samples-per-subject" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="repeated-samples-per-subject"><span class="header-section-number">6</span> Repeated samples per subject</h2>
+<p>Longitudinal cohorts give several samples per subject. For a between-person contrast with positive within-person correlation, an independent-row analysis can understate uncertainty. For a within-person contrast, ignoring pairing can instead discard precision (the <a href="../../guides/analysis-problems/multivariate-comparisons.html">Multivariate comparisons: permutation and distance-based tests</a> page shows the same failure in a different setting). limma has two tools.</p>
+<p><strong>Block as a fixed effect.</strong> Put subject in the design matrix. Useful for specified within-person contrasts under its mean/error assumptions, but it uses person-level parameters and renders a group main effect that is constant within person (patient versus control) inestimable, since subject is nested in group.</p>
+<p><strong><code>duplicateCorrelation()</code>.</strong> Estimates a single within-subject correlation shared across genes, then fits each gene by generalized least squares with that correlation. Keeps subject-level contrasts estimable and borrows strength for the correlation the way <code>eBayes</code> does for the variance. It assumes the within-subject correlation is the same for every gene and every pair of samples from a subject, which should be assessed against the visit structure and biological heterogeneity rather than assumed suitable for every cohort.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">83</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>subject_id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(<span class="dv">12</span>), <span class="at">each =</span> <span class="dv">2</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>visit <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="dv">12</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>group_r <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"control"</span>, <span class="st">"patient"</span>), <span class="at">each =</span> <span class="dv">6</span>), <span class="at">each =</span> <span class="dv">2</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"control"</span>, <span class="st">"patient"</span>))</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>X_r <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> group_r <span class="sc">+</span> visit)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>U <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">200</span> <span class="sc">*</span> <span class="dv">12</span>, <span class="at">sd =</span> <span class="fl">0.6</span>), <span class="dv">200</span>, <span class="dv">12</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>y_r <span class="ot">&lt;-</span> <span class="dv">6</span> <span class="sc">+</span> U[, subject_id] <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">200</span> <span class="sc">*</span> <span class="dv">24</span>, <span class="at">sd =</span> <span class="fl">0.6</span>), <span class="dv">200</span>, <span class="dv">24</span>) <span class="sc">+</span></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">outer</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">0.7</span>, <span class="dv">15</span>), <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">185</span>)), <span class="fu">as.numeric</span>(group_r <span class="sc">==</span> <span class="st">"patient"</span>)) <span class="sc">+</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">outer</span>(<span class="fu">rep</span>(<span class="fl">0.2</span>, <span class="dv">200</span>), visit)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>corfit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">duplicateCorrelation</span>(y_r, <span class="at">design =</span> X_r, <span class="at">block =</span> subject_id)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>repeated_fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">lmFit</span>(y_r, <span class="at">design =</span> X_r, <span class="at">block =</span> subject_id,</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>                            <span class="at">correlation =</span> corfit<span class="sc">$</span>consensus.correlation)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>repeated_fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">eBayes</span>(repeated_fit)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">people =</span> <span class="fu">length</span>(<span class="fu">unique</span>(subject_id)), <span class="at">specimens =</span> <span class="fu">ncol</span>(y_r),</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimated_consensus_correlation =</span> corfit<span class="sc">$</span>consensus.correlation)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                         people                       specimens 
+                     12.0000000                      24.0000000 
+estimated_consensus_correlation 
+                      0.4989482 </code></pre>
+</div>
+</div>
+<p>In this generator the residual for a specimen is its person’s shared random intercept plus its own noise. Both have variance <span class="math inline">0.6^2=0.36</span>. Two visits from the same person therefore have covariance 0.36 and marginal residual variance <span class="math inline">0.36+0.36=0.72</span>, giving within-person correlation 0.5. Visits from different people share no random intercept. This explains why compound symmetry matches this example and why 24 specimens still represent only 12 independent people. It does not establish that one consensus correlation fits every longitudinal assay.</p>
+<p>Gene-specific mixed models, including <code>dream</code> in <code>variancePartition</code>, can model richer correlation structures under their own assumptions. Unequal visit counts also affect target weighting and selection, not only covariance. Choose the target and design before the fitting engine; see <a href="../../guides/questions-and-design/units-and-study-design.html">Units of analysis, replication, and study design</a>.</p>
+</section>
+<section id="check-the-inference-before-interpreting-the-list" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="check-the-inference-before-interpreting-the-list"><span class="header-section-number">7</span> Check the inference before interpreting the list</h2>
+<p>Check whether the design matrix is full rank and the desired contrast is estimable; perfect group–batch confounding cannot be removed by adding both columns. Examine residuals, mean–variance trends, influential samples, and whether repeated measurements were handled at the correct level. Report the estimated contrast and uncertainty on the stated scale, alongside the multiple-testing procedure and the family of features tested.</p>
+<p>The weighted limma workflow can accommodate modeled precision differences; the simple unweighted example above has a narrower variance model. Consult the <a href="https://www.bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/intro.html">limma introduction and user guide</a> for the implemented weighting and correlation options. Variance moderation improves variance estimation under its assumptions; it does not identify a confounded contrast or correct a scientifically inappropriate adjustment set.</p>
+</section>
+<section id="where-this-connects" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="where-this-connects"><span class="header-section-number">8</span> Where this connects</h2>
+<ul>
+<li>The <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> page: the design matrix is where “adjusting for <span class="math inline">Z</span>” happens, and the coefficient’s target is the within-covariate difference only when the adjustment is correct and complete.</li>
+<li>The <a href="../../guides/analysis-problems/jackknife-pseudo-values.html">Jackknife pseudo-values</a> page: comparing per-sample network edges between groups is a limma or <span class="math inline">t</span>-test on the edges as if they were expression values. Check the dependence introduced by estimating those summaries from the shared cohort as well as the mean and variance models; ordinary independent-observation testing is not automatically justified.</li>
+<li>The <a href="../../guides/semiparametric-methods/orthogonality-and-cross-fitting.html">Orthogonality and cross-fitting</a> page: a misspecified linear adjustment can change the coefficient’s target. An orthogonal, cross-fitted construction is an alternative when its target, model, and nuisance-rate conditions fit the question; it is not an automatic repair for every design or measurement problem.</li>
+<li>The <a href="../../guides/analysis-problems/multiple-testing.html">Multiple testing when the tests are not independent</a> page: the output of limma is 15,000 <span class="math inline">p</span>-values, and what you do with them is the subject of that shared inference guide.</li>
+</ul>
+</section>
+<section id="exercises" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="exercises"><span class="header-section-number">9</span> Exercises</h2>
+<p><strong>Checkpoints are completion targets for this page. Additional practice below is optional.</strong> Each checkpoint gives a completion standard, a hint, and a solution outline.</p>
+<div id="checkpoint-de-01" class="checkpoint">
+<section id="checkpoint-de-01-write-an-estimable-contrast" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-de-01-write-an-estimable-contrast">Checkpoint · DE-01 — Write an estimable contrast</h3>
+<p><strong>Task type:</strong> Construction and interpretation.</p>
+<p>Use a group-means design with columns <span class="math inline">(A,B,C,Z)</span> for three groups and one continuous covariate. Write contrast vectors for B minus A and the average of B and C minus A. State the scale and common-slope assumption needed to interpret these contrasts as adjusted feature differences. Explain what must be checked before claiming the contrasts are estimable.</p>
+<p><strong>Ready to continue when:</strong> you can connect a design/contrast calculation to its population interpretation and check rank and confounding.</p>
+<p><strong>Transfer:</strong> If the group difference varies with <span class="math inline">Z</span>, which additional design terms and reference values would you need?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>A contrast takes a weighted sum of the coefficients; a common covariate term cancels in a same-<span class="math inline">Z</span> difference.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>In the stated column order, the vectors are <span class="math inline">(-1,1,0,0)</span> and <span class="math inline">(-1,1/2,1/2,0)</span>. Interpretation is on the feature scale modeled, such as log-expression. Without interactions the design assumes a common covariate slope and a group difference constant in <span class="math inline">Z</span>. Check the design rank and whether the contrast lies in its estimable space; perfect confounding or absent groups can prevent identification. More generally, a standardized group contrast can differ from a coefficient in a misspecified model.</p>
+</details>
+</section>
+</div>
+<div id="checkpoint-de-02" class="checkpoint">
+<section id="checkpoint-de-02-explain-what-variance-moderation-changes" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-de-02-explain-what-variance-moderation-changes">Checkpoint · DE-02 — Explain what variance moderation changes</h3>
+<p><strong>Task type:</strong> Derivation and interpretation.</p>
+<p>In the known-prior teaching model, take <span class="math inline">d_0=4</span>, <span class="math inline">s_0^2=1</span>, <span class="math inline">d_g=4</span>, and observed <span class="math inline">s_g^2=0.2</span>. Compute the moderated variance and compare it with the result at <span class="math inline">d_g=40</span>. State whether the fitted group coefficient is shrunk. Explain what is averaged over in the known-prior moderated-t calibration and what remains to check in an actual weighted, repeated-measures limma analysis.</p>
+<p><strong>Ready to continue when:</strong> you can separate the target contrast, variance borrowing, hierarchical calibration, and the independent-unit/weighting assumptions.</p>
+<p><strong>Transfer:</strong> Would changing a batch-confounded design become identifiable after stronger variance moderation? Why?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Use the weighted variance formula; the hyperprior scale is not every gene’s true variance.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The moderated variance is <span class="math inline">(4+4(0.2))/8=0.6</span> at four residual df, and <span class="math inline">(4+40(0.2))/44=12/44</span> at forty df. More residual information reduces shrinkage toward the prior scale. This variance moderation does not shrink the fitted group coefficient in the displayed workflow. The ideal moderated-t reference integrates over the specified gene-variance distribution; it is not an exact conditional-on-every-fixed-variance guarantee. Estimated hyperparameters, mean specification, precision weights, within-person covariance, contrast estimability, marginal p-values, and the tested family still need checking.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<p>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</p>
+<ol type="1">
+<li>In the shrinkage simulation, add a true difference of 1 to the first 200 genes and compare the number of true positives at a Bonferroni threshold for the ordinary and moderated statistics. Then set <code>d0 &lt;- 50</code> and <code>d0 &lt;- 0.5</code> and explain what happens.</li>
+<li>Extend the <code>Level()</code> simulation so that the two groups also differ in shape (one normal, one a <span class="math inline">t_3</span> scaled to the same SD). Does Welch still hold its level? At what sample size?</li>
+<li>Simulate 20 subjects with 3 samples each and a within-subject correlation of 0.5, no group effect. Fit <code>lm(y ~ group)</code> ignoring subjects and record the level over 2000 simulated genes. Then fit with subject as a random effect (<code>lme4::lmer</code>) and compare.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="reading"><span class="header-section-number">10</span> Reading</h2>
+<ul>
+<li>Smyth, G. K. (2004). Linear models and empirical Bayes methods for assessing differential expression in microarray experiments. <em>Statistical Applications in Genetics and Molecular Biology</em>, 3(1), Article 3. Sections 1 to 4 and 6.</li>
+<li>Ritchie, M. E., et al.&nbsp;(2015). limma powers differential expression analyses for RNA-sequencing and microarray studies. <em>Nucleic Acids Research</em>, 43(7), e47.</li>
+<li>Law, C. W., Chen, Y., Shi, W., and Smyth, G. K. (2014). voom: precision weights unlock linear model analysis tools for RNA-seq read counts. <em>Genome Biology</em>, 15, R29.</li>
+<li>Law, C. W., et al.&nbsp;(2020). A guide to creating design matrices for gene expression experiments. <em>F1000Research</em>, 9, 1444. A worked design-matrix reference.</li>
+<li>Smyth, G. K., Michaud, J., and Scott, H. S. (2005). Use of within-array replicate spots for assessing differential expression in microarray experiments. <em>Bioinformatics</em>, 21(9), 2067 to 2075. The <code>duplicateCorrelation</code> paper.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/analysis-problems/index.html" class="pagination-link" aria-label="Omics analysis problems">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Omics analysis problems</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/analysis-problems/multiple-testing.html" class="pagination-link" aria-label="Multiple testing when the tests are not independent">
+        <span class="nav-page-text">Multiple testing when the tests are not independent</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Differential expression and abundance"</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Define the contrast, build the design, and understand variance moderation; limma as a worked expression-data method."</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="an">aliases:</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/statistical-background/09-linear-models-limma.html"</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/statistical-background/08-linear-models-limma.html"</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>**Before reading:** The relevant assay primer in <span class="co">[</span><span class="ot">Omics data and measurement</span><span class="co">](../data-and-measurement/index.qmd)</span>, basic regression, and the distinction between an estimand and a model coefficient. The worked examples use gene expression; transferring the design and contrast ideas to another assay requires its own measurement and variance assumptions.</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>For a population-standardized contrast with covariate-varying group differences and missing assays, see <span class="co">[</span><span class="ot">An end-to-end expression analysis</span><span class="co">](adjusted-expression-case-study.qmd)</span>. Its target and assumptions differ from a constant linear-model contrast; the examples are not a blanket ranking of procedures.</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a><span class="fu">## Start with a feature-level contrast</span></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>For a feature $g$ measured on a stated scale, an unadjusted group contrast is $\Delta_g=E<span class="co">[</span><span class="ot">Y_g\mid A=1</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">Y_g\mid A=0</span><span class="co">]</span>$. If adjustment is needed, define the conditional contrast or specify a common covariate distribution $Q$ over which to average it. The corresponding standardized contrast is $\int<span class="sc">\{</span>E<span class="co">[</span><span class="ot">Y_g\mid A=1,Z=z</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">Y_g\mid A=0,Z=z</span><span class="co">]</span><span class="sc">\}</span>\,dQ(z)$. These targets need not equal a coefficient in an arbitrary regression.</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>Decide which units are independent, which design supports the contrast, and which preprocessing created $Y_g$. Here the worked method is limma for log-expression, with a common linear contrast across the modeled covariates. Applying a similar workflow to proteins, metabolites, or relative microbial abundances requires assay-appropriate measurement and observation models. A difference on the log scale is not a difference in mean abundance on the original scale.</span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span> page explains interpretation under misspecification; the <span class="co">[</span><span class="ot">Omics data and measurement</span><span class="co">](../data-and-measurement/index.qmd)</span> overview compares the available assay primers and the assumptions that differ across them.</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a><span class="fu">## One regression per gene</span></span>
+<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>The standard analysis of an expression matrix fits the same linear model to every gene. For gene $g$ with expression $y_{gi}$ in sample $i$ (on the log scale),</span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>y_{gi}&amp;= \mathbf{x}_i^\top \boldsymbol\beta_g + \varepsilon_{gi},<span class="sc">\\</span></span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a>\varepsilon_{gi}&amp;\sim N(0, \sigma_g^2),</span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb19-32"><a href="#cb19-32" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-33"><a href="#cb19-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a>where independent-person errors are assumed in this unweighted teaching model. The vector $\mathbf{x}_i$ records sample $i$'s group and covariates. It is the same row of the **design matrix** for every gene; the coefficient vector $\boldsymbol\beta_g$ and residual variance $\sigma_g^2$ are gene-specific. With 15,000 genes this is 15,000 regressions sharing one design, not 15,000 independent people.</span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a>Let $X$ have $N$ rows and $r$ linearly independent columns. Choose a fixed contrast vector $c$: for example, a vector that selects the patient coefficient, or subtracts the control mean coefficient from the patient mean coefficient. The model contrast and ordinary least-squares uncertainty are</span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a>\theta_g&amp;=c^\top\boldsymbol\beta_g,<span class="sc">\\</span></span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>\hat\theta_g&amp;=c^\top\hat{\boldsymbol\beta}_g,<span class="sc">\\</span></span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}(\hat\theta_g\mid X)</span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a> &amp;=\sigma_g^2\,c^\top(X^\top X)^{-1}c,<span class="sc">\\</span></span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a>\widehat{\operatorname{SE}}_g</span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a> &amp;=s_g\sqrt{c^\top(X^\top X)^{-1}c}.</span>
+<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb19-47"><a href="#cb19-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-48"><a href="#cb19-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-49"><a href="#cb19-49" aria-hidden="true" tabindex="-1"></a>The design factor describes how much information this study provides about the chosen contrast. The residual SD $s_g$ describes feature-specific noise after fitting the mean. Their product is the contrast's SE; neither alone is the SE. Dividing $\hat\theta_g-\theta_{g,0}$ by that SE gives an ordinary t-statistic for the specified null value. Under this Gaussian, constant-variance, independent-error model its reference has $N-r$ residual degrees of freedom.</span>
+<span id="cb19-50"><a href="#cb19-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-51"><a href="#cb19-51" aria-hidden="true" tabindex="-1"></a>Everything you know about linear regression applies, per gene. What is new is that the number of samples is small (often 10 to 50), the number of genes is large, and the questions are asked across genes. Those three facts are what limma (Smyth 2004; Ritchie et al. 2015) is built around.</span>
+<span id="cb19-52"><a href="#cb19-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-53"><a href="#cb19-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## The design matrix is the analysis</span></span>
+<span id="cb19-54"><a href="#cb19-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-55"><a href="#cb19-55" aria-hidden="true" tabindex="-1"></a>Students arriving from a regression course know <span class="in">`lm(y ~ group)`</span>. In expression work you write the design matrix explicitly, once, and hand it to every gene.</span>
+<span id="cb19-56"><a href="#cb19-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-59"><a href="#cb19-59" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-60"><a href="#cb19-60" aria-hidden="true" tabindex="-1"></a>group <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"control"</span>, <span class="st">"patient"</span>), <span class="fu">c</span>(<span class="dv">6</span>, <span class="dv">10</span>)))</span>
+<span id="cb19-61"><a href="#cb19-61" aria-hidden="true" tabindex="-1"></a>batch <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"b1"</span>, <span class="st">"b2"</span>), <span class="dv">8</span>))</span>
+<span id="cb19-62"><a href="#cb19-62" aria-hidden="true" tabindex="-1"></a>sex   <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">replace</span>(<span class="fu">rep</span>(<span class="st">"F"</span>, <span class="dv">16</span>), <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">11</span>), <span class="st">"M"</span>))   <span class="co"># two males, fixed so the page renders the same every time</span></span>
+<span id="cb19-63"><a href="#cb19-63" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> group <span class="sc">+</span> batch <span class="sc">+</span> sex)</span>
+<span id="cb19-64"><a href="#cb19-64" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(X)</span>
+<span id="cb19-65"><a href="#cb19-65" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(X)</span>
+<span id="cb19-66"><a href="#cb19-66" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-67"><a href="#cb19-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-68"><a href="#cb19-68" aria-hidden="true" tabindex="-1"></a>Reading it: the intercept is the control, batch 1, female baseline; <span class="in">`grouppatient`</span> is the patient-minus-control difference *at fixed batch and sex under the stated common-contrast model*; <span class="in">`batchb2`</span> and <span class="in">`sexM`</span> are adjustments. Adding a covariate to the design is what "adjusting for" means in practice, and the <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span> page says what that buys: the coefficient on <span class="in">`group`</span> is the group difference within levels of the covariates, which is the estimand you want only if the covariates are the right ones and enter correctly (a continuous composition score entered linearly is a linear adjustment; the group's research on cell-composition adjustment is about what that leaves behind).</span>
+<span id="cb19-69"><a href="#cb19-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-70"><a href="#cb19-70" aria-hidden="true" tabindex="-1"></a>Two design decisions that come up constantly:</span>
+<span id="cb19-71"><a href="#cb19-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-72"><a href="#cb19-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Group-means parameterization.** <span class="in">`model.matrix(~ 0 + group)`</span> gives one column per group and you then form contrasts (<span class="in">`patient - control`</span>). Equivalent fits, often clearer when there are three or more groups.</span>
+<span id="cb19-73"><a href="#cb19-73" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Interactions.** <span class="in">`~ group * sex`</span> lets the group difference differ by sex. Use interactions when the target permits group differences to vary across the covariate. Without them, a common-contrast assumption is being imposed; their value is not decided by available degrees of freedom alone.</span>
+<span id="cb19-74"><a href="#cb19-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-75"><a href="#cb19-75" aria-hidden="true" tabindex="-1"></a>For a continuous covariate $Z$, a model containing $A$, $Z$, and $AZ$ has conditional group contrast $\beta_{A,g}+\beta_{AZ,g}z$. The coefficient on $A$ alone is the contrast at $z=0$. Averaging over a specified covariate population gives $\beta_{A,g}+\beta_{AZ,g}E<span class="co">[</span><span class="ot">Z</span><span class="co">]</span>$. These coincide only in special cases. Always translate the proposed contrast into words before fitting it.</span>
+<span id="cb19-76"><a href="#cb19-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-77"><a href="#cb19-77" aria-hidden="true" tabindex="-1"></a>The inverse above also needs full column rank. If every patient is in batch 2 and every control is in batch 1, separate group and batch effects cannot be learned from this design. Software cannot recover the missing comparison by adding both columns. Even with full rank, limited overlap can make the contrast imprecise or dependent on extrapolation of the mean model.</span>
+<span id="cb19-78"><a href="#cb19-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-81"><a href="#cb19-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-82"><a href="#cb19-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-expression-design</span></span>
+<span id="cb19-83"><a href="#cb19-83" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb19-84"><a href="#cb19-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "The shared design has 16 specimens and four columns. Group and batch overlap, and both groups contain the sex categories; the rank check matters more than the visual appearance alone. Rows are not automatically independent people."</span></span>
+<span id="cb19-85"><a href="#cb19-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "A heat map shows intercept, patient, batch-2, and male indicator columns for the 16 samples."</span></span>
+<span id="cb19-86"><a href="#cb19-86" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">qr</span>(X)<span class="sc">$</span>rank <span class="sc">==</span> <span class="fu">ncol</span>(X))</span>
+<span id="cb19-87"><a href="#cb19-87" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(<span class="fu">seq_len</span>(<span class="fu">ncol</span>(X)), <span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)), <span class="fu">t</span>(X[<span class="fu">nrow</span>(X)<span class="sc">:</span><span class="dv">1</span>, ]),</span>
+<span id="cb19-88"><a href="#cb19-88" aria-hidden="true" tabindex="-1"></a>      <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"white"</span>, <span class="st">"#2F80C8"</span>), <span class="at">zlim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>), <span class="at">xaxt =</span> <span class="st">"n"</span>, <span class="at">yaxt =</span> <span class="st">"n"</span>,</span>
+<span id="cb19-89"><a href="#cb19-89" aria-hidden="true" tabindex="-1"></a>      <span class="at">xlab =</span> <span class="st">"Design column"</span>, <span class="at">ylab =</span> <span class="st">"Specimen"</span>)</span>
+<span id="cb19-90"><a href="#cb19-90" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">4</span>, <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Intercept"</span>, <span class="st">"Patient"</span>, <span class="st">"Batch 2"</span>, <span class="st">"Male"</span>), <span class="at">cex.axis =</span> <span class="fl">0.8</span>)</span>
+<span id="cb19-91"><a href="#cb19-91" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">16</span>, <span class="at">labels =</span> <span class="dv">16</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">cex.axis =</span> <span class="fl">0.65</span>)</span>
+<span id="cb19-92"><a href="#cb19-92" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-93"><a href="#cb19-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-94"><a href="#cb19-94" aria-hidden="true" tabindex="-1"></a>The design matrix specifies mean contrasts; the covariance model and variance calculation specify how dependence is handled. An ordinary independent-error fit with one row per specimen is inadequate when repeated specimens from one subject remain correlated. The repeated-measures section below discusses alternatives.</span>
+<span id="cb19-95"><a href="#cb19-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-96"><a href="#cb19-96" aria-hidden="true" tabindex="-1"></a><span class="fu">## What limma adds: borrowing strength across genes</span></span>
+<span id="cb19-97"><a href="#cb19-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-98"><a href="#cb19-98" aria-hidden="true" tabindex="-1"></a>With $N=16$ and four linearly independent design columns, fitting the mean uses four dimensions, leaving $16-4=12$ residual degrees of freedom. The estimate is $s_g^2=\mathrm{RSS}_g/12$. Across hypothetical repetitions, a gene's variance estimate can be too small or too large relative to its true variance. An accidentally small denominator can inflate a t-statistic, although a large statistic can also reflect a large numerator; the top-ranked genes need not have the smallest absolute variances.</span>
+<span id="cb19-99"><a href="#cb19-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-100"><a href="#cb19-100" aria-hidden="true" tabindex="-1"></a>limma's empirical Bayes step assumes the true variances across genes are drawn from a common prior, a scaled inverse chi-square with $d_0$ degrees of freedom and scale $s_0^2$, and forms a moderated variance estimate</span>
+<span id="cb19-101"><a href="#cb19-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-102"><a href="#cb19-102" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-103"><a href="#cb19-103" aria-hidden="true" tabindex="-1"></a>\tilde s_g^2 = \frac{d_0\, s_0^2 + d_g\, s_g^2}{d_0 + d_g}.</span>
+<span id="cb19-104"><a href="#cb19-104" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-105"><a href="#cb19-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-106"><a href="#cb19-106" aria-hidden="true" tabindex="-1"></a>Each gene's variance is pulled toward the common value $s_0^2$, by an amount that depends on how informative the prior is ($d_0$) relative to the data ($d_g$). In the ideal known-prior model, the **moderated t** uses $\tilde s_g$ in the denominator and has a marginal $t_{d_0+d_g}$ reference. This is calibration over the stated hierarchical variance distribution, not an exact conditional-on-every-fixed-variance theorem. In the implementation the hyperparameters are estimated, residual degrees of freedom can vary, and the total degrees of freedom are also constrained by available information. The formula is the simple constant-prior teaching case. $d_0$ and $s_0^2$ are estimated from the spread of the observed $s_g^2$ across genes (Smyth 2004, Section 6), so the shrinkage is data-driven: if gene variances really vary a lot, $d_0$ is small and little shrinkage happens.</span>
+<span id="cb19-107"><a href="#cb19-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-108"><a href="#cb19-108" aria-hidden="true" tabindex="-1"></a>The formula is a weighted average: the prior scale gets weight $d_0/(d_0+d_g)$ and the observed variance gets weight $d_g/(d_0+d_g)$. With $d_0=4$, $d_g=12$, and $s_0^2=1$, an observed variance of 2 becomes 1.75, while an observed variance of 0.1 becomes 0.325. Moderation can move a variance **up or down**. The added prior degrees of freedom represent information borrowed through the variance model, not four additional people.</span>
+<span id="cb19-109"><a href="#cb19-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-110"><a href="#cb19-110" aria-hidden="true" tabindex="-1"></a>The moderated statistic replaces $s_g$ by $\tilde s_g$ in the SE formula above; it leaves the fitted contrast in the numerator unchanged. This is why understanding the ordinary regression calculation first makes moderation easier to interpret.</span>
+<span id="cb19-111"><a href="#cb19-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-112"><a href="#cb19-112" aria-hidden="true" tabindex="-1"></a>Here is the effect with a known prior, which is a simplified version of what <span class="in">`eBayes()`</span> estimates. This separate simulation uses only two group means and no batch/sex adjustment, so its design has rank 2 and residual degrees of freedom $16-2=14$, rather than the earlier design's 12.</span>
+<span id="cb19-113"><a href="#cb19-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-116"><a href="#cb19-116" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-117"><a href="#cb19-117" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb19-118"><a href="#cb19-118" aria-hidden="true" tabindex="-1"></a>G <span class="ot">&lt;-</span> <span class="dv">5000</span>; n1 <span class="ot">&lt;-</span> <span class="dv">8</span>; n2 <span class="ot">&lt;-</span> <span class="dv">8</span>; d_g <span class="ot">&lt;-</span> n1 <span class="sc">+</span> n2 <span class="sc">-</span> <span class="dv">2</span></span>
+<span id="cb19-119"><a href="#cb19-119" aria-hidden="true" tabindex="-1"></a>sigma2 <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">rgamma</span>(G, <span class="at">shape =</span> <span class="dv">2</span>, <span class="at">rate =</span> <span class="dv">2</span>)        <span class="co"># inverse-chi-square scale 1, df 4; mean 2</span></span>
+<span id="cb19-120"><a href="#cb19-120" aria-hidden="true" tabindex="-1"></a>Y1 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(G <span class="sc">*</span> n1, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2)), G)   <span class="co"># control; no true differences</span></span>
+<span id="cb19-121"><a href="#cb19-121" aria-hidden="true" tabindex="-1"></a>Y2 <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(G <span class="sc">*</span> n2, <span class="at">sd =</span> <span class="fu">sqrt</span>(sigma2)), G)   <span class="co"># patient</span></span>
+<span id="cb19-122"><a href="#cb19-122" aria-hidden="true" tabindex="-1"></a>diff <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(Y2) <span class="sc">-</span> <span class="fu">rowMeans</span>(Y1)</span>
+<span id="cb19-123"><a href="#cb19-123" aria-hidden="true" tabindex="-1"></a>s2 <span class="ot">&lt;-</span> (<span class="fu">rowSums</span>((Y1 <span class="sc">-</span> <span class="fu">rowMeans</span>(Y1))<span class="sc">^</span><span class="dv">2</span>) <span class="sc">+</span> <span class="fu">rowSums</span>((Y2 <span class="sc">-</span> <span class="fu">rowMeans</span>(Y2))<span class="sc">^</span><span class="dv">2</span>)) <span class="sc">/</span> d_g</span>
+<span id="cb19-124"><a href="#cb19-124" aria-hidden="true" tabindex="-1"></a>se_factor <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="dv">1</span> <span class="sc">/</span> n1 <span class="sc">+</span> <span class="dv">1</span> <span class="sc">/</span> n2)</span>
+<span id="cb19-125"><a href="#cb19-125" aria-hidden="true" tabindex="-1"></a>t_ord <span class="ot">&lt;-</span> diff <span class="sc">/</span> (<span class="fu">sqrt</span>(s2) <span class="sc">*</span> se_factor)</span>
+<span id="cb19-126"><a href="#cb19-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-127"><a href="#cb19-127" aria-hidden="true" tabindex="-1"></a>d0 <span class="ot">&lt;-</span> <span class="dv">4</span>; s0_2 <span class="ot">&lt;-</span> <span class="dv">1</span>                                   <span class="co"># true prior scale here; limma estimates it</span></span>
+<span id="cb19-128"><a href="#cb19-128" aria-hidden="true" tabindex="-1"></a>s2_mod <span class="ot">&lt;-</span> (d0 <span class="sc">*</span> s0_2 <span class="sc">+</span> d_g <span class="sc">*</span> s2) <span class="sc">/</span> (d0 <span class="sc">+</span> d_g)</span>
+<span id="cb19-129"><a href="#cb19-129" aria-hidden="true" tabindex="-1"></a>t_mod <span class="ot">&lt;-</span> diff <span class="sc">/</span> (<span class="fu">sqrt</span>(s2_mod) <span class="sc">*</span> se_factor)</span>
+<span id="cb19-130"><a href="#cb19-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-131"><a href="#cb19-131" aria-hidden="true" tabindex="-1"></a><span class="co"># Assess noise relative to each gene's own known variance, not absolute s2.</span></span>
+<span id="cb19-132"><a href="#cb19-132" aria-hidden="true" tabindex="-1"></a>top_ord <span class="ot">&lt;-</span> <span class="fu">order</span>(<span class="sc">-</span><span class="fu">abs</span>(t_ord))[<span class="dv">1</span><span class="sc">:</span><span class="dv">20</span>]</span>
+<span id="cb19-133"><a href="#cb19-133" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="at">all_genes =</span> <span class="fu">quantile</span>(s2 <span class="sc">/</span> sigma2), <span class="at">top_ordinary_t =</span> <span class="fu">quantile</span>((s2 <span class="sc">/</span> sigma2)[top_ord]))</span>
+<span id="cb19-134"><a href="#cb19-134" aria-hidden="true" tabindex="-1"></a><span class="co"># The moderated reference here is marginal under this known-prior generator.</span></span>
+<span id="cb19-135"><a href="#cb19-135" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">ordinary =</span> <span class="fu">mean</span>(<span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_ord), d_g) <span class="sc">&lt;</span> <span class="fl">0.05</span>),</span>
+<span id="cb19-136"><a href="#cb19-136" aria-hidden="true" tabindex="-1"></a>  <span class="at">moderated =</span> <span class="fu">mean</span>(<span class="dv">2</span> <span class="sc">*</span> <span class="fu">pt</span>(<span class="sc">-</span><span class="fu">abs</span>(t_mod), d0 <span class="sc">+</span> d_g) <span class="sc">&lt;</span> <span class="fl">0.05</span>))</span>
+<span id="cb19-137"><a href="#cb19-137" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-138"><a href="#cb19-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-139"><a href="#cb19-139" aria-hidden="true" tabindex="-1"></a>Moderation borrows information about variances; it does not shrink the fitted group coefficient in this workflow. It can improve power and stability under suitable variance models, but cannot guarantee superiority for every feature or population. Compare the simulated rejection fractions with binomial MCSEs if assessing calibration across independently generated genes; that calculation is specific to this simulation.</span>
+<span id="cb19-140"><a href="#cb19-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-143"><a href="#cb19-143" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-144"><a href="#cb19-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-variance-moderation</span></span>
+<span id="cb19-145"><a href="#cb19-145" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Known-prior variance moderation toward scale 1. Smaller residual degrees of freedom give more shrinkage. The horizontal reference is a prior scale, not a known variance for every gene or the prior mean."</span></span>
+<span id="cb19-146"><a href="#cb19-146" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Moderated variance curves lie between the observed variance and prior scale, with stronger shrinkage at fewer residual degrees of freedom."</span></span>
+<span id="cb19-147"><a href="#cb19-147" aria-hidden="true" tabindex="-1"></a>observed_s2 <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fl">0.05</span>, <span class="dv">5</span>, <span class="at">length.out =</span> <span class="dv">200</span>)</span>
+<span id="cb19-148"><a href="#cb19-148" aria-hidden="true" tabindex="-1"></a>residual_df <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">14</span>, <span class="dv">60</span>)</span>
+<span id="cb19-149"><a href="#cb19-149" aria-hidden="true" tabindex="-1"></a>curves <span class="ot">&lt;-</span> <span class="fu">sapply</span>(residual_df, <span class="cf">function</span>(d) (<span class="dv">4</span> <span class="sc">+</span> d <span class="sc">*</span> observed_s2)<span class="sc">/</span>(<span class="dv">4</span> <span class="sc">+</span> d))</span>
+<span id="cb19-150"><a href="#cb19-150" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(observed_s2, curves, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb19-151"><a href="#cb19-151" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#009E73"</span>),</span>
+<span id="cb19-152"><a href="#cb19-152" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Observed residual variance"</span>, <span class="at">ylab =</span> <span class="st">"Moderated variance"</span>)</span>
+<span id="cb19-153"><a href="#cb19-153" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">col =</span> <span class="st">"gray65"</span>); <span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">"gray65"</span>)</span>
+<span id="cb19-154"><a href="#cb19-154" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>, <span class="fu">paste</span>(<span class="st">"Residual df"</span>, residual_df), <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>,</span>
+<span id="cb19-155"><a href="#cb19-155" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#009E73"</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb19-156"><a href="#cb19-156" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-157"><a href="#cb19-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-158"><a href="#cb19-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### Run the actual log-expression workflow</span></span>
+<span id="cb19-159"><a href="#cb19-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-160"><a href="#cb19-160" aria-hidden="true" tabindex="-1"></a>This executable example uses **synthetic log2 expression** and the design above. It requires <span class="in">`limma`</span> and its dependencies. Normalization is not learned in this generator. Feature and sample identifiers remain explicit.</span>
+<span id="cb19-161"><a href="#cb19-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-164"><a href="#cb19-164" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-165"><a href="#cb19-165" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">81</span>)</span>
+<span id="cb19-166"><a href="#cb19-166" aria-hidden="true" tabindex="-1"></a>G_demo <span class="ot">&lt;-</span> <span class="dv">600</span></span>
+<span id="cb19-167"><a href="#cb19-167" aria-hidden="true" tabindex="-1"></a>beta <span class="ot">&lt;-</span> <span class="fu">rbind</span>(<span class="fu">rep</span>(<span class="dv">6</span>, G_demo), <span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">0.7</span>, <span class="dv">40</span>), <span class="fu">rep</span>(<span class="dv">0</span>, G_demo <span class="sc">-</span> <span class="dv">40</span>)),</span>
+<span id="cb19-168"><a href="#cb19-168" aria-hidden="true" tabindex="-1"></a>              <span class="fu">rep</span>(<span class="fl">0.2</span>, G_demo), <span class="fu">rep</span>(<span class="sc">-</span><span class="fl">0.1</span>, G_demo))</span>
+<span id="cb19-169"><a href="#cb19-169" aria-hidden="true" tabindex="-1"></a>variance_demo <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="sc">/</span> <span class="fu">rgamma</span>(G_demo, <span class="at">shape =</span> <span class="dv">3</span>, <span class="at">rate =</span> <span class="dv">2</span>)</span>
+<span id="cb19-170"><a href="#cb19-170" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(X) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"sample_"</span>, <span class="fu">seq_len</span>(<span class="fu">nrow</span>(X)))</span>
+<span id="cb19-171"><a href="#cb19-171" aria-hidden="true" tabindex="-1"></a>logexpr <span class="ot">&lt;-</span> <span class="fu">t</span>(beta) <span class="sc">%*%</span> <span class="fu">t</span>(X) <span class="sc">+</span></span>
+<span id="cb19-172"><a href="#cb19-172" aria-hidden="true" tabindex="-1"></a>  <span class="fu">matrix</span>(<span class="fu">rnorm</span>(G_demo <span class="sc">*</span> <span class="fu">nrow</span>(X), <span class="at">sd =</span> <span class="fu">sqrt</span>(variance_demo)), G_demo)</span>
+<span id="cb19-173"><a href="#cb19-173" aria-hidden="true" tabindex="-1"></a><span class="fu">dimnames</span>(logexpr) <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="fu">paste0</span>(<span class="st">"gene_"</span>, <span class="fu">seq_len</span>(G_demo)), <span class="fu">rownames</span>(X))</span>
+<span id="cb19-174"><a href="#cb19-174" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(<span class="fu">colnames</span>(logexpr), <span class="fu">rownames</span>(X)), <span class="fu">qr</span>(X)<span class="sc">$</span>rank <span class="sc">==</span> <span class="fu">ncol</span>(X))</span>
+<span id="cb19-175"><a href="#cb19-175" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">lmFit</span>(logexpr, <span class="at">design =</span> X)</span>
+<span id="cb19-176"><a href="#cb19-176" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">eBayes</span>(fit, <span class="at">trend =</span> <span class="cn">TRUE</span>, <span class="at">robust =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-177"><a href="#cb19-177" aria-hidden="true" tabindex="-1"></a>limma<span class="sc">::</span><span class="fu">topTable</span>(fit, <span class="at">coef =</span> <span class="st">"grouppatient"</span>, <span class="at">number =</span> <span class="dv">6</span>, <span class="at">sort.by =</span> <span class="st">"none"</span>,</span>
+<span id="cb19-178"><a href="#cb19-178" aria-hidden="true" tabindex="-1"></a>                <span class="at">adjust.method =</span> <span class="st">"BH"</span>, <span class="at">confint =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-179"><a href="#cb19-179" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-180"><a href="#cb19-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-181"><a href="#cb19-181" aria-hidden="true" tabindex="-1"></a>The output is a six-row display from the full 600-feature family. <span class="in">`number = 6`</span> limits printing; it does not mean that only six hypotheses received the multiplicity adjustment. The model contrast is the constant patient–control difference at the same batch/sex levels. Report <span class="in">`logFC`</span>, its scale, uncertainty, and the hypothesis family. The moderation and estimated hyperparameters are part of the inference model. BH still needs valid individual tests and the appropriate dependence conditions; its adjusted p-values do not make the displayed intervals simultaneous or selection-adjusted. See the <span class="co">[</span><span class="ot">Multiple testing when the tests are not independent</span><span class="co">](multiple-testing.qmd)</span> page.</span>
+<span id="cb19-182"><a href="#cb19-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-183"><a href="#cb19-183" aria-hidden="true" tabindex="-1"></a><span class="fu">### A separate raw-count example with voom</span></span>
+<span id="cb19-184"><a href="#cb19-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-185"><a href="#cb19-185" aria-hidden="true" tabindex="-1"></a>Do not feed raw counts into the unweighted log-expression model. This separate synthetic count example uses edgeR's filtering and normalization factors, then voom's observation-level precision weights. The resulting modeled scale and assumptions must be stated; it is not an absolute-abundance analysis or a validation of every real RNA-seq pipeline.</span>
+<span id="cb19-186"><a href="#cb19-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-189"><a href="#cb19-189" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-190"><a href="#cb19-190" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-voom-weights</span></span>
+<span id="cb19-191"><a href="#cb19-191" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "The voom mean–variance trend in a separate synthetic count example. The fitted trend generates observation-level precision weights; it does not change the number of independent biological units."</span></span>
+<span id="cb19-192"><a href="#cb19-192" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Voom plots estimated variability against average log-count size and a fitted smooth trend used to obtain precision weights."</span></span>
+<span id="cb19-193"><a href="#cb19-193" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">82</span>)</span>
+<span id="cb19-194"><a href="#cb19-194" aria-hidden="true" tabindex="-1"></a>expected_counts <span class="ot">&lt;-</span> <span class="dv">2</span><span class="sc">^</span>(<span class="fu">t</span>(beta) <span class="sc">%*%</span> <span class="fu">t</span>(X)) <span class="sc">*</span></span>
+<span id="cb19-195"><a href="#cb19-195" aria-hidden="true" tabindex="-1"></a>  <span class="fu">outer</span>(<span class="fu">rep</span>(<span class="dv">1</span>, G_demo), <span class="fu">exp</span>(<span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.4</span>, <span class="fl">0.4</span>, <span class="at">length.out =</span> <span class="fu">nrow</span>(X))))</span>
+<span id="cb19-196"><a href="#cb19-196" aria-hidden="true" tabindex="-1"></a>counts <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnbinom</span>(<span class="fu">length</span>(expected_counts), <span class="at">mu =</span> <span class="fu">as.vector</span>(expected_counts), <span class="at">size =</span> <span class="dv">10</span>),</span>
+<span id="cb19-197"><a href="#cb19-197" aria-hidden="true" tabindex="-1"></a>                 G_demo, <span class="at">dimnames =</span> <span class="fu">dimnames</span>(logexpr))</span>
+<span id="cb19-198"><a href="#cb19-198" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> edgeR<span class="sc">::</span><span class="fu">DGEList</span>(counts)</span>
+<span id="cb19-199"><a href="#cb19-199" aria-hidden="true" tabindex="-1"></a>keep <span class="ot">&lt;-</span> edgeR<span class="sc">::</span><span class="fu">filterByExpr</span>(dge, <span class="at">design =</span> X)</span>
+<span id="cb19-200"><a href="#cb19-200" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> dge[keep, , keep.lib.sizes <span class="ot">=</span> <span class="cn">FALSE</span>]</span>
+<span id="cb19-201"><a href="#cb19-201" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> edgeR<span class="sc">::</span><span class="fu">calcNormFactors</span>(dge)</span>
+<span id="cb19-202"><a href="#cb19-202" aria-hidden="true" tabindex="-1"></a>v <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">voom</span>(dge, <span class="at">design =</span> X, <span class="at">plot =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-203"><a href="#cb19-203" aria-hidden="true" tabindex="-1"></a>count_fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">eBayes</span>(limma<span class="sc">::</span><span class="fu">lmFit</span>(v, <span class="at">design =</span> X))</span>
+<span id="cb19-204"><a href="#cb19-204" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">tested_features =</span> <span class="fu">nrow</span>(v), <span class="at">independent_people =</span> <span class="fu">ncol</span>(v))</span>
+<span id="cb19-205"><a href="#cb19-205" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-206"><a href="#cb19-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-207"><a href="#cb19-207" aria-hidden="true" tabindex="-1"></a>Filtering defines the tested feature set and needs the workflow's null-calibration justification. Keep the original counts and record filtering, normalization, design, and weighting decisions. <span class="in">`trend=TRUE`</span> moderates variances with an intensity trend; voom models observation-level precision. They are not identical operations. The official <span class="co">[</span><span class="ot">limma documentation</span><span class="co">](https://bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/intro.html)</span> and <span class="co">[</span><span class="ot">voom paper</span><span class="co">](https://doi.org/10.1186/gb-2014-15-2-r29)</span> describe the implementations.</span>
+<span id="cb19-208"><a href="#cb19-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-209"><a href="#cb19-209" aria-hidden="true" tabindex="-1"></a>A voom weight is approximately an inverse variance for a log-expression observation: a noisier observation receives less weight in fitting its gene's mean model. It is not a count of additional biological replicates. Normalization factors address the modeled library scale, precision weights address variability on that scale, and variance moderation borrows information about residual variances. Understanding their separate roles helps diagnose which part of a workflow needs attention.</span>
+<span id="cb19-210"><a href="#cb19-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-211"><a href="#cb19-211" aria-hidden="true" tabindex="-1"></a><span class="fu">## What limma assumes, and when it breaks</span></span>
+<span id="cb19-212"><a href="#cb19-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-213"><a href="#cb19-213" aria-hidden="true" tabindex="-1"></a>The empirical Bayes step buys power with assumptions. Know them.</span>
+<span id="cb19-214"><a href="#cb19-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-215"><a href="#cb19-215" aria-hidden="true" tabindex="-1"></a>**One residual variance per gene, shared across groups.** The linear model has a single $\sigma_g^2$ for all samples, so patients and controls are assumed equally variable. When they are not, the moderated $t$ inherits the behavior of the pooled-variance $t$-test, which depends on which group is more variable and which is larger. The simple unweighted variance model has the same vulnerability as a pooled two-sample t-test. Welch addresses unequal variances for independent observations; it does not repair dependence from cohort-derived pseudo-values or network scores. See the variance issue on independently generated observations:</span>
+<span id="cb19-216"><a href="#cb19-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-219"><a href="#cb19-219" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-220"><a href="#cb19-220" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb19-221"><a href="#cb19-221" aria-hidden="true" tabindex="-1"></a>Level <span class="ot">&lt;-</span> <span class="cf">function</span>(n1, n2, sd1, sd2, <span class="at">R =</span> <span class="dv">2000</span>) {</span>
+<span id="cb19-222"><a href="#cb19-222" aria-hidden="true" tabindex="-1"></a>  p <span class="ot">&lt;-</span> <span class="fu">replicate</span>(R, {</span>
+<span id="cb19-223"><a href="#cb19-223" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n1, <span class="at">sd =</span> sd1); b <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n2, <span class="at">sd =</span> sd2)</span>
+<span id="cb19-224"><a href="#cb19-224" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(<span class="at">pooled =</span> <span class="fu">t.test</span>(a, b, <span class="at">var.equal =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>p.value, <span class="at">welch =</span> <span class="fu">t.test</span>(a, b)<span class="sc">$</span>p.value)</span>
+<span id="cb19-225"><a href="#cb19-225" aria-hidden="true" tabindex="-1"></a>  })</span>
+<span id="cb19-226"><a href="#cb19-226" aria-hidden="true" tabindex="-1"></a>  rate <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(p <span class="sc">&lt;=</span> <span class="fl">0.05</span>)</span>
+<span id="cb19-227"><a href="#cb19-227" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(n1, n2, sd1, sd2, <span class="at">method =</span> <span class="fu">rownames</span>(p), <span class="at">rejection =</span> rate,</span>
+<span id="cb19-228"><a href="#cb19-228" aria-hidden="true" tabindex="-1"></a>             <span class="at">MCSE =</span> <span class="fu">sqrt</span>(rate <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> rate) <span class="sc">/</span> R), <span class="at">row.names =</span> <span class="cn">NULL</span>)</span>
+<span id="cb19-229"><a href="#cb19-229" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-230"><a href="#cb19-230" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(<span class="st">`</span><span class="at">5 vs 15, small group more variable</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">Level</span>(<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">2</span>, <span class="dv">1</span>),</span>
+<span id="cb19-231"><a href="#cb19-231" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">5 vs 15, small group less variable</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">Level</span>(<span class="dv">5</span>, <span class="dv">15</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb19-232"><a href="#cb19-232" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">10 vs 10, unequal variances</span><span class="st">`</span>        <span class="ot">=</span> <span class="fu">Level</span>(<span class="dv">10</span>, <span class="dv">10</span>, <span class="dv">2</span>, <span class="dv">1</span>))</span>
+<span id="cb19-233"><a href="#cb19-233" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-234"><a href="#cb19-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-235"><a href="#cb19-235" aria-hidden="true" tabindex="-1"></a>Check the simulated rates and their Monte Carlo uncertainty. The pooled test is anti-conservative when the smaller group is more variable and can be conservative in the reverse configuration. Balance reduces this particular distortion but does not establish exact validity under unequal variances. Welch usually improves calibration here; very small samples still require scrutiny. The result concerns this synthetic configuration. Weighted limma models instead allow $\operatorname{Var}(\varepsilon_{gi})=\sigma_g^2/w_{gi}$ for supplied or estimated precision weights. <span class="in">`arrayWeights()`</span> and <span class="in">`voomWithQualityWeights()`</span> address particular sample/observation precision structures. The weights and correlation model still need justification for the assay and design; the unweighted example does not describe every weighting option.</span>
+<span id="cb19-236"><a href="#cb19-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-237"><a href="#cb19-237" aria-hidden="true" tabindex="-1"></a>**Genes share a variance distribution.** Borrowing variance information trades conditional bias against variability under the variance model. A feature far from the bulk can be affected differently from a typical feature. <span class="in">`trend=TRUE`</span> allows an intensity-dependent prior scale, and <span class="in">`robust=TRUE`</span> robustifies hyperparameter estimation against outlying variances; neither proves that every feature satisfies the model.</span>
+<span id="cb19-238"><a href="#cb19-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-239"><a href="#cb19-239" aria-hidden="true" tabindex="-1"></a>**Normality on the log scale, and independence across samples.** A transformation does not prove normality or control extreme tails. The exact small-sample reference uses its distributional assumptions; residual diagnostics and suitable large-sample arguments have their own scope. Dependence across samples requires a design-appropriate covariance calculation. Correlated genes do not by themselves create additional independent people.</span>
+<span id="cb19-240"><a href="#cb19-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-241"><a href="#cb19-241" aria-hidden="true" tabindex="-1"></a><span class="fu">## Repeated samples per subject</span></span>
+<span id="cb19-242"><a href="#cb19-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-243"><a href="#cb19-243" aria-hidden="true" tabindex="-1"></a>Longitudinal cohorts give several samples per subject. For a between-person contrast with positive within-person correlation, an independent-row analysis can understate uncertainty. For a within-person contrast, ignoring pairing can instead discard precision (the <span class="co">[</span><span class="ot">Multivariate comparisons: permutation and distance-based tests</span><span class="co">](multivariate-comparisons.qmd)</span> page shows the same failure in a different setting). limma has two tools.</span>
+<span id="cb19-244"><a href="#cb19-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-245"><a href="#cb19-245" aria-hidden="true" tabindex="-1"></a>**Block as a fixed effect.** Put subject in the design matrix. Useful for specified within-person contrasts under its mean/error assumptions, but it uses person-level parameters and renders a group main effect that is constant within person (patient versus control) inestimable, since subject is nested in group.</span>
+<span id="cb19-246"><a href="#cb19-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-247"><a href="#cb19-247" aria-hidden="true" tabindex="-1"></a>**`duplicateCorrelation()`.** Estimates a single within-subject correlation shared across genes, then fits each gene by generalized least squares with that correlation. Keeps subject-level contrasts estimable and borrows strength for the correlation the way <span class="in">`eBayes`</span> does for the variance. It assumes the within-subject correlation is the same for every gene and every pair of samples from a subject, which should be assessed against the visit structure and biological heterogeneity rather than assumed suitable for every cohort.</span>
+<span id="cb19-248"><a href="#cb19-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-251"><a href="#cb19-251" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb19-252"><a href="#cb19-252" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">83</span>)</span>
+<span id="cb19-253"><a href="#cb19-253" aria-hidden="true" tabindex="-1"></a>subject_id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="fu">seq_len</span>(<span class="dv">12</span>), <span class="at">each =</span> <span class="dv">2</span>)</span>
+<span id="cb19-254"><a href="#cb19-254" aria-hidden="true" tabindex="-1"></a>visit <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="dv">12</span>)</span>
+<span id="cb19-255"><a href="#cb19-255" aria-hidden="true" tabindex="-1"></a>group_r <span class="ot">&lt;-</span> <span class="fu">factor</span>(<span class="fu">rep</span>(<span class="fu">rep</span>(<span class="fu">c</span>(<span class="st">"control"</span>, <span class="st">"patient"</span>), <span class="at">each =</span> <span class="dv">6</span>), <span class="at">each =</span> <span class="dv">2</span>),</span>
+<span id="cb19-256"><a href="#cb19-256" aria-hidden="true" tabindex="-1"></a>                  <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"control"</span>, <span class="st">"patient"</span>))</span>
+<span id="cb19-257"><a href="#cb19-257" aria-hidden="true" tabindex="-1"></a>X_r <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> group_r <span class="sc">+</span> visit)</span>
+<span id="cb19-258"><a href="#cb19-258" aria-hidden="true" tabindex="-1"></a>U <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">200</span> <span class="sc">*</span> <span class="dv">12</span>, <span class="at">sd =</span> <span class="fl">0.6</span>), <span class="dv">200</span>, <span class="dv">12</span>)</span>
+<span id="cb19-259"><a href="#cb19-259" aria-hidden="true" tabindex="-1"></a>y_r <span class="ot">&lt;-</span> <span class="dv">6</span> <span class="sc">+</span> U[, subject_id] <span class="sc">+</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(<span class="dv">200</span> <span class="sc">*</span> <span class="dv">24</span>, <span class="at">sd =</span> <span class="fl">0.6</span>), <span class="dv">200</span>, <span class="dv">24</span>) <span class="sc">+</span></span>
+<span id="cb19-260"><a href="#cb19-260" aria-hidden="true" tabindex="-1"></a>  <span class="fu">outer</span>(<span class="fu">c</span>(<span class="fu">rep</span>(<span class="fl">0.7</span>, <span class="dv">15</span>), <span class="fu">rep</span>(<span class="dv">0</span>, <span class="dv">185</span>)), <span class="fu">as.numeric</span>(group_r <span class="sc">==</span> <span class="st">"patient"</span>)) <span class="sc">+</span></span>
+<span id="cb19-261"><a href="#cb19-261" aria-hidden="true" tabindex="-1"></a>  <span class="fu">outer</span>(<span class="fu">rep</span>(<span class="fl">0.2</span>, <span class="dv">200</span>), visit)</span>
+<span id="cb19-262"><a href="#cb19-262" aria-hidden="true" tabindex="-1"></a>corfit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">duplicateCorrelation</span>(y_r, <span class="at">design =</span> X_r, <span class="at">block =</span> subject_id)</span>
+<span id="cb19-263"><a href="#cb19-263" aria-hidden="true" tabindex="-1"></a>repeated_fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">lmFit</span>(y_r, <span class="at">design =</span> X_r, <span class="at">block =</span> subject_id,</span>
+<span id="cb19-264"><a href="#cb19-264" aria-hidden="true" tabindex="-1"></a>                            <span class="at">correlation =</span> corfit<span class="sc">$</span>consensus.correlation)</span>
+<span id="cb19-265"><a href="#cb19-265" aria-hidden="true" tabindex="-1"></a>repeated_fit <span class="ot">&lt;-</span> limma<span class="sc">::</span><span class="fu">eBayes</span>(repeated_fit)</span>
+<span id="cb19-266"><a href="#cb19-266" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">people =</span> <span class="fu">length</span>(<span class="fu">unique</span>(subject_id)), <span class="at">specimens =</span> <span class="fu">ncol</span>(y_r),</span>
+<span id="cb19-267"><a href="#cb19-267" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimated_consensus_correlation =</span> corfit<span class="sc">$</span>consensus.correlation)</span>
+<span id="cb19-268"><a href="#cb19-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-269"><a href="#cb19-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-270"><a href="#cb19-270" aria-hidden="true" tabindex="-1"></a>In this generator the residual for a specimen is its person's shared random intercept plus its own noise. Both have variance $0.6^2=0.36$. Two visits from the same person therefore have covariance 0.36 and marginal residual variance $0.36+0.36=0.72$, giving within-person correlation 0.5. Visits from different people share no random intercept. This explains why compound symmetry matches this example and why 24 specimens still represent only 12 independent people. It does not establish that one consensus correlation fits every longitudinal assay.</span>
+<span id="cb19-271"><a href="#cb19-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-272"><a href="#cb19-272" aria-hidden="true" tabindex="-1"></a>Gene-specific mixed models, including <span class="in">`dream`</span> in <span class="in">`variancePartition`</span>, can model richer correlation structures under their own assumptions. Unequal visit counts also affect target weighting and selection, not only covariance. Choose the target and design before the fitting engine; see <span class="co">[</span><span class="ot">Units of analysis, replication, and study design</span><span class="co">](../questions-and-design/units-and-study-design.qmd)</span>.</span>
+<span id="cb19-273"><a href="#cb19-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-274"><a href="#cb19-274" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check the inference before interpreting the list</span></span>
+<span id="cb19-275"><a href="#cb19-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-276"><a href="#cb19-276" aria-hidden="true" tabindex="-1"></a>Check whether the design matrix is full rank and the desired contrast is estimable; perfect group–batch confounding cannot be removed by adding both columns. Examine residuals, mean–variance trends, influential samples, and whether repeated measurements were handled at the correct level. Report the estimated contrast and uncertainty on the stated scale, alongside the multiple-testing procedure and the family of features tested.</span>
+<span id="cb19-277"><a href="#cb19-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-278"><a href="#cb19-278" aria-hidden="true" tabindex="-1"></a>The weighted limma workflow can accommodate modeled precision differences; the simple unweighted example above has a narrower variance model. Consult the <span class="co">[</span><span class="ot">limma introduction and user guide</span><span class="co">](https://www.bioconductor.org/packages/release/bioc/vignettes/limma/inst/doc/intro.html)</span> for the implemented weighting and correlation options. Variance moderation improves variance estimation under its assumptions; it does not identify a confounded contrast or correct a scientifically inappropriate adjustment set.</span>
+<span id="cb19-279"><a href="#cb19-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-280"><a href="#cb19-280" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where this connects</span></span>
+<span id="cb19-281"><a href="#cb19-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-282"><a href="#cb19-282" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span> page: the design matrix is where "adjusting for $Z$" happens, and the coefficient's target is the within-covariate difference only when the adjustment is correct and complete.</span>
+<span id="cb19-283"><a href="#cb19-283" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">Jackknife pseudo-values</span><span class="co">](jackknife-pseudo-values.qmd)</span> page: comparing per-sample network edges between groups is a limma or $t$-test on the edges as if they were expression values. Check the dependence introduced by estimating those summaries from the shared cohort as well as the mean and variance models; ordinary independent-observation testing is not automatically justified.</span>
+<span id="cb19-284"><a href="#cb19-284" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">Orthogonality and cross-fitting</span><span class="co">](../semiparametric-methods/orthogonality-and-cross-fitting.qmd)</span> page: a misspecified linear adjustment can change the coefficient's target. An orthogonal, cross-fitted construction is an alternative when its target, model, and nuisance-rate conditions fit the question; it is not an automatic repair for every design or measurement problem.</span>
+<span id="cb19-285"><a href="#cb19-285" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">Multiple testing when the tests are not independent</span><span class="co">](multiple-testing.qmd)</span> page: the output of limma is 15,000 $p$-values, and what you do with them is the subject of that shared inference guide.</span>
+<span id="cb19-286"><a href="#cb19-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-287"><a href="#cb19-287" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb19-288"><a href="#cb19-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-289"><a href="#cb19-289" aria-hidden="true" tabindex="-1"></a>**Checkpoints are completion targets for this page. Additional practice below is optional.** Each checkpoint gives a completion standard, a hint, and a solution outline.</span>
+<span id="cb19-290"><a href="#cb19-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-291"><a href="#cb19-291" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-de-01 .checkpoint}</span>
+<span id="cb19-292"><a href="#cb19-292" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · DE-01 — Write an estimable contrast {.unnumbered}</span></span>
+<span id="cb19-293"><a href="#cb19-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-294"><a href="#cb19-294" aria-hidden="true" tabindex="-1"></a>**Task type:** Construction and interpretation.</span>
+<span id="cb19-295"><a href="#cb19-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-296"><a href="#cb19-296" aria-hidden="true" tabindex="-1"></a>Use a group-means design with columns $(A,B,C,Z)$ for three groups and one continuous covariate. Write contrast vectors for B minus A and the average of B and C minus A. State the scale and common-slope assumption needed to interpret these contrasts as adjusted feature differences. Explain what must be checked before claiming the contrasts are estimable.</span>
+<span id="cb19-297"><a href="#cb19-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-298"><a href="#cb19-298" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can connect a design/contrast calculation to its population interpretation and check rank and confounding.</span>
+<span id="cb19-299"><a href="#cb19-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-300"><a href="#cb19-300" aria-hidden="true" tabindex="-1"></a>**Transfer:** If the group difference varies with $Z$, which additional design terms and reference values would you need?</span>
+<span id="cb19-301"><a href="#cb19-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-302"><a href="#cb19-302" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb19-303"><a href="#cb19-303" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb19-304"><a href="#cb19-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-305"><a href="#cb19-305" aria-hidden="true" tabindex="-1"></a>A contrast takes a weighted sum of the coefficients; a common covariate term cancels in a same-$Z$ difference.</span>
+<span id="cb19-306"><a href="#cb19-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-307"><a href="#cb19-307" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb19-308"><a href="#cb19-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-309"><a href="#cb19-309" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb19-310"><a href="#cb19-310" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb19-311"><a href="#cb19-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-312"><a href="#cb19-312" aria-hidden="true" tabindex="-1"></a>In the stated column order, the vectors are $(-1,1,0,0)$ and $(-1,1/2,1/2,0)$. Interpretation is on the feature scale modeled, such as log-expression. Without interactions the design assumes a common covariate slope and a group difference constant in $Z$. Check the design rank and whether the contrast lies in its estimable space; perfect confounding or absent groups can prevent identification. More generally, a standardized group contrast can differ from a coefficient in a misspecified model.</span>
+<span id="cb19-313"><a href="#cb19-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-314"><a href="#cb19-314" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb19-315"><a href="#cb19-315" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-316"><a href="#cb19-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-317"><a href="#cb19-317" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-de-02 .checkpoint}</span>
+<span id="cb19-318"><a href="#cb19-318" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · DE-02 — Explain what variance moderation changes {.unnumbered}</span></span>
+<span id="cb19-319"><a href="#cb19-319" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-320"><a href="#cb19-320" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and interpretation.</span>
+<span id="cb19-321"><a href="#cb19-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-322"><a href="#cb19-322" aria-hidden="true" tabindex="-1"></a>In the known-prior teaching model, take $d_0=4$, $s_0^2=1$, $d_g=4$, and observed $s_g^2=0.2$. Compute the moderated variance and compare it with the result at $d_g=40$. State whether the fitted group coefficient is shrunk. Explain what is averaged over in the known-prior moderated-t calibration and what remains to check in an actual weighted, repeated-measures limma analysis.</span>
+<span id="cb19-323"><a href="#cb19-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-324"><a href="#cb19-324" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can separate the target contrast, variance borrowing, hierarchical calibration, and the independent-unit/weighting assumptions.</span>
+<span id="cb19-325"><a href="#cb19-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-326"><a href="#cb19-326" aria-hidden="true" tabindex="-1"></a>**Transfer:** Would changing a batch-confounded design become identifiable after stronger variance moderation? Why?</span>
+<span id="cb19-327"><a href="#cb19-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-328"><a href="#cb19-328" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb19-329"><a href="#cb19-329" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb19-330"><a href="#cb19-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-331"><a href="#cb19-331" aria-hidden="true" tabindex="-1"></a>Use the weighted variance formula; the hyperprior scale is not every gene’s true variance.</span>
+<span id="cb19-332"><a href="#cb19-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-333"><a href="#cb19-333" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb19-334"><a href="#cb19-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-335"><a href="#cb19-335" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb19-336"><a href="#cb19-336" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb19-337"><a href="#cb19-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-338"><a href="#cb19-338" aria-hidden="true" tabindex="-1"></a>The moderated variance is $(4+4(0.2))/8=0.6$ at four residual df, and $(4+40(0.2))/44=12/44$ at forty df. More residual information reduces shrinkage toward the prior scale. This variance moderation does not shrink the fitted group coefficient in the displayed workflow. The ideal moderated-t reference integrates over the specified gene-variance distribution; it is not an exact conditional-on-every-fixed-variance guarantee. Estimated hyperparameters, mean specification, precision weights, within-person covariance, contrast estimability, marginal p-values, and the tested family still need checking.</span>
+<span id="cb19-339"><a href="#cb19-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-340"><a href="#cb19-340" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb19-341"><a href="#cb19-341" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-342"><a href="#cb19-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-343"><a href="#cb19-343" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb19-344"><a href="#cb19-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-345"><a href="#cb19-345" aria-hidden="true" tabindex="-1"></a>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</span>
+<span id="cb19-346"><a href="#cb19-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-347"><a href="#cb19-347" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>In the shrinkage simulation, add a true difference of 1 to the first 200 genes and compare the number of true positives at a Bonferroni threshold for the ordinary and moderated statistics. Then set <span class="in">`d0 &lt;- 50`</span> and <span class="in">`d0 &lt;- 0.5`</span> and explain what happens.</span>
+<span id="cb19-348"><a href="#cb19-348" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Extend the <span class="in">`Level()`</span> simulation so that the two groups also differ in shape (one normal, one a $t_3$ scaled to the same SD). Does Welch still hold its level? At what sample size?</span>
+<span id="cb19-349"><a href="#cb19-349" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Simulate 20 subjects with 3 samples each and a within-subject correlation of 0.5, no group effect. Fit <span class="in">`lm(y ~ group)`</span> ignoring subjects and record the level over 2000 simulated genes. Then fit with subject as a random effect (<span class="in">`lme4::lmer`</span>) and compare.</span>
+<span id="cb19-350"><a href="#cb19-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-351"><a href="#cb19-351" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb19-352"><a href="#cb19-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-353"><a href="#cb19-353" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Smyth, G. K. (2004). Linear models and empirical Bayes methods for assessing differential expression in microarray experiments. *Statistical Applications in Genetics and Molecular Biology*, 3(1), Article 3. Sections 1 to 4 and 6.</span>
+<span id="cb19-354"><a href="#cb19-354" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ritchie, M. E., et al. (2015). limma powers differential expression analyses for RNA-sequencing and microarray studies. *Nucleic Acids Research*, 43(7), e47.</span>
+<span id="cb19-355"><a href="#cb19-355" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Law, C. W., Chen, Y., Shi, W., and Smyth, G. K. (2014). voom: precision weights unlock linear model analysis tools for RNA-seq read counts. *Genome Biology*, 15, R29.</span>
+<span id="cb19-356"><a href="#cb19-356" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Law, C. W., et al. (2020). A guide to creating design matrices for gene expression experiments. *F1000Research*, 9, 1444. A worked design-matrix reference.</span>
+<span id="cb19-357"><a href="#cb19-357" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Smyth, G. K., Michaud, J., and Scott, H. S. (2005). Use of within-array replicate spots for assessing differential expression in microarray experiments. *Bioinformatics*, 21(9), 2067 to 2075. The <span class="in">`duplicateCorrelation`</span> paper.</span>
+<span id="cb19-358"><a href="#cb19-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-359"><a href="#cb19-359" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

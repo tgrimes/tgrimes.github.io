@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>A reproducible research project – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/research-practice/data-provenance.html" rel="next">
+<link href="../../guides/research-practice/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">A reproducible research project</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/research-practice/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research practice and reproducibility</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/research-practice/reproducible-projects.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">A reproducible research project</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/research-practice/data-provenance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Data provenance and an analysis-ready dataset</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/research-practice/reporting-methods-studies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Reporting a statistical methods study</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#a-result-should-have-an-executable-route-back-to-its-inputs" id="toc-a-result-should-have-an-executable-route-back-to-its-inputs" class="nav-link active" data-scroll-target="#a-result-should-have-an-executable-route-back-to-its-inputs"><span class="header-section-number">1</span> A result should have an executable route back to its inputs</a></li>
+  <li><a href="#separate-a-function-from-an-analysis-run" id="toc-separate-a-function-from-an-analysis-run" class="nav-link" data-scroll-target="#separate-a-function-from-an-analysis-run"><span class="header-section-number">2</span> Separate a function from an analysis run</a>
+  <ul class="collapse">
+  <li><a href="#rebuild-in-a-fresh-r-process" id="toc-rebuild-in-a-fresh-r-process" class="nav-link" data-scroll-target="#rebuild-in-a-fresh-r-process"><span class="header-section-number">2.1</span> Rebuild in a fresh R process</a></li>
+  <li><a href="#inspect-what-the-run-retained" id="toc-inspect-what-the-run-retained" class="nav-link" data-scroll-target="#inspect-what-the-run-retained"><span class="header-section-number">2.2</span> Inspect what the run retained</a></li>
+  </ul></li>
+  <li><a href="#record-the-environment-and-randomness" id="toc-record-the-environment-and-randomness" class="nav-link" data-scroll-target="#record-the-environment-and-randomness"><span class="header-section-number">3</span> Record the environment and randomness</a></li>
+  <li><a href="#keep-code-changes-reviewable" id="toc-keep-code-changes-reviewable" class="nav-link" data-scroll-target="#keep-code-changes-reviewable"><span class="header-section-number">4</span> Keep code changes reviewable</a></li>
+  <li><a href="#use-caching-deliberately" id="toc-use-caching-deliberately" class="nav-link" data-scroll-target="#use-caching-deliberately"><span class="header-section-number">5</span> Use caching deliberately</a></li>
+  <li><a href="#decide-what-to-retain" id="toc-decide-what-to-retain" class="nav-link" data-scroll-target="#decide-what-to-retain"><span class="header-section-number">6</span> Decide what to retain</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">7</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-rep-01-specify-a-complete-rerun-contract" id="toc-checkpoint-rep-01-specify-a-complete-rerun-contract" class="nav-link" data-scroll-target="#checkpoint-rep-01-specify-a-complete-rerun-contract">Checkpoint · REP-01 — Specify a complete rerun contract</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">8</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">A reproducible research project</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">From explicit inputs to a result another researcher can rebuild</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> Basic R functions and file paths; no prior workflow system is required.</p>
+<section id="a-result-should-have-an-executable-route-back-to-its-inputs" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="a-result-should-have-an-executable-route-back-to-its-inputs"><span class="header-section-number">1</span> A result should have an executable route back to its inputs</h2>
+<p>A reproducible project records what another researcher needs to regenerate a stated result: inputs, acquisition and inclusion rules, code, configuration, software environment, and a documented execution command. This makes an argument inspectable. It does not establish that its target is meaningful or its assumptions are true.</p>
+<p>For a first project, use a small structure whose responsibilities are clear:</p>
+<pre class="text"><code>project/
+  README.md             # question, inputs, environment, execution instructions
+  data/raw/             # original inputs, or documented controlled acquisition
+  data/metadata/        # manifests, identifiers, acquisition and decision logs
+  R/                    # functions with explicit inputs and return values
+  config/               # analysis settings and simulation scenarios
+  results/              # derived tables, figures, and replicate-level records
+  reports/              # Quarto sources connecting results to claims
+  renv.lock             # R package environment, if using renv</code></pre>
+<p>Sensitive or restricted inputs need not be committed to a repository. Record how an authorized collaborator obtains the correct version, and provide synthetic data for exercising the pipeline where appropriate. Keep raw inputs unchanged; regenerate derived objects through code. Follow <a href="../../guides/research-practice/data-provenance.html">Data provenance and an analysis-ready dataset</a> for identifiers and transformation records.</p>
+</section>
+<section id="separate-a-function-from-an-analysis-run" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="separate-a-function-from-an-analysis-run"><span class="header-section-number">2</span> Separate a function from an analysis run</h2>
+<p>A function should expose its statistical inputs. Avoid an estimator that silently reads a variable from an interactive workspace, changes its target according to a filename, or reuses a previously fitted model. An analysis run supplies the data and settings, calls functions, and saves labeled results.</p>
+<p>A function is the statistical recipe; a run is a particular application of that recipe. For example, <code>SummarizePeople(y, confidence)</code> computes a mean interval from supplied values. <code>GeneratePeople(config)</code> creates synthetic inputs. The runner reads settings, calls those functions, and writes outputs. The estimator does not receive the generator’s true population mean.</p>
+<p>The <a href="../examples/research-project.zip">downloadable teaching project</a> contains four files: <code>R/analysis.R</code>, <code>config/config.csv</code>, <code>run.R</code>, and <code>README.md</code>. It uses only standard R packages and invented people. The example below unpacks that actual archive into a temporary directory, reads its configuration, and computes the result. Students should keep an unpacked project in a persistent location when working through it.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>work_dir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">"teaching project-"</span>); <span class="fu">dir.create</span>(work_dir)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span>(<span class="st">"../examples/research-project.zip"</span>, <span class="at">exdir =</span> work_dir)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>project_root <span class="ot">&lt;-</span> <span class="fu">normalizePath</span>(<span class="fu">file.path</span>(work_dir, <span class="st">"research-project"</span>))</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">file.path</span>(project_root, <span class="st">"R"</span>, <span class="st">"analysis.R"</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>config <span class="ot">&lt;-</span> <span class="fu">ReadConfig</span>(<span class="fu">file.path</span>(project_root, <span class="st">"config"</span>, <span class="st">"config.csv"</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>people <span class="ot">&lt;-</span> <span class="fu">GeneratePeople</span>(config)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">SummarizePeople</span>(people<span class="sc">$</span>outcome, config<span class="sc">$</span>confidence)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  n_people estimate        se confidence    lower    upper
+1       80 2.021953 0.1162457       0.95 1.790572 2.253335</code></pre>
+</div>
+</div>
+<p>The configuration specifies 80 independent normal outcomes, population mean 2, seed 71, and confidence level 0.95. The interval is a normal-population t interval for the mean, in synthetic measurement units. Its assumptions come from this generator; running the code on dependent cells would require a different uncertainty argument.</p>
+<section id="rebuild-in-a-fresh-r-process" class="level3" data-number="2.1">
+<h3 data-number="2.1" class="anchored" data-anchor-id="rebuild-in-a-fresh-r-process"><span class="header-section-number">2.1</span> Rebuild in a fresh R process</h3>
+<p>From the unpacked project directory, the documented entry point is:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--vanilla</span> run.R . results/run-01</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--vanilla</span> run.R . results/run-02</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>The dot names the project root, and the final argument names a new output directory relative to it. Each command starts a separate R process. The runner finds its functions and configuration from the explicit root, so it can also be called from elsewhere using the appropriate script and root paths. It refuses an existing output directory, keeping the two attempts separate.</p>
+<p>This page performs those fresh-process runs rather than merely repeating a function in its existing workspace:</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>FreshRun <span class="ot">&lt;-</span> <span class="cf">function</span>(root, output_relative) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  command_output <span class="ot">&lt;-</span> <span class="fu">system2</span>(<span class="fu">file.path</span>(<span class="fu">R.home</span>(<span class="st">"bin"</span>), <span class="st">"Rscript"</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">c</span>(<span class="st">"--vanilla"</span>, <span class="fu">shQuote</span>(<span class="fu">file.path</span>(root, <span class="st">"run.R"</span>)),</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">shQuote</span>(root), <span class="fu">shQuote</span>(output_relative)),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">stdout =</span> <span class="cn">TRUE</span>, <span class="at">stderr =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="fu">file.path</span>(root, <span class="st">"logs"</span>), <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>(command_output,</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(root, <span class="st">"logs"</span>, <span class="fu">paste0</span>(<span class="fu">basename</span>(output_relative), <span class="st">".txt"</span>)))</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  status <span class="ot">&lt;-</span> <span class="fu">attr</span>(command_output, <span class="st">"status"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(status) <span class="sc">&amp;&amp;</span> status <span class="sc">!=</span> <span class="dv">0</span>L) <span class="fu">stop</span>(<span class="fu">paste</span>(command_output, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">file.path</span>(root, output_relative)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">file.exists</span>(<span class="fu">file.path</span>(out, <span class="st">"COMPLETE"</span>)))</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>(<span class="fu">file.path</span>(out, <span class="st">"summary.rds"</span>))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>run_01 <span class="ot">&lt;-</span> <span class="fu">FreshRun</span>(project_root, <span class="st">"results/run-01"</span>)</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>run_02 <span class="ot">&lt;-</span> <span class="fu">FreshRun</span>(project_root, <span class="st">"results/run-02"</span>)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(result, run_01, <span class="at">tolerance =</span> <span class="fl">1e-12</span>)),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>          <span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(run_01, run_02, <span class="at">tolerance =</span> <span class="fl">1e-12</span>)))</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">run =</span> <span class="fu">c</span>(<span class="st">"Current process"</span>, <span class="st">"Fresh process 1"</span>, <span class="st">"Fresh process 2"</span>),</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>           <span class="at">estimate =</span> <span class="fu">c</span>(result<span class="sc">$</span>estimate, run_01<span class="sc">$</span>estimate, run_02<span class="sc">$</span>estimate),</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>           <span class="at">SE =</span> <span class="fu">c</span>(result<span class="sc">$</span>se, run_01<span class="sc">$</span>se, run_02<span class="sc">$</span>se))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>              run estimate        SE
+1 Current process 2.021953 0.1162457
+2 Fresh process 1 2.021953 0.1162457
+3 Fresh process 2 2.021953 0.1162457</code></pre>
+</div>
+</div>
+<p>Agreement shows that these inputs and code reproduce the numeric result without relying on a fitted object left in the first process. It does not establish correctness of the statistical question or guarantee identical file bytes on every platform. State which outputs must agree and at what tolerance. Exact ID sets, row counts, and categorical decisions often deserve exact checks; floating-point estimates may need a justified numeric tolerance. “The conclusions looked similar” is too vague to serve as an output check.</p>
+<p><span id="fig-project-execution"></span> <span id="fig-project-execution-title"></span></p>
+</section>
+<section id="inspect-what-the-run-retained" class="level3" data-number="2.2">
+<h3 data-number="2.2" class="anchored" data-anchor-id="inspect-what-the-run-retained"><span class="header-section-number">2.2</span> Inspect what the run retained</h3>
+<p>Each completed run saves the synthetic people, summary table and R object, configuration used, input/code manifest, output checksums, R session details, and RNG setup. Its final <code>COMPLETE</code> file is written after the listed outputs. An interrupted directory without that marker is retained as an incomplete attempt, rather than mistaken for a successful analysis. The marker describes execution status, not statistical validity.</p>
+<div class="table-responsive">
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>input_manifest <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(project_root, <span class="st">"results"</span>, <span class="st">"run-01"</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"input-manifest.csv"</span>))</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(input_manifest, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<thead>
+<tr class="header">
+<th style="text-align: left;">path</th>
+<th style="text-align: left;">role</th>
+<th style="text-align: left;">checksum</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">config/config.csv</td>
+<td style="text-align: left;">configuration</td>
+<td style="text-align: left;">e8784c6e9aeafd8d014d28ceb7386a17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">R/analysis.R</td>
+<td style="text-align: left;">functions</td>
+<td style="text-align: left;">fa68c28933b1a691f6cbf27e9b48c61f</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">run.R</td>
+<td style="text-align: left;">entry point</td>
+<td style="text-align: left;">90a574b941d9a1fbba17f627cc9f9460</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Read the manifest as a statement of dependencies. Changing <code>config/config.csv</code> changes the requested run even when the functions are identical. Changing <code>R/analysis.R</code> changes the procedure even when the settings are identical. The checksum identifies each saved file’s contents; the role column says why it matters. A real omics project additionally needs acquired data versions, annotation references, preprocessing, and exclusion rules. An analysis notebook’s filename alone does not identify those dependencies.</p>
+</section>
+</section>
+<section id="record-the-environment-and-randomness" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="record-the-environment-and-randomness"><span class="header-section-number">3</span> Record the environment and randomness</h2>
+<p>A seed controls a random-number stream under a given setup; it does not identify the software, input data, or entire parallel execution schedule. Retain R and package versions, operating-system details when relevant, code revision, configuration, and seeds or per-replicate streams. Use stable replicate IDs when splitting simulation work across workers. Two jobs that each reset the same seed can accidentally generate duplicate replicates.</p>
+<p>For projects using <strong>renv</strong>, its documented workflow includes initialization, recording package versions with a snapshot, and restoration from the lockfile. These are commands for a deliberately configured project, not commands automatically executed by this page:</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">init</span>()</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">snapshot</span>()</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># In a checkout that already contains the intended lockfile:</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">restore</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>A lockfile covers an important part of the R environment, not every external system dependency or input dataset. Document those separately. Check the restored project in a fresh environment before describing it as reproducible.</p>
+<p>The base-R example uses <code>--vanilla</code> to skip startup files and saved workspaces, as described in <a href="https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html">R’s startup documentation</a>. In a project using renv, however, the normal automatic activation is in <code>.Rprofile</code>, which that flag also skips. Activate the documented project environment explicitly, for example by sourcing <code>renv/activate.R</code>, or use the project’s documented startup route. A fresh session must still use the intended environment.</p>
+<p>Keep randomness tied to the unit being reproduced. An analysis with learned nuisances may need fold assignments and tuning seeds; a simulation may need one recorded stream per replicate. Saving only the first seed can leave results dependent on method order or worker scheduling. The run record should let a collaborator recover the same dataset and fitting choices for a particular replicate, not merely obtain a similar overall rejection rate.</p>
+</section>
+<section id="keep-code-changes-reviewable" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="keep-code-changes-reviewable"><span class="header-section-number">4</span> Keep code changes reviewable</h2>
+<p>Use version control for code, configuration, report sources, and documentation. Make focused commits with messages explaining the analysis decision, and record the code revision used for a run. If results were generated with uncommitted changes, retain the corresponding changes as well; a commit identifier alone does not describe that state. Review a change together with its affected results and assumptions.</p>
+<p>Keep credentials and restricted data outside the repository, with documented acquisition paths and appropriate ignore rules. Large derived outputs can be stored separately when they remain linked to the run manifest and can be regenerated. Collaborators should agree on which files are authoritative inputs and which are rebuildable outputs.</p>
+<p>A protocol and a run manifest answer different questions. The protocol records the planned target, methods, exclusions, and comparisons, with reasons for amendments. A run manifest records the actual inputs, code, settings, and outputs of one attempt. Retain both: reproducing an exploratory revision does not make it prespecified. New outputs should receive a new run ID, rather than silently replacing the evidence for an earlier draft.</p>
+</section>
+<section id="use-caching-deliberately" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="use-caching-deliberately"><span class="header-section-number">5</span> Use caching deliberately</h2>
+<p>Quarto’s <code>freeze</code> feature can reuse prior computation during project renders; it makes repeated builds faster. A rendered page is therefore not evidence that its code was executed in that build. A data file or helper function may change without the report source itself changing.</p>
+<p>Record a clean execution procedure that recomputes the analysis when inputs, settings, functions, or dependencies change. Check the run log and output timestamps or run identifiers. Treat cached/frozen results as outputs with provenance, and review Quarto’s <a href="https://quarto.org/docs/projects/code-execution.html">execution</a> and <a href="https://quarto.org/docs/computations/caching.html">caching</a> documentation when defining that procedure.</p>
+<p>For example, <code>exclusions.csv</code> changes while the report source is untouched. A global project render using <code>freeze: auto</code> may reuse the old computation. Knitr caching is another layer: unchanged chunk text does not automatically detect every changed external input. For an executable R report, explicitly rendering the file bypasses project-level freeze, and <code>--cache-refresh</code> refreshes chunk caches:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render reports/analysis.qmd <span class="at">--cache-refresh</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Run the project’s analysis entry point first if the report reads previously saved results rather than fitting the model itself. Refreshing a report cache cannot regenerate a result file that no report chunk creates. Confirm that the displayed result belongs to the new input manifest and run ID; a recent HTML timestamp alone only establishes that a page was written.</p>
+</section>
+<section id="decide-what-to-retain" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="decide-what-to-retain"><span class="header-section-number">6</span> Decide what to retain</h2>
+<p>For a simple analysis, keep the result table, diagnostics, input manifest, configuration, session information, code revision, and report source. For a simulation, keep one record per attempted replicate and method, including failures and seeds. Avoid relying on a manually edited spreadsheet as the only record of a result.</p>
+<p>A useful README answers: What scientific target is studied? What files or access permissions are required? Which environment is supported? What command runs the project? Which outputs should appear? What is intentionally excluded from a public release? A collaborator should not need your interactive command history to discover these answers.</p>
+<div id="rerun-procedure" class="callout callout-style-default callout-note no-icon callout-titled" title="Procedure: audit a collaborator's rerun">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Procedure: audit a collaborator’s rerun
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Start from the documented code revision and acquire the recorded input versions through the permitted route.</li>
+<li>Establish the stated environment and a fresh analysis process, with project activation made explicit.</li>
+<li>Execute the documented entry point into a new run directory, retaining its status and logs.</li>
+<li>Check expected files, identifiers, dimensions, diagnostics, and numeric results against the stated comparison criteria.</li>
+<li>Resolve any discrepancy by tracing changed inputs, settings, code, software, or randomness. Record the resolution and any remaining limitation.</li>
+</ol>
+<p><strong>Completion means:</strong> the declared result is recoverable through the documented route. Its scientific assumptions remain part of the research argument.</p>
+</div>
+</div>
+</section>
+<section id="exercises" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="exercises"><span class="header-section-number">7</span> Exercises</h2>
+<p>Try each checkpoint before opening its hint or solution.</p>
+<div id="checkpoint-rep-01" class="checkpoint">
+<section id="checkpoint-rep-01-specify-a-complete-rerun-contract" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-rep-01-specify-a-complete-rerun-contract">Checkpoint · REP-01 — Specify a complete rerun contract</h3>
+<p><strong>Task type:</strong> Construction and diagnosis.</p>
+<p>A report renders successfully on its author’s laptop but fails in a fresh R session because <code>fit</code> is absent. Its frozen output also predates a changed sample-exclusion file. Write a minimal project structure and rerun procedure that resolves both problems. Identify what a seed and a package lockfile each fail to record.</p>
+<p>Use the downloadable teaching project to perform two fresh-process runs. State which inputs and outputs you compare, how you distinguish an incomplete run, and whether each comparison needs byte identity, exact records, or numeric agreement.</p>
+<p><strong>Ready to continue when:</strong> another reader can identify the inputs, configuration, environment, entry point, and expected outputs, and you can verify a rerun without your interactive workspace.</p>
+<p><strong>Transfer:</strong> How would you preserve reproducibility if raw data could only be accessed inside a controlled computing environment?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Follow the dependencies of <code>fit</code> and the exclusion decision all the way to the reported table.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>Create fit from explicit data and settings in a function called by the entry script or report. Record the exclusion file/version in an input manifest, regenerate the analysis after it changes, and rebuild the report with recomputation verified. Document acquisition, environment restoration, execution, and output checks. A seed does not specify inputs or package versions; a package lockfile does not specify biological inclusion rules, all system dependencies, or acquired data. Test the instructions in a fresh session.</p>
+<p>For the teaching project, run the same configuration into two new directories, inspect their input manifests and completion markers, and compare the numeric summaries at the stated tolerance. A completion marker without matching inputs is insufficient. A renamed output directory need not make every recorded path identical; the comparison should concern the scientific output and the dependencies that produced it.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Apply the README questions to a small existing project and ask a collaborator to perform the rerun.</li>
+<li>Split a toy simulation into two batches with distinct replicate IDs and verify that the combined record has no duplicate replicates.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="reading"><span class="header-section-number">8</span> Reading</h2>
+<ul>
+<li>Wilson et al., <a href="https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510">Good enough practices in scientific computing</a>.</li>
+<li>Official <a href="https://rstudio.github.io/renv/articles/renv.html">renv introduction</a> and <a href="https://quarto.org/docs/projects/code-execution.html">Quarto project execution</a>.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/research-practice/index.html" class="pagination-link" aria-label="Research practice and reproducibility">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Research practice and reproducibility</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/research-practice/data-provenance.html" class="pagination-link" aria-label="Data provenance and an analysis-ready dataset">
+        <span class="nav-page-text">Data provenance and an analysis-ready dataset</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "A reproducible research project"</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "From explicit inputs to a result another researcher can rebuild"</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>**Before reading:** Basic R functions and file paths; no prior workflow system is required.</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## A result should have an executable route back to its inputs</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>A reproducible project records what another researcher needs to regenerate a stated result: inputs, acquisition and inclusion rules, code, configuration, software environment, and a documented execution command. This makes an argument inspectable. It does not establish that its target is meaningful or its assumptions are true.</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>For a first project, use a small structure whose responsibilities are clear:</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="in">project/</span></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="in">  README.md             # question, inputs, environment, execution instructions</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="in">  data/raw/             # original inputs, or documented controlled acquisition</span></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="in">  data/metadata/        # manifests, identifiers, acquisition and decision logs</span></span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="in">  R/                    # functions with explicit inputs and return values</span></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="in">  config/               # analysis settings and simulation scenarios</span></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="in">  results/              # derived tables, figures, and replicate-level records</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="in">  reports/              # Quarto sources connecting results to claims</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="in">  renv.lock             # R package environment, if using renv</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>Sensitive or restricted inputs need not be committed to a repository. Record how an authorized collaborator obtains the correct version, and provide synthetic data for exercising the pipeline where appropriate. Keep raw inputs unchanged; regenerate derived objects through code. Follow <span class="co">[</span><span class="ot">Data provenance and an analysis-ready dataset</span><span class="co">](data-provenance.qmd)</span> for identifiers and transformation records.</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Separate a function from an analysis run</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>A function should expose its statistical inputs. Avoid an estimator that silently reads a variable from an interactive workspace, changes its target according to a filename, or reuses a previously fitted model. An analysis run supplies the data and settings, calls functions, and saves labeled results.</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>A function is the statistical recipe; a run is a particular application of that recipe. For example, <span class="in">`SummarizePeople(y, confidence)`</span> computes a mean interval from supplied values. <span class="in">`GeneratePeople(config)`</span> creates synthetic inputs. The runner reads settings, calls those functions, and writes outputs. The estimator does not receive the generator's true population mean.</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">downloadable teaching project</span><span class="co">](../examples/research-project.zip)</span> contains four files: <span class="in">`R/analysis.R`</span>, <span class="in">`config/config.csv`</span>, <span class="in">`run.R`</span>, and <span class="in">`README.md`</span>. It uses only standard R packages and invented people. The example below unpacks that actual archive into a temporary directory, reads its configuration, and computes the result. Students should keep an unpacked project in a persistent location when working through it.</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>work_dir <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">"teaching project-"</span>); <span class="fu">dir.create</span>(work_dir)</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="fu">unzip</span>(<span class="st">"../examples/research-project.zip"</span>, <span class="at">exdir =</span> work_dir)</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>project_root <span class="ot">&lt;-</span> <span class="fu">normalizePath</span>(<span class="fu">file.path</span>(work_dir, <span class="st">"research-project"</span>))</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a><span class="fu">source</span>(<span class="fu">file.path</span>(project_root, <span class="st">"R"</span>, <span class="st">"analysis.R"</span>))</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>config <span class="ot">&lt;-</span> <span class="fu">ReadConfig</span>(<span class="fu">file.path</span>(project_root, <span class="st">"config"</span>, <span class="st">"config.csv"</span>))</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>people <span class="ot">&lt;-</span> <span class="fu">GeneratePeople</span>(config)</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">SummarizePeople</span>(people<span class="sc">$</span>outcome, config<span class="sc">$</span>confidence)</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>result</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>The configuration specifies 80 independent normal outcomes, population mean 2, seed 71, and confidence level 0.95. The interval is a normal-population t interval for the mean, in synthetic measurement units. Its assumptions come from this generator; running the code on dependent cells would require a different uncertainty argument.</span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a><span class="fu">### Rebuild in a fresh R process</span></span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>From the unpacked project directory, the documented entry point is:</span>
+<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{.bash}</span></span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--vanilla</span> run.R . results/run-01</span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a><span class="ex">Rscript</span> <span class="at">--vanilla</span> run.R . results/run-02</span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>The dot names the project root, and the final argument names a new output directory relative to it. Each command starts a separate R process. The runner finds its functions and configuration from the explicit root, so it can also be called from elsewhere using the appropriate script and root paths. It refuses an existing output directory, keeping the two attempts separate.</span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>This page performs those fresh-process runs rather than merely repeating a function in its existing workspace:</span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a>FreshRun <span class="ot">&lt;-</span> <span class="cf">function</span>(root, output_relative) {</span>
+<span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a>  command_output <span class="ot">&lt;-</span> <span class="fu">system2</span>(<span class="fu">file.path</span>(<span class="fu">R.home</span>(<span class="st">"bin"</span>), <span class="st">"Rscript"</span>),</span>
+<span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a>    <span class="at">args =</span> <span class="fu">c</span>(<span class="st">"--vanilla"</span>, <span class="fu">shQuote</span>(<span class="fu">file.path</span>(root, <span class="st">"run.R"</span>)),</span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a>             <span class="fu">shQuote</span>(root), <span class="fu">shQuote</span>(output_relative)),</span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a>    <span class="at">stdout =</span> <span class="cn">TRUE</span>, <span class="at">stderr =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>  <span class="fu">dir.create</span>(<span class="fu">file.path</span>(root, <span class="st">"logs"</span>), <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">writeLines</span>(command_output,</span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>    <span class="fu">file.path</span>(root, <span class="st">"logs"</span>, <span class="fu">paste0</span>(<span class="fu">basename</span>(output_relative), <span class="st">".txt"</span>)))</span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>  status <span class="ot">&lt;-</span> <span class="fu">attr</span>(command_output, <span class="st">"status"</span>)</span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(status) <span class="sc">&amp;&amp;</span> status <span class="sc">!=</span> <span class="dv">0</span>L) <span class="fu">stop</span>(<span class="fu">paste</span>(command_output, <span class="at">collapse =</span> <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>))</span>
+<span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a>  out <span class="ot">&lt;-</span> <span class="fu">file.path</span>(root, output_relative)</span>
+<span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stopifnot</span>(<span class="fu">file.exists</span>(<span class="fu">file.path</span>(out, <span class="st">"COMPLETE"</span>)))</span>
+<span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a>  <span class="fu">readRDS</span>(<span class="fu">file.path</span>(out, <span class="st">"summary.rds"</span>))</span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a>run_01 <span class="ot">&lt;-</span> <span class="fu">FreshRun</span>(project_root, <span class="st">"results/run-01"</span>)</span>
+<span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a>run_02 <span class="ot">&lt;-</span> <span class="fu">FreshRun</span>(project_root, <span class="st">"results/run-02"</span>)</span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(result, run_01, <span class="at">tolerance =</span> <span class="fl">1e-12</span>)),</span>
+<span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a>          <span class="fu">isTRUE</span>(<span class="fu">all.equal</span>(run_01, run_02, <span class="at">tolerance =</span> <span class="fl">1e-12</span>)))</span>
+<span id="cb10-87"><a href="#cb10-87" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">run =</span> <span class="fu">c</span>(<span class="st">"Current process"</span>, <span class="st">"Fresh process 1"</span>, <span class="st">"Fresh process 2"</span>),</span>
+<span id="cb10-88"><a href="#cb10-88" aria-hidden="true" tabindex="-1"></a>           <span class="at">estimate =</span> <span class="fu">c</span>(result<span class="sc">$</span>estimate, run_01<span class="sc">$</span>estimate, run_02<span class="sc">$</span>estimate),</span>
+<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a>           <span class="at">SE =</span> <span class="fu">c</span>(result<span class="sc">$</span>se, run_01<span class="sc">$</span>se, run_02<span class="sc">$</span>se))</span>
+<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-92"><a href="#cb10-92" aria-hidden="true" tabindex="-1"></a>Agreement shows that these inputs and code reproduce the numeric result without relying on a fitted object left in the first process. It does not establish correctness of the statistical question or guarantee identical file bytes on every platform. State which outputs must agree and at what tolerance. Exact ID sets, row counts, and categorical decisions often deserve exact checks; floating-point estimates may need a justified numeric tolerance. “The conclusions looked similar” is too vague to serve as an output check.</span>
+<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-94"><a href="#cb10-94" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"fig-project-execution"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb10-95"><a href="#cb10-95" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"fig-project-execution-title"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb10-96"><a href="#cb10-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-97"><a href="#cb10-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Inspect what the run retained</span></span>
+<span id="cb10-98"><a href="#cb10-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-99"><a href="#cb10-99" aria-hidden="true" tabindex="-1"></a>Each completed run saves the synthetic people, summary table and R object, configuration used, input/code manifest, output checksums, R session details, and RNG setup. Its final <span class="in">`COMPLETE`</span> file is written after the listed outputs. An interrupted directory without that marker is retained as an incomplete attempt, rather than mistaken for a successful analysis. The marker describes execution status, not statistical validity.</span>
+<span id="cb10-100"><a href="#cb10-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-101"><a href="#cb10-101" aria-hidden="true" tabindex="-1"></a>::: {.table-responsive}</span>
+<span id="cb10-104"><a href="#cb10-104" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb10-105"><a href="#cb10-105" aria-hidden="true" tabindex="-1"></a>input_manifest <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="fu">file.path</span>(project_root, <span class="st">"results"</span>, <span class="st">"run-01"</span>,</span>
+<span id="cb10-106"><a href="#cb10-106" aria-hidden="true" tabindex="-1"></a>                                      <span class="st">"input-manifest.csv"</span>))</span>
+<span id="cb10-107"><a href="#cb10-107" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(input_manifest, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb10-108"><a href="#cb10-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-109"><a href="#cb10-109" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb10-110"><a href="#cb10-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-111"><a href="#cb10-111" aria-hidden="true" tabindex="-1"></a>Read the manifest as a statement of dependencies. Changing <span class="in">`config/config.csv`</span> changes the requested run even when the functions are identical. Changing <span class="in">`R/analysis.R`</span> changes the procedure even when the settings are identical. The checksum identifies each saved file's contents; the role column says why it matters. A real omics project additionally needs acquired data versions, annotation references, preprocessing, and exclusion rules. An analysis notebook's filename alone does not identify those dependencies.</span>
+<span id="cb10-112"><a href="#cb10-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-113"><a href="#cb10-113" aria-hidden="true" tabindex="-1"></a><span class="fu">## Record the environment and randomness</span></span>
+<span id="cb10-114"><a href="#cb10-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-115"><a href="#cb10-115" aria-hidden="true" tabindex="-1"></a>A seed controls a random-number stream under a given setup; it does not identify the software, input data, or entire parallel execution schedule. Retain R and package versions, operating-system details when relevant, code revision, configuration, and seeds or per-replicate streams. Use stable replicate IDs when splitting simulation work across workers. Two jobs that each reset the same seed can accidentally generate duplicate replicates.</span>
+<span id="cb10-116"><a href="#cb10-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-117"><a href="#cb10-117" aria-hidden="true" tabindex="-1"></a>For projects using **renv**, its documented workflow includes initialization, recording package versions with a snapshot, and restoration from the lockfile. These are commands for a deliberately configured project, not commands automatically executed by this page:</span>
+<span id="cb10-118"><a href="#cb10-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-121"><a href="#cb10-121" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb10-122"><a href="#cb10-122" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb10-123"><a href="#cb10-123" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">init</span>()</span>
+<span id="cb10-124"><a href="#cb10-124" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">snapshot</span>()</span>
+<span id="cb10-125"><a href="#cb10-125" aria-hidden="true" tabindex="-1"></a><span class="co"># In a checkout that already contains the intended lockfile:</span></span>
+<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a>renv<span class="sc">::</span><span class="fu">restore</span>()</span>
+<span id="cb10-127"><a href="#cb10-127" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-129"><a href="#cb10-129" aria-hidden="true" tabindex="-1"></a>A lockfile covers an important part of the R environment, not every external system dependency or input dataset. Document those separately. Check the restored project in a fresh environment before describing it as reproducible.</span>
+<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-131"><a href="#cb10-131" aria-hidden="true" tabindex="-1"></a>The base-R example uses <span class="in">`--vanilla`</span> to skip startup files and saved workspaces, as described in <span class="co">[</span><span class="ot">R's startup documentation</span><span class="co">](https://stat.ethz.ch/R-manual/R-devel/library/base/html/Startup.html)</span>. In a project using renv, however, the normal automatic activation is in <span class="in">`.Rprofile`</span>, which that flag also skips. Activate the documented project environment explicitly, for example by sourcing <span class="in">`renv/activate.R`</span>, or use the project's documented startup route. A fresh session must still use the intended environment.</span>
+<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-133"><a href="#cb10-133" aria-hidden="true" tabindex="-1"></a>Keep randomness tied to the unit being reproduced. An analysis with learned nuisances may need fold assignments and tuning seeds; a simulation may need one recorded stream per replicate. Saving only the first seed can leave results dependent on method order or worker scheduling. The run record should let a collaborator recover the same dataset and fitting choices for a particular replicate, not merely obtain a similar overall rejection rate.</span>
+<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-135"><a href="#cb10-135" aria-hidden="true" tabindex="-1"></a><span class="fu">## Keep code changes reviewable</span></span>
+<span id="cb10-136"><a href="#cb10-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-137"><a href="#cb10-137" aria-hidden="true" tabindex="-1"></a>Use version control for code, configuration, report sources, and documentation. Make focused commits with messages explaining the analysis decision, and record the code revision used for a run. If results were generated with uncommitted changes, retain the corresponding changes as well; a commit identifier alone does not describe that state. Review a change together with its affected results and assumptions.</span>
+<span id="cb10-138"><a href="#cb10-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-139"><a href="#cb10-139" aria-hidden="true" tabindex="-1"></a>Keep credentials and restricted data outside the repository, with documented acquisition paths and appropriate ignore rules. Large derived outputs can be stored separately when they remain linked to the run manifest and can be regenerated. Collaborators should agree on which files are authoritative inputs and which are rebuildable outputs.</span>
+<span id="cb10-140"><a href="#cb10-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-141"><a href="#cb10-141" aria-hidden="true" tabindex="-1"></a>A protocol and a run manifest answer different questions. The protocol records the planned target, methods, exclusions, and comparisons, with reasons for amendments. A run manifest records the actual inputs, code, settings, and outputs of one attempt. Retain both: reproducing an exploratory revision does not make it prespecified. New outputs should receive a new run ID, rather than silently replacing the evidence for an earlier draft.</span>
+<span id="cb10-142"><a href="#cb10-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-143"><a href="#cb10-143" aria-hidden="true" tabindex="-1"></a><span class="fu">## Use caching deliberately</span></span>
+<span id="cb10-144"><a href="#cb10-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-145"><a href="#cb10-145" aria-hidden="true" tabindex="-1"></a>Quarto's <span class="in">`freeze`</span> feature can reuse prior computation during project renders; it makes repeated builds faster. A rendered page is therefore not evidence that its code was executed in that build. A data file or helper function may change without the report source itself changing.</span>
+<span id="cb10-146"><a href="#cb10-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-147"><a href="#cb10-147" aria-hidden="true" tabindex="-1"></a>Record a clean execution procedure that recomputes the analysis when inputs, settings, functions, or dependencies change. Check the run log and output timestamps or run identifiers. Treat cached/frozen results as outputs with provenance, and review Quarto's <span class="co">[</span><span class="ot">execution</span><span class="co">](https://quarto.org/docs/projects/code-execution.html)</span> and <span class="co">[</span><span class="ot">caching</span><span class="co">](https://quarto.org/docs/computations/caching.html)</span> documentation when defining that procedure.</span>
+<span id="cb10-148"><a href="#cb10-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-149"><a href="#cb10-149" aria-hidden="true" tabindex="-1"></a>For example, <span class="in">`exclusions.csv`</span> changes while the report source is untouched. A global project render using <span class="in">`freeze: auto`</span> may reuse the old computation. Knitr caching is another layer: unchanged chunk text does not automatically detect every changed external input. For an executable R report, explicitly rendering the file bypasses project-level freeze, and <span class="in">`--cache-refresh`</span> refreshes chunk caches:</span>
+<span id="cb10-150"><a href="#cb10-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-151"><a href="#cb10-151" aria-hidden="true" tabindex="-1"></a><span class="in">```{.bash}</span></span>
+<span id="cb10-152"><a href="#cb10-152" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render reports/analysis.qmd <span class="at">--cache-refresh</span></span>
+<span id="cb10-153"><a href="#cb10-153" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-154"><a href="#cb10-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-155"><a href="#cb10-155" aria-hidden="true" tabindex="-1"></a>Run the project's analysis entry point first if the report reads previously saved results rather than fitting the model itself. Refreshing a report cache cannot regenerate a result file that no report chunk creates. Confirm that the displayed result belongs to the new input manifest and run ID; a recent HTML timestamp alone only establishes that a page was written.</span>
+<span id="cb10-156"><a href="#cb10-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-157"><a href="#cb10-157" aria-hidden="true" tabindex="-1"></a><span class="fu">## Decide what to retain</span></span>
+<span id="cb10-158"><a href="#cb10-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-159"><a href="#cb10-159" aria-hidden="true" tabindex="-1"></a>For a simple analysis, keep the result table, diagnostics, input manifest, configuration, session information, code revision, and report source. For a simulation, keep one record per attempted replicate and method, including failures and seeds. Avoid relying on a manually edited spreadsheet as the only record of a result.</span>
+<span id="cb10-160"><a href="#cb10-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-161"><a href="#cb10-161" aria-hidden="true" tabindex="-1"></a>A useful README answers: What scientific target is studied? What files or access permissions are required? Which environment is supported? What command runs the project? Which outputs should appear? What is intentionally excluded from a public release? A collaborator should not need your interactive command history to discover these answers.</span>
+<span id="cb10-162"><a href="#cb10-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-163"><a href="#cb10-163" aria-hidden="true" tabindex="-1"></a>::: {#rerun-procedure .callout-note icon=false title="Procedure: audit a collaborator's rerun"}</span>
+<span id="cb10-164"><a href="#cb10-164" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Start from the documented code revision and acquire the recorded input versions through the permitted route.</span>
+<span id="cb10-165"><a href="#cb10-165" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Establish the stated environment and a fresh analysis process, with project activation made explicit.</span>
+<span id="cb10-166"><a href="#cb10-166" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Execute the documented entry point into a new run directory, retaining its status and logs.</span>
+<span id="cb10-167"><a href="#cb10-167" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Check expected files, identifiers, dimensions, diagnostics, and numeric results against the stated comparison criteria.</span>
+<span id="cb10-168"><a href="#cb10-168" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Resolve any discrepancy by tracing changed inputs, settings, code, software, or randomness. Record the resolution and any remaining limitation.</span>
+<span id="cb10-169"><a href="#cb10-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-170"><a href="#cb10-170" aria-hidden="true" tabindex="-1"></a>**Completion means:** the declared result is recoverable through the documented route. Its scientific assumptions remain part of the research argument.</span>
+<span id="cb10-171"><a href="#cb10-171" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb10-172"><a href="#cb10-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-173"><a href="#cb10-173" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a>Try each checkpoint before opening its hint or solution.</span>
+<span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-177"><a href="#cb10-177" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-rep-01 .checkpoint}</span>
+<span id="cb10-178"><a href="#cb10-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · REP-01 — Specify a complete rerun contract {.unnumbered}</span></span>
+<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a>**Task type:** Construction and diagnosis.</span>
+<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-182"><a href="#cb10-182" aria-hidden="true" tabindex="-1"></a>A report renders successfully on its author’s laptop but fails in a fresh R session because <span class="in">`fit`</span> is absent. Its frozen output also predates a changed sample-exclusion file. Write a minimal project structure and rerun procedure that resolves both problems. Identify what a seed and a package lockfile each fail to record.</span>
+<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-184"><a href="#cb10-184" aria-hidden="true" tabindex="-1"></a>Use the downloadable teaching project to perform two fresh-process runs. State which inputs and outputs you compare, how you distinguish an incomplete run, and whether each comparison needs byte identity, exact records, or numeric agreement.</span>
+<span id="cb10-185"><a href="#cb10-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-186"><a href="#cb10-186" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** another reader can identify the inputs, configuration, environment, entry point, and expected outputs, and you can verify a rerun without your interactive workspace.</span>
+<span id="cb10-187"><a href="#cb10-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-188"><a href="#cb10-188" aria-hidden="true" tabindex="-1"></a>**Transfer:** How would you preserve reproducibility if raw data could only be accessed inside a controlled computing environment?</span>
+<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb10-191"><a href="#cb10-191" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb10-192"><a href="#cb10-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-193"><a href="#cb10-193" aria-hidden="true" tabindex="-1"></a>Follow the dependencies of <span class="in">`fit`</span> and the exclusion decision all the way to the reported table.</span>
+<span id="cb10-194"><a href="#cb10-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a>Create fit from explicit data and settings in a function called by the entry script or report. Record the exclusion file/version in an input manifest, regenerate the analysis after it changes, and rebuild the report with recomputation verified. Document acquisition, environment restoration, execution, and output checks. A seed does not specify inputs or package versions; a package lockfile does not specify biological inclusion rules, all system dependencies, or acquired data. Test the instructions in a fresh session.</span>
+<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a>For the teaching project, run the same configuration into two new directories, inspect their input manifests and completion markers, and compare the numeric summaries at the stated tolerance. A completion marker without matching inputs is insufficient. A renamed output directory need not make every recorded path identical; the comparison should concern the scientific output and the dependencies that produced it.</span>
+<span id="cb10-203"><a href="#cb10-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-204"><a href="#cb10-204" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb10-205"><a href="#cb10-205" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb10-206"><a href="#cb10-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-207"><a href="#cb10-207" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb10-208"><a href="#cb10-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-209"><a href="#cb10-209" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Apply the README questions to a small existing project and ask a collaborator to perform the rerun.</span>
+<span id="cb10-210"><a href="#cb10-210" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Split a toy simulation into two batches with distinct replicate IDs and verify that the combined record has no duplicate replicates.</span>
+<span id="cb10-211"><a href="#cb10-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-212"><a href="#cb10-212" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb10-213"><a href="#cb10-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-214"><a href="#cb10-214" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Wilson et al., <span class="co">[</span><span class="ot">Good enough practices in scientific computing</span><span class="co">](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005510)</span>.</span>
+<span id="cb10-215"><a href="#cb10-215" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Official <span class="co">[</span><span class="ot">renv introduction</span><span class="co">](https://rstudio.github.io/renv/articles/renv.html)</span> and <span class="co">[</span><span class="ot">Quarto project execution</span><span class="co">](https://quarto.org/docs/projects/code-execution.html)</span>.</span>
+<span id="cb10-216"><a href="#cb10-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-217"><a href="#cb10-217" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

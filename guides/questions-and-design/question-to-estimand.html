@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>From a research question to an identified estimand – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/questions-and-design/units-and-study-design.html" rel="next">
+<link href="../../guides/questions-and-design/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">From a research question to an identified estimand</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/questions-and-design/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Research questions, study design, and estimands</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/questions-and-design/question-to-estimand.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">From a research question to an identified estimand</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/questions-and-design/units-and-study-design.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Units of analysis, replication, and study design</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/questions-and-design/estimands-and-misspecification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">What is your estimator actually estimating?</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/questions-and-design/missingness-and-selection.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Missingness, selection, and the observed-data target</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#write-the-question-in-population-language" id="toc-write-the-question-in-population-language" class="nav-link active" data-scroll-target="#write-the-question-in-population-language"><span class="header-section-number">1</span> Write the question in population language</a></li>
+  <li><a href="#a-running-population-mean" id="toc-a-running-population-mean" class="nav-link" data-scroll-target="#a-running-population-mean"><span class="header-section-number">2</span> A running population mean</a></li>
+  <li><a href="#four-kinds-of-question" id="toc-four-kinds-of-question" class="nav-link" data-scroll-target="#four-kinds-of-question"><span class="header-section-number">3</span> Four kinds of question</a></li>
+  <li><a href="#definition-and-identification-are-different-steps" id="toc-definition-and-identification-are-different-steps" class="nav-link" data-scroll-target="#definition-and-identification-are-different-steps"><span class="header-section-number">4</span> Definition and identification are different steps</a></li>
+  <li><a href="#a-contrast-can-change-after-standardization" id="toc-a-contrast-can-change-after-standardization" class="nav-link" data-scroll-target="#a-contrast-can-change-after-standardization"><span class="header-section-number">5</span> A contrast can change after standardization</a></li>
+  <li><a href="#a-causal-interpretation-needs-an-additional-argument" id="toc-a-causal-interpretation-needs-an-additional-argument" class="nav-link" data-scroll-target="#a-causal-interpretation-needs-an-additional-argument"><span class="header-section-number">6</span> A causal interpretation needs an additional argument</a></li>
+  <li><a href="#the-partially-linear-coefficient-is-another-target" id="toc-the-partially-linear-coefficient-is-another-target" class="nav-link" data-scroll-target="#the-partially-linear-coefficient-is-another-target"><span class="header-section-number">7</span> The partially linear coefficient is another target</a></li>
+  <li><a href="#distinguish-structural-absence-from-a-small-sample" id="toc-distinguish-structural-absence-from-a-small-sample" class="nav-link" data-scroll-target="#distinguish-structural-absence-from-a-small-sample"><span class="header-section-number">8</span> Distinguish structural absence from a small sample</a></li>
+  <li><a href="#write-an-estimand-specification" id="toc-write-an-estimand-specification" class="nav-link" data-scroll-target="#write-an-estimand-specification"><span class="header-section-number">9</span> Write an estimand specification</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">10</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-id-01-separate-definition-identification-and-estimation" id="toc-checkpoint-id-01-separate-definition-identification-and-estimation" class="nav-link" data-scroll-target="#checkpoint-id-01-separate-definition-identification-and-estimation">Checkpoint · ID-01 — Separate definition, identification, and estimation</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">11</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">From a research question to an identified estimand</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Population, target, support, and interpretation.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> Elementary means, conditional means, and basic regression. The observation and sampling unit are introduced here; no assay-specific biology is assumed.</p>
+<section id="write-the-question-in-population-language" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="write-the-question-in-population-language"><span class="header-section-number">1</span> Write the question in population language</h2>
+<p>“Compare the patients and controls” does not specify a unique estimand. You still need a feature scale, population, time, contrast, adjustment, and weighting rule. A coefficient returned by software is a candidate answer only after those choices are connected to its population meaning.</p>
+<p>A useful first statement is: among the eligible people in this cohort, compare the mean log-expression of feature <span class="math inline">g</span> between groups, standardized to a specified covariate distribution. A different question might concern prediction for a new person, a within-person trajectory, or an intervention effect. Those questions can use related data and algorithms while requiring different assumptions and evaluation criteria.</p>
+<p>Make the statement operational. “Eligible” needs inclusion criteria and a time window. “Mean expression” needs the measured scale and a rule for repeated specimens. “Adjusted” needs both the covariates and the population over which comparisons are averaged. These are parts of the question, not details to leave to the software defaults.</p>
+</section>
+<section id="a-running-population-mean" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="a-running-population-mean"><span class="header-section-number">2</span> A running population mean</h2>
+<p>For a first example, Y is one measured feature level per eligible person on a stated scale. Z is recorded for everyone, and R says whether Y was observed. The target is the eligible-population mean <span class="math inline">\mu=E[Y]</span>, and the observed record is <span class="math inline">W=(Z,R,RY)</span>. Retain R so that an unrecorded outcome is not confused with an observed zero.</p>
+<p>Here the eligibility rule defines the population from which people are sampled. The expectation is over that population’s distribution, not just an average of the outcomes that happened to be observed. A mean for a fixed finite enrolled cohort is another possible target, but it needs that finite-population interpretation and its sampling/observation argument stated explicitly.</p>
+<p>A study can contain repeated specimens from a person. The independent sampling unit for a person-level question is the person, not automatically the specimen, cell, or matrix column. <a href="../../guides/questions-and-design/units-and-study-design.html">Units of analysis, replication, and study design</a> develops the weighting and replication choices. An assay’s detailed interpretation comes later in <a href="../../guides/data-and-measurement/index.html">Omics data and measurement</a>.</p>
+<p>A difference between two population means is a subsequent extension. Standardization then asks which covariate distribution should be used for each mean; the binary-stratum example below keeps those weights visible.</p>
+</section>
+<section id="four-kinds-of-question" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="four-kinds-of-question"><span class="header-section-number">3</span> Four kinds of question</h2>
+<p>A descriptive target summarizes a specified population. An associational target relates variables within that population, possibly after adjustment. A predictive target concerns a loss or accuracy measure in a stated deployment population, for a learning rule with a defined training procedure. A causal target concerns outcomes under interventions and needs assumptions linking those potential outcomes to observations.</p>
+<p>The categories describe the interpretation being claimed, not whether a method is sophisticated. Flexible regression can estimate an associational target. A simple mean can identify a causal contrast in an appropriately randomized design.</p>
+</section>
+<section id="definition-and-identification-are-different-steps" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="definition-and-identification-are-different-steps"><span class="header-section-number">4</span> Definition and identification are different steps</h2>
+<p>For a target <span class="math inline">\psi</span>, <strong>definition</strong> says what quantity is wanted. <strong>Identification</strong> expresses it as a unique functional of the observable distribution under assumptions. <strong>Estimation</strong> constructs a finite-sample procedure for that functional. <strong>Inference</strong> studies uncertainty and approximation errors.</p>
+<p>For the missing mean, definition names all eligible people’s Y values as the quantity of interest, even though some are unobserved. Identification must explain how those missing outcomes relate to what was recorded. Estimation then replaces the identified population averages or regressions by sample quantities. Inference asks how much that estimate varies and which approximation errors remain. A precise estimate at the last step cannot supply an assumption missing at the second.</p>
+<p>For example, <span class="math inline">E[Y\mid A=1]-E[Y\mid A=0]</span> is an observed-data group contrast if both groups occur and the means exist. A standardized contrast</p>
+<p><span class="math display">
+\begin{aligned}
+\psi_Q&amp;=\int\{m_1(z)-m_0(z)\}\,dQ(z),\\
+m_a(z)&amp;=E[Y\mid A=a,Z=z],
+\end{aligned}
+</span></p>
+<p>also specifies a covariate distribution <span class="math inline">Q</span>. Identifying it from the observed data requires that the needed group–covariate combinations are supported, or additional extrapolation restrictions. Choosing <span class="math inline">Q</span> as the overall cohort covariate distribution differs from choosing the control or patient distribution.</p>
+<p>This displayed contrast initially assumes fully observed outcomes and group conditional means defined on the support used by Q. With missing outcomes, the full-group means additionally need an observation-process argument. If a group never occurs in a target stratum, its conditional mean there is not uniquely defined by that observed joint law. An extrapolated response model or a potential-outcome formulation must define what is intended there before asking how to identify it.</p>
+<p><span id="fig-question-roadmap"></span> <span id="fig-question-roadmap-title"></span></p>
+</section>
+<section id="a-contrast-can-change-after-standardization" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="a-contrast-can-change-after-standardization"><span class="header-section-number">5</span> A contrast can change after standardization</h2>
+<p>This separate numerical example concerns a group contrast. Consider a binary covariate <span class="math inline">Z</span> with population probability <span class="math inline">P(Z=1)=1/2</span>. Group membership is associated with <span class="math inline">Z</span>: <span class="math inline">P(A=1\mid Z=0)=0.2</span> and <span class="math inline">P(A=1\mid Z=1)=0.8</span>. The conditional means are <span class="math inline">m_0(z)=1+2z</span> and <span class="math inline">m_1(z)=2+3z</span>.</p>
+<p>The within-<span class="math inline">Z</span> contrasts are 1 and 2. Predict the contrast averaged equally over <span class="math inline">Z</span>, and compare it with the crude group difference.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pz <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>); pa <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>m0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>); m1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>pz_a1 <span class="ot">&lt;-</span> pz <span class="sc">*</span> pa <span class="sc">/</span> <span class="fu">sum</span>(pz <span class="sc">*</span> pa)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>pz_a0 <span class="ot">&lt;-</span> pz <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> pa) <span class="sc">/</span> <span class="fu">sum</span>(pz <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> pa))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">crude =</span> <span class="fu">sum</span>(pz_a1 <span class="sc">*</span> m1) <span class="sc">-</span> <span class="fu">sum</span>(pz_a0 <span class="sc">*</span> m0),</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="fu">sum</span>(pz <span class="sc">*</span> (m1 <span class="sc">-</span> m0)),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">at_Z0 =</span> m1[<span class="dv">1</span>] <span class="sc">-</span> m0[<span class="dv">1</span>], <span class="at">at_Z1 =</span> m1[<span class="dv">2</span>] <span class="sc">-</span> m0[<span class="dv">2</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>       crude standardized        at_Z0        at_Z1 
+         3.0          1.5          1.0          2.0 </code></pre>
+</div>
+</div>
+<p>The answers are 3, 1.5, 1, and 2. Work through the weights: group 1 has stratum probabilities 0.2 and 0.8, so its mean is <span class="math inline">0.2(2)+0.8(5)=4.4</span>. Group 0 has probabilities 0.8 and 0.2, so its mean is <span class="math inline">0.8(1)+0.2(3)=1.4</span>. Subtracting gives 3.</p>
+<p>Equal-Z standardization instead compares the means <strong>within</strong> each stratum, then uses the same weights: <span class="math inline">0.5(2-1)+0.5(5-3)=1.5</span>. Using the patient covariate distribution gives <span class="math inline">0.2(1)+0.8(2)=1.8</span>; using the control distribution gives 1.2. None of these answers is intrinsically wrong. They summarize different comparisons. Calling one “corrected” is insufficient without explaining why its adjustment and target population answer the question.</p>
+</section>
+<section id="a-causal-interpretation-needs-an-additional-argument" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="a-causal-interpretation-needs-an-additional-argument"><span class="header-section-number">6</span> A causal interpretation needs an additional argument</h2>
+<p>If the target is <span class="math inline">E[Y^1-Y^0]</span>, a common identification argument uses consistency, conditional exchangeability <span class="math inline">Y^a\perp A\mid Z</span>, and treatment positivity over the target covariate support. These are distinct from choosing a flexible regression learner. Under them, standardization to the target population’s <span class="math inline">Z</span> distribution identifies the causal mean contrast.</p>
+<p>Here consistency means <span class="math inline">Y=Y^A</span>: the observed outcome agrees with the specified intervention received. This causal linking assumption is different from statistical consistency, which later describes an estimator approaching its target. Conditional exchangeability lets us replace an intervention-specific conditional mean by an observed group mean at the same Z. Positivity supplies observations for each intervention comparison required by the target population. These are separate roles; fitting an accurate prediction model addresses none of them by itself.</p>
+<p>The assumptions must match the intervention and study. A group label such as disease status may not define a sufficiently specified intervention. Adjusting for a variable affected by the exposure can change the causal question. Unmeasured common causes are not removed by a good prediction score. This collection introduces the identification distinction; deeper causal designs are a separate branch.</p>
+</section>
+<section id="the-partially-linear-coefficient-is-another-target" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="the-partially-linear-coefficient-is-another-target"><span class="header-section-number">7</span> The partially linear coefficient is another target</h2>
+<p>In <span class="math inline">Y=\beta X+g(Z)+\varepsilon</span> with <span class="math inline">E[\varepsilon\mid X,Z]=0</span>, residualizing <span class="math inline">X</span> and <span class="math inline">Y</span> identifies <span class="math inline">\beta</span> when residual exposure variation is positive. That coefficient has a model-based interpretation. A causal effect interpretation additionally needs an intervention and identifying assumptions. Outside the model, the same sample equation may approach a projection-like functional rather than the original scientific contrast.</p>
+<p>Use the <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> page to study that limit. Do not use model flexibility as a substitute for identifying the quantity in the first place.</p>
+</section>
+<section id="distinguish-structural-absence-from-a-small-sample" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="distinguish-structural-absence-from-a-small-sample"><span class="header-section-number">8</span> Distinguish structural absence from a small sample</h2>
+<p>No observations in a sample cell need not mean its population probability is zero. With positive population support, an empty finite cell is an estimation difficulty: more suitable observations may supply information. A structural zero is different. If outcomes are never observed in a needed population stratum, even an infinite sample from that process leaves its outcome mean unknown without additional restrictions.</p>
+<p>For the exercise below, both groups still occur in both Z strata. What becomes zero is the probability of <strong>observing an outcome</strong> in group 0 at Z=1. Its full-population conditional mean is therefore a defined quantity, but the observed record contains no outcomes that reveal it. Keeping group membership and outcome observation separate makes the nonidentification argument precise.</p>
+</section>
+<section id="write-an-estimand-specification" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="write-an-estimand-specification"><span class="header-section-number">9</span> Write an estimand specification</h2>
+<p>Record the eligible population and sampling frame; independent unit; assay feature and measurement scale; time or visit summary; contrast and weighting; covariate distribution; missingness assumptions; and interpretation. Then write the observable functional and list the support needed to evaluate it. If a required combination is absent, state whether the analysis changes population, introduces extrapolation, or cannot identify the target.</p>
+<p>A short specification should allow another analyst to disagree about the assumptions while still knowing exactly which quantity you intend to estimate. This is more useful than choosing an algorithm name as the analysis plan.</p>
+<p>When identification depends on an untestable restriction, use <a href="../../guides/method-development/sensitivity-analysis.html">Sensitivity analysis for assumptions and research decisions</a> to distinguish a changed assumption from a changed target.</p>
+</section>
+<section id="exercises" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="exercises"><span class="header-section-number">10</span> Exercises</h2>
+<p>Try each checkpoint before opening its hint or solution.</p>
+<div id="checkpoint-id-01" class="checkpoint">
+<section id="checkpoint-id-01-separate-definition-identification-and-estimation" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-id-01-separate-definition-identification-and-estimation">Checkpoint · ID-01 — Separate definition, identification, and estimation</h3>
+<p><strong>Task type:</strong> Interpretation and derivation.</p>
+<p>Use the binary-<span class="math inline">Z</span> example to define the equal-<span class="math inline">Z</span> standardized contrast and derive 1.5. Suppose both groups still occur in both strata, but <span class="math inline">P(R=1\mid A=0,Z=1)=0</span> in the population, while outcomes are observed in the other cells and the target gives Z=1 weight 1/2. Which conditional mean is unsupported? Describe two observed-data-compatible choices for it that give different targets. Would a flexible learner or a sandwich standard error resolve this?</p>
+<p><strong>Ready to continue when:</strong> you can show nonidentification by constructing different compatible targets, rather than describing it only as a software difficulty.</p>
+<p><strong>Transfer:</strong> If you restrict the target to <span class="math inline">Z=0</span>, what is gained and what population claim is lost?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>The target still needs <span class="math inline">m_0(1)</span> even when that conditional mean cannot be observed.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The contrast is <span class="math inline">\{m_1(0)-m_0(0)+m_1(1)-m_0(1)\}/2</span>. With all means supplied it is <span class="math inline">(1+2)/2=1.5</span>. If group 0 still occurs at <span class="math inline">Z=1</span> but none of its outcomes are observed, changing its full-group conditional mean from 3 to 7 leaves the law of <span class="math inline">(Z,A,R,RY)</span> unchanged but changes the contrast from 1.5 to -0.5. Additional restrictions, a new population target, or new observations are needed. Learning and variance estimation cannot identify an unrestricted mean in an unsupported stratum.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Replace the overall covariate distribution by the patient distribution and compute the standardized contrast.</li>
+<li>Write separate estimand specifications for a bulk-expression contrast and a composition-adjusted contrast.</li>
+<li>For a prediction study, specify deployment population, loss, training procedure, and validation unit.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="reading"><span class="header-section-number">11</span> Reading</h2>
+<ul>
+<li>Kennedy, <a href="https://arxiv.org/abs/1709.06418">Semiparametric theory</a>, for an estimation framework with explicitly defined target functionals.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/questions-and-design/index.html" class="pagination-link" aria-label="Research questions, study design, and estimands">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Research questions, study design, and estimands</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/questions-and-design/units-and-study-design.html" class="pagination-link" aria-label="Units of analysis, replication, and study design">
+        <span class="nav-page-text">Units of analysis, replication, and study design</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "From a research question to an identified estimand"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Population, target, support, and interpretation."</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>**Before reading:** Elementary means, conditional means, and basic regression. The observation and sampling unit are introduced here; no assay-specific biology is assumed.</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Write the question in population language</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>“Compare the patients and controls” does not specify a unique estimand. You still need a feature scale, population, time, contrast, adjustment, and weighting rule. A coefficient returned by software is a candidate answer only after those choices are connected to its population meaning.</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>A useful first statement is: among the eligible people in this cohort, compare the mean log-expression of feature $g$ between groups, standardized to a specified covariate distribution. A different question might concern prediction for a new person, a within-person trajectory, or an intervention effect. Those questions can use related data and algorithms while requiring different assumptions and evaluation criteria.</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>Make the statement operational. “Eligible” needs inclusion criteria and a time window. “Mean expression” needs the measured scale and a rule for repeated specimens. “Adjusted” needs both the covariates and the population over which comparisons are averaged. These are parts of the question, not details to leave to the software defaults.</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## A running population mean</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>For a first example, Y is one measured feature level per eligible person on a stated scale. Z is recorded for everyone, and R says whether Y was observed. The target is the eligible-population mean $\mu=E<span class="co">[</span><span class="ot">Y</span><span class="co">]</span>$, and the observed record is $W=(Z,R,RY)$. Retain R so that an unrecorded outcome is not confused with an observed zero.</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>Here the eligibility rule defines the population from which people are sampled. The expectation is over that population's distribution, not just an average of the outcomes that happened to be observed. A mean for a fixed finite enrolled cohort is another possible target, but it needs that finite-population interpretation and its sampling/observation argument stated explicitly.</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>A study can contain repeated specimens from a person. The independent sampling unit for a person-level question is the person, not automatically the specimen, cell, or matrix column. <span class="co">[</span><span class="ot">Units of analysis, replication, and study design</span><span class="co">](units-and-study-design.qmd)</span> develops the weighting and replication choices. An assay’s detailed interpretation comes later in <span class="co">[</span><span class="ot">Omics data and measurement</span><span class="co">](../data-and-measurement/index.qmd)</span>.</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>A difference between two population means is a subsequent extension. Standardization then asks which covariate distribution should be used for each mean; the binary-stratum example below keeps those weights visible.</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## Four kinds of question</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>A descriptive target summarizes a specified population. An associational target relates variables within that population, possibly after adjustment. A predictive target concerns a loss or accuracy measure in a stated deployment population, for a learning rule with a defined training procedure. A causal target concerns outcomes under interventions and needs assumptions linking those potential outcomes to observations.</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>The categories describe the interpretation being claimed, not whether a method is sophisticated. Flexible regression can estimate an associational target. A simple mean can identify a causal contrast in an appropriately randomized design.</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="fu">## Definition and identification are different steps</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>For a target $\psi$, **definition** says what quantity is wanted. **Identification** expresses it as a unique functional of the observable distribution under assumptions. **Estimation** constructs a finite-sample procedure for that functional. **Inference** studies uncertainty and approximation errors.</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>For the missing mean, definition names all eligible people's Y values as the quantity of interest, even though some are unobserved. Identification must explain how those missing outcomes relate to what was recorded. Estimation then replaces the identified population averages or regressions by sample quantities. Inference asks how much that estimate varies and which approximation errors remain. A precise estimate at the last step cannot supply an assumption missing at the second.</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>For example, $E<span class="co">[</span><span class="ot">Y\mid A=1</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">Y\mid A=0</span><span class="co">]</span>$ is an observed-data group contrast if both groups occur and the means exist. A standardized contrast</span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>\psi_Q&amp;=\int<span class="sc">\{</span>m_1(z)-m_0(z)<span class="sc">\}</span>\,dQ(z),<span class="sc">\\</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>m_a(z)&amp;=E<span class="co">[</span><span class="ot">Y\mid A=a,Z=z</span><span class="co">]</span>,</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>also specifies a covariate distribution $Q$. Identifying it from the observed data requires that the needed group–covariate combinations are supported, or additional extrapolation restrictions. Choosing $Q$ as the overall cohort covariate distribution differs from choosing the control or patient distribution.</span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>This displayed contrast initially assumes fully observed outcomes and group conditional means defined on the support used by Q. With missing outcomes, the full-group means additionally need an observation-process argument. If a group never occurs in a target stratum, its conditional mean there is not uniquely defined by that observed joint law. An extrapolated response model or a potential-outcome formulation must define what is intended there before asking how to identify it.</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"fig-question-roadmap"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"fig-question-roadmap-title"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## A contrast can change after standardization</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>This separate numerical example concerns a group contrast. Consider a binary covariate $Z$ with population probability $P(Z=1)=1/2$. Group membership is associated with $Z$: $P(A=1\mid Z=0)=0.2$ and $P(A=1\mid Z=1)=0.8$. The conditional means are $m_0(z)=1+2z$ and $m_1(z)=2+3z$.</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>The within-$Z$ contrasts are 1 and 2. Predict the contrast averaged equally over $Z$, and compare it with the crude group difference.</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>pz <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">0.5</span>); pa <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="fl">0.8</span>)</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>m0 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>); m1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">5</span>)</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>pz_a1 <span class="ot">&lt;-</span> pz <span class="sc">*</span> pa <span class="sc">/</span> <span class="fu">sum</span>(pz <span class="sc">*</span> pa)</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>pz_a0 <span class="ot">&lt;-</span> pz <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> pa) <span class="sc">/</span> <span class="fu">sum</span>(pz <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> pa))</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">crude =</span> <span class="fu">sum</span>(pz_a1 <span class="sc">*</span> m1) <span class="sc">-</span> <span class="fu">sum</span>(pz_a0 <span class="sc">*</span> m0),</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>  <span class="at">standardized =</span> <span class="fu">sum</span>(pz <span class="sc">*</span> (m1 <span class="sc">-</span> m0)),</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>  <span class="at">at_Z0 =</span> m1[<span class="dv">1</span>] <span class="sc">-</span> m0[<span class="dv">1</span>], <span class="at">at_Z1 =</span> m1[<span class="dv">2</span>] <span class="sc">-</span> m0[<span class="dv">2</span>])</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>The answers are 3, 1.5, 1, and 2. Work through the weights: group 1 has stratum probabilities 0.2 and 0.8, so its mean is $0.2(2)+0.8(5)=4.4$. Group 0 has probabilities 0.8 and 0.2, so its mean is $0.8(1)+0.2(3)=1.4$. Subtracting gives 3.</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>Equal-Z standardization instead compares the means **within** each stratum, then uses the same weights: $0.5(2-1)+0.5(5-3)=1.5$. Using the patient covariate distribution gives $0.2(1)+0.8(2)=1.8$; using the control distribution gives 1.2. None of these answers is intrinsically wrong. They summarize different comparisons. Calling one “corrected” is insufficient without explaining why its adjustment and target population answer the question.</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="fu">## A causal interpretation needs an additional argument</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>If the target is $E<span class="co">[</span><span class="ot">Y^1-Y^0</span><span class="co">]</span>$, a common identification argument uses consistency, conditional exchangeability $Y^a\perp A\mid Z$, and treatment positivity over the target covariate support. These are distinct from choosing a flexible regression learner. Under them, standardization to the target population's $Z$ distribution identifies the causal mean contrast.</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>Here consistency means $Y=Y^A$: the observed outcome agrees with the specified intervention received. This causal linking assumption is different from statistical consistency, which later describes an estimator approaching its target. Conditional exchangeability lets us replace an intervention-specific conditional mean by an observed group mean at the same Z. Positivity supplies observations for each intervention comparison required by the target population. These are separate roles; fitting an accurate prediction model addresses none of them by itself.</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>The assumptions must match the intervention and study. A group label such as disease status may not define a sufficiently specified intervention. Adjusting for a variable affected by the exposure can change the causal question. Unmeasured common causes are not removed by a good prediction score. This collection introduces the identification distinction; deeper causal designs are a separate branch.</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="fu">## The partially linear coefficient is another target</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>In $Y=\beta X+g(Z)+\varepsilon$ with $E<span class="co">[</span><span class="ot">\varepsilon\mid X,Z</span><span class="co">]</span>=0$, residualizing $X$ and $Y$ identifies $\beta$ when residual exposure variation is positive. That coefficient has a model-based interpretation. A causal effect interpretation additionally needs an intervention and identifying assumptions. Outside the model, the same sample equation may approach a projection-like functional rather than the original scientific contrast.</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>Use the <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](estimands-and-misspecification.qmd)</span> page to study that limit. Do not use model flexibility as a substitute for identifying the quantity in the first place.</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a><span class="fu">## Distinguish structural absence from a small sample</span></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>No observations in a sample cell need not mean its population probability is zero. With positive population support, an empty finite cell is an estimation difficulty: more suitable observations may supply information. A structural zero is different. If outcomes are never observed in a needed population stratum, even an infinite sample from that process leaves its outcome mean unknown without additional restrictions.</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>For the exercise below, both groups still occur in both Z strata. What becomes zero is the probability of **observing an outcome** in group 0 at Z=1. Its full-population conditional mean is therefore a defined quantity, but the observed record contains no outcomes that reveal it. Keeping group membership and outcome observation separate makes the nonidentification argument precise.</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="fu">## Write an estimand specification</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>Record the eligible population and sampling frame; independent unit; assay feature and measurement scale; time or visit summary; contrast and weighting; covariate distribution; missingness assumptions; and interpretation. Then write the observable functional and list the support needed to evaluate it. If a required combination is absent, state whether the analysis changes population, introduces extrapolation, or cannot identify the target.</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>A short specification should allow another analyst to disagree about the assumptions while still knowing exactly which quantity you intend to estimate. This is more useful than choosing an algorithm name as the analysis plan.</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>When identification depends on an untestable restriction, use <span class="co">[</span><span class="ot">Sensitivity analysis for assumptions and research decisions</span><span class="co">](../method-development/sensitivity-analysis.qmd)</span> to distinguish a changed assumption from a changed target.</span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>Try each checkpoint before opening its hint or solution.</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-id-01 .checkpoint}</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · ID-01 — Separate definition, identification, and estimation {.unnumbered}</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>**Task type:** Interpretation and derivation.</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>Use the binary-$Z$ example to define the equal-$Z$ standardized contrast and derive 1.5. Suppose both groups still occur in both strata, but $P(R=1\mid A=0,Z=1)=0$ in the population, while outcomes are observed in the other cells and the target gives Z=1 weight 1/2. Which conditional mean is unsupported? Describe two observed-data-compatible choices for it that give different targets. Would a flexible learner or a sandwich standard error resolve this?</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can show nonidentification by constructing different compatible targets, rather than describing it only as a software difficulty.</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>**Transfer:** If you restrict the target to $Z=0$, what is gained and what population claim is lost?</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>The target still needs $m_0(1)$ even when that conditional mean cannot be observed.</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>The contrast is $<span class="sc">\{</span>m_1(0)-m_0(0)+m_1(1)-m_0(1)<span class="sc">\}</span>/2$. With all means supplied it is $(1+2)/2=1.5$. If group 0 still occurs at $Z=1$ but none of its outcomes are observed, changing its full-group conditional mean from 3 to 7 leaves the law of $(Z,A,R,RY)$ unchanged but changes the contrast from 1.5 to -0.5. Additional restrictions, a new population target, or new observations are needed. Learning and variance estimation cannot identify an unrestricted mean in an unsupported stratum.</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Replace the overall covariate distribution by the patient distribution and compute the standardized contrast.</span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Write separate estimand specifications for a bulk-expression contrast and a composition-adjusted contrast.</span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>For a prediction study, specify deployment population, loss, training procedure, and validation unit.</span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kennedy, <span class="co">[</span><span class="ot">Semiparametric theory</span><span class="co">](https://arxiv.org/abs/1709.06418)</span>, for an estimation framework with explicitly defined target functionals.</span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

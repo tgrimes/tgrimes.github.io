@@ -5,88 +5,292 @@
     <lastmod>2026-09-22T01:30:42.129Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/people.html</loc>
-    <lastmod>2026-09-22T02:58:23.050Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/method-development/index.html</loc>
+    <lastmod>2026-10-29T05:35:27.507Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/notes/adjusting-class-threshold-by-strata2.html</loc>
-    <lastmod>2026-10-05T21:01:33.397Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/method-development/simulation-studies.html</loc>
+    <lastmod>2026-10-30T03:27:53.994Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/notes/partial-cor-vis-3-var.html</loc>
-    <lastmod>2026-09-22T02:47:51.130Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/association-targets-and-bias.html</loc>
+    <lastmod>2026-10-30T03:27:53.988Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications.html</loc>
-    <lastmod>2026-09-22T02:59:08.724Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/residual-covariance-and-nuisance-error.html</loc>
+    <lastmod>2026-10-30T03:27:53.987Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/talks/2018_ISMB/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.144Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/residual-network-case-study.html</loc>
+    <lastmod>2026-10-30T03:27:53.987Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/talks/2020_CMStatistics/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.145Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/adjusted-expression-case-study.html</loc>
+    <lastmod>2026-10-30T03:27:53.986Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications/2020_jss_seqnet/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.139Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/differential-expression-and-abundance.html</loc>
+    <lastmod>2026-10-30T03:27:53.985Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications/2021_frontiers_tumor_purity/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.139Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/semiparametric-methods/orthogonality-and-cross-fitting.html</loc>
+    <lastmod>2026-10-29T20:19:22.026Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications/2017_camda_metasub/index.html</loc>
-    <lastmod>2026-09-22T03:01:14.124Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/semiparametric-methods/influence-function-to-estimator.html</loc>
+    <lastmod>2026-10-30T03:27:53.983Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications/2023_BMC_Bio_pseudo/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.143Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/gene-expression.html</loc>
+    <lastmod>2026-10-30T14:40:06.773Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/notes.html</loc>
-    <lastmod>2026-09-22T02:58:53.726Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/preprocessing-and-estimands.html</loc>
+    <lastmod>2026-10-30T03:27:53.978Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/talks.html</loc>
-    <lastmod>2026-09-22T02:59:01.394Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/index.html</loc>
+    <lastmod>2026-10-29T02:46:17.881Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications/2017_camda_neuroblastoma/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.135Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/proteomics.html</loc>
+    <lastmod>2026-10-30T03:27:53.977Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications/2021_plosone_prob/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.142Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/statistical-models/survival-extension.html</loc>
+    <lastmod>2026-10-29T20:19:22.043Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/publications/2019_pathways_in_dc/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.137Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/statistical-models/model-target-paths.html</loc>
+    <lastmod>2026-10-29T20:19:22.039Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/talks/2017_ISMB/index.html</loc>
-    <lastmod>2026-09-22T03:00:19.976Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/statistical-models/quantiles-and-local-expansions.html</loc>
+    <lastmod>2026-10-29T20:19:22.042Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/talks/2022_UMBC/index.html</loc>
-    <lastmod>2026-09-22T01:30:42.146Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/statistical-models/likelihood-and-information.html</loc>
+    <lastmod>2026-10-30T03:27:53.973Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/index.html</loc>
-    <lastmod>2026-10-23T17:24:06.367Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/research-practice/index.html</loc>
+    <lastmod>2026-10-29T12:49:36.387Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/notes/lme-heteroskedastic-t-test.html</loc>
-    <lastmod>2026-09-22T02:46:24.865Z</lastmod>
+    <loc>https://tgrimes.github.io/guides/research-practice/reporting-methods-studies.html</loc>
+    <lastmod>2026-10-30T03:27:53.969Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/questions-and-design/estimands-and-misspecification.html</loc>
+    <lastmod>2026-10-29T20:19:22.020Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/questions-and-design/question-to-estimand.html</loc>
+    <lastmod>2026-10-30T03:27:53.966Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/questions-and-design/index.html</loc>
+    <lastmod>2026-10-30T14:40:06.742Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/estimating-equations.html</loc>
+    <lastmod>2026-10-30T03:27:53.961Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/index.html</loc>
+    <lastmod>2026-10-29T16:42:50.119Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/checkpoints.html</loc>
+    <lastmod>2026-10-29T16:46:30.040Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/large-sample-reasoning.html</loc>
+    <lastmod>2026-10-29T20:19:22.015Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/notes/how-to-write-a-paper.html</loc>
+    <lastmod>2026-10-05T20:46:10.217Z</lastmod>
   </url>
   <url>
     <loc>https://tgrimes.github.io/notes/class-imbalance-strategies-on-calibration.html</loc>
     <lastmod>2026-09-22T02:44:23.840Z</lastmod>
   </url>
   <url>
-    <loc>https://tgrimes.github.io/notes/how-to-write-a-paper.html</loc>
-    <lastmod>2026-10-05T20:46:10.217Z</lastmod>
+    <loc>https://tgrimes.github.io/notes/lme-heteroskedastic-t-test.html</loc>
+    <lastmod>2026-09-22T02:46:24.865Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/index.html</loc>
+    <lastmod>2026-10-23T17:24:06.367Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/talks/2022_UMBC/index.html</loc>
+    <lastmod>2026-09-22T01:30:42.146Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/talks/2017_ISMB/index.html</loc>
+    <lastmod>2026-09-22T03:00:19.976Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications/2019_pathways_in_dc/index.html</loc>
+    <lastmod>2026-10-30T14:40:06.840Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications/2021_plosone_prob/index.html</loc>
+    <lastmod>2026-09-22T01:30:42.142Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications/2017_camda_neuroblastoma/index.html</loc>
+    <lastmod>2026-09-22T01:30:42.135Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/talks.html</loc>
+    <lastmod>2026-09-22T02:59:01.394Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/notes.html</loc>
+    <lastmod>2026-09-22T02:58:53.726Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications/2023_BMC_Bio_pseudo/index.html</loc>
+    <lastmod>2026-09-22T01:30:42.143Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications/2017_camda_metasub/index.html</loc>
+    <lastmod>2026-09-22T03:01:14.124Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications/2021_frontiers_tumor_purity/index.html</loc>
+    <lastmod>2026-09-22T01:30:42.139Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications/2020_jss_seqnet/index.html</loc>
+    <lastmod>2026-10-30T14:40:06.861Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/talks/2020_CMStatistics/index.html</loc>
+    <lastmod>2026-09-22T01:30:42.145Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/talks/2018_ISMB/index.html</loc>
+    <lastmod>2026-09-22T01:30:42.144Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/publications.html</loc>
+    <lastmod>2026-09-22T02:59:08.724Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/notes/partial-cor-vis-3-var.html</loc>
+    <lastmod>2026-09-22T02:47:51.130Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/notes/adjusting-class-threshold-by-strata2.html</loc>
+    <lastmod>2026-10-05T21:01:33.397Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/people.html</loc>
+    <lastmod>2026-09-22T02:58:23.050Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/bootstrap-and-resampling.html</loc>
+    <lastmod>2026-10-30T03:27:53.958Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/dependent-observations.html</loc>
+    <lastmod>2026-10-30T14:40:06.795Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/uncertainty-and-interpretation.html</loc>
+    <lastmod>2026-10-29T20:19:22.016Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/estimation-and-inference/mathematics-statistics-bridge.html</loc>
+    <lastmod>2026-10-29T16:44:58.268Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/questions-and-design/missingness-and-selection.html</loc>
+    <lastmod>2026-10-30T03:27:53.965Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/questions-and-design/units-and-study-design.html</loc>
+    <lastmod>2026-10-30T03:27:53.967Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/research-practice/reproducible-projects.html</loc>
+    <lastmod>2026-10-30T03:27:53.969Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/research-practice/data-provenance.html</loc>
+    <lastmod>2026-10-30T03:27:53.970Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/statistical-models/conditional-expectation.html</loc>
+    <lastmod>2026-10-30T03:27:53.972Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/statistical-models/index.html</loc>
+    <lastmod>2026-10-29T00:23:43.291Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/statistical-models/models-and-efficiency.html</loc>
+    <lastmod>2026-10-30T03:27:53.973Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/statistical-models/influence-functions.html</loc>
+    <lastmod>2026-10-30T03:27:53.974Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/understanding-omics-data.html</loc>
+    <lastmod>2026-10-30T03:27:53.976Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/microbiome-and-composition.html</loc>
+    <lastmod>2026-10-30T03:27:53.977Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/methylation.html</loc>
+    <lastmod>2026-10-30T03:27:53.977Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/data-and-measurement/metabolomics-and-lipidomics.html</loc>
+    <lastmod>2026-10-30T14:40:06.815Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/semiparametric-methods/index.html</loc>
+    <lastmod>2026-10-29T00:42:54.971Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/semiparametric-methods/nuisance-estimation.html</loc>
+    <lastmod>2026-10-30T03:27:53.983Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/multiple-testing.html</loc>
+    <lastmod>2026-10-30T03:27:53.984Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/multivariate-comparisons.html</loc>
+    <lastmod>2026-10-30T03:27:53.985Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/index.html</loc>
+    <lastmod>2026-10-29T04:05:21.622Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/jackknife-pseudo-values.html</loc>
+    <lastmod>2026-10-30T03:27:53.987Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/analysis-problems/network-inference.html</loc>
+    <lastmod>2026-10-30T03:27:53.987Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/method-development/evaluating-methods.html</loc>
+    <lastmod>2026-10-30T03:27:53.993Z</lastmod>
+  </url>
+  <url>
+    <loc>https://tgrimes.github.io/guides/method-development/sensitivity-analysis.html</loc>
+    <lastmod>2026-10-30T03:27:53.994Z</lastmod>
   </url>
   <url>
     <loc>https://tgrimes.github.io/teaching/sta3136/syllabus.html</loc>

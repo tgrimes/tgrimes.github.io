@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Proteomics: from measured evidence to an estimand – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/data-and-measurement/metabolomics-and-lipidomics.html" rel="next">
+<link href="../../guides/data-and-measurement/gene-expression.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Proteomics: from measured evidence to an estimand</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Omics data and measurement</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/understanding-omics-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Understanding an omics dataset</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/preprocessing-and-estimands.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preprocessing and the quantity being estimated</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/gene-expression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Gene expression data, for people who have never seen any</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/proteomics.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Proteomics: from measured evidence to an estimand</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/metabolomics-and-lipidomics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Metabolomics and lipidomics: features, identities, and scales</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/microbiome-and-composition.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Microbiome data and compositional targets</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/data-and-measurement/methylation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Methylation: scales, mixtures, and regional targets</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#start-with-the-feature-not-the-column-heading" id="toc-start-with-the-feature-not-the-column-heading" class="nav-link active" data-scroll-target="#start-with-the-feature-not-the-column-heading"><span class="header-section-number">1</span> Start with the feature, not the column heading</a></li>
+  <li><a href="#aggregation-makes-an-assumption-about-a-shared-signal" id="toc-aggregation-makes-an-assumption-about-a-shared-signal" class="nav-link" data-scroll-target="#aggregation-makes-an-assumption-about-a-shared-signal"><span class="header-section-number">2</span> Aggregation makes an assumption about a shared signal</a></li>
+  <li><a href="#missing-signals-do-not-have-a-single-explanation" id="toc-missing-signals-do-not-have-a-single-explanation" class="nav-link" data-scroll-target="#missing-signals-do-not-have-a-single-explanation"><span class="header-section-number">3</span> Missing signals do not have a single explanation</a></li>
+  <li><a href="#write-the-estimand-on-the-available-scale" id="toc-write-the-estimand-on-the-available-scale" class="nav-link" data-scroll-target="#write-the-estimand-on-the-available-scale"><span class="header-section-number">4</span> Write the estimand on the available scale</a></li>
+  <li><a href="#before-differential-abundance-analysis" id="toc-before-differential-abundance-analysis" class="nav-link" data-scroll-target="#before-differential-abundance-analysis"><span class="header-section-number">5</span> Before differential abundance analysis</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">6</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-prot-01-reconstruct-a-protein-level-claim" id="toc-checkpoint-prot-01-reconstruct-a-protein-level-claim" class="nav-link" data-scroll-target="#checkpoint-prot-01-reconstruct-a-protein-level-claim">Checkpoint · PROT-01 — Reconstruct a protein-level claim</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">7</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Proteomics: from measured evidence to an estimand</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Peptides, protein groups, detection, and abundance contrasts</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> The <a href="../../guides/data-and-measurement/understanding-omics-data.html">Understanding an omics dataset</a> page, means and logarithms; read <a href="../../guides/data-and-measurement/preprocessing-and-estimands.html">Preprocessing and the quantity being estimated</a> alongside this page.</p>
+<section id="start-with-the-feature-not-the-column-heading" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="start-with-the-feature-not-the-column-heading"><span class="header-section-number">1</span> Start with the feature, not the column heading</h2>
+<p>Proteomics measures proteins or evidence about proteins. In <strong>bottom-up mass spectrometry</strong>, proteins are digested into shorter amino-acid sequences called peptides. The instrument measures ions from those peptides, and a pipeline assigns identities and quantities. A protein table is therefore a derived summary, rather than a direct count of intact protein molecules.</p>
+<p>A peptide sequence can occur in more than one protein. If the detected evidence cannot distinguish the candidates, the pipeline can report a <strong>protein group</strong>. A gene symbol used as its display label does not resolve that ambiguity. A <strong>proteoform</strong> is a particular molecular form, for example one affected by sequence processing or modification; a shared-peptide summary may not distinguish such forms. Affinity assays instead measure reagent binding, with their own specificity and calibration requirements. A change in binding signal needs a platform-specific interpretation.</p>
+<p>Before analysis, reconstruct the chain from specimen to run to quantified feature. Record the platform, acquisition and processing versions, feature definition, mapping rules, measurement units, normalization, missing-value codes, and identification confidence. <a href="https://bioconductor.org/packages/release/bioc/vignettes/QFeatures/inst/doc/Processing.html">QFeatures</a> keeps peptide and protein assay levels connected. Identification FDR addresses incorrect identifications among accepted identifications; differential-abundance FDR addresses false group-comparison discoveries. Controlling the first does not automatically control the second.</p>
+<div class="guide-flow">
+<div class="guide-flow-title">
+Which object does the comparison concern?
+</div>
+<ol>
+<li>
+<strong>Independent people and specimens</strong><span>Aliquots, runs, and peptide measurements retain their person and specimen IDs.</span>
+</li>
+<li>
+<strong>Measured evidence</strong><span>Peptide signals or reagent-binding measurements have platform-specific units.</span>
+</li>
+<li>
+<strong>Defined feature summary</strong><span>Mapping and aggregation produce a protein, protein group, or assay target.</span>
+</li>
+<li>
+<strong>Population contrast</strong><span>Specify the scale, population, covariates, and observation process before inference.</span>
+</li>
+</ol>
+</div>
+<p>More peptides can improve measurement of one specimen. They do not create more independently sampled people. Technical replicates are useful for studying assay error; their role differs from biological replication.</p>
+</section>
+<section id="aggregation-makes-an-assumption-about-a-shared-signal" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="aggregation-makes-an-assumption-about-a-shared-signal"><span class="header-section-number">2</span> Aggregation makes an assumption about a shared signal</h2>
+<p>Suppose the idealized log2 intensity for peptide <span class="math inline">p</span> in person <span class="math inline">i</span> is</p>
+<p><span class="math display">
+L_{ip}=a_p+Q_i+\epsilon_{ip}.
+</span></p>
+<p>Here <span class="math inline">a_p</span> is a peptide-specific response and <span class="math inline">Q_i</span> a common protein-level component. Let <span class="math inline">A_i</span> denote group and assume errors have mean zero within each group. If <span class="math inline">a_p</span> is stable across groups, subtraction gives</p>
+<p><span class="math display">
+E[L_{ip}\mid A_i=1]-E[L_{ip}\mid A_i=0]=E[Q_i\mid A_i=1]-E[Q_i\mid A_i=0].
+</span></p>
+<p>The peptide’s baseline response cancels even if one peptide is systematically much brighter than another. Averaging a fixed set of peptides then estimates the shared contrast. It does not make raw intensities directly comparable or calibrate <span class="math inline">Q_i</span> to concentration.</p>
+<p>If specimens contribute different subsets of peptides, the average offset can change: the mean of <span class="math inline">a_p</span> among observed peptides need not stay fixed. Missingness can therefore affect aggregation before a group test. Shared peptides, modifications, interference, or changing proteoform mixtures can also break the model. A discordant peptide warrants investigation; it does not identify a particular mechanism by itself.</p>
+<p>Let <span class="math inline">\mathcal S_i</span> be the peptides observed in specimen <span class="math inline">i</span>. The naïve average of their log2 intensities is</p>
+<p><span class="math display">
+\begin{aligned}
+\overline L_i^{\mathrm{obs}}
+&amp;=Q_i+\overline a_{\mathcal S_i}
+       +\overline\epsilon_{i,\mathcal S_i}.
+\end{aligned}
+</span></p>
+<p>The bars denote averages over the retained peptides. Even with unchanged protein signal <span class="math inline">Q_i</span>, this summary can change when the mean peptide response <span class="math inline">\overline a_{\mathcal S_i}</span> changes.</p>
+<p>The following <strong>noiseless synthetic example</strong> holds <span class="math inline">Q_i=12</span> in every specimen. Five peptides have fixed response offsets <span class="math inline">-2,-1,0,1,2</span>, giving intensities 10 through 14. All five are observed in group 0. In group 1, progressively more of the lower-response peptides are unobserved. The missingness pattern is imposed for this illustration; the measured values that remain do not change. Follow each matrix column down to its average before reading the result.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-protein-peptides" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two vertically aligned panels. Above, five peptide rows and eight specimen columns show unchanged intensities 10 through 14. Group 0 has all five measurements; group 1 progressively lacks the lower-response peptides. Below, the corresponding observed-peptide averages are 12 for specimens S1 to S4, then 12.5, 13, 13.5, and 14 for S5 to S8. The complete-data average is 12 throughout, and the apparent group contrast is 1.25.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-protein-peptides-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="proteomics_files/figure-html/fig-protein-peptides-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: An imposed missingness pattern changes the peptide mix used in each average. Every specimen has protein signal 12, zero errors, and fixed peptide responses. Gray crosses mean unobserved, not zero. The naïve group contrast is +1.25 despite a true contrast of zero."><img src="proteomics_files/figure-html/fig-protein-peptides-1.png" class="img-fluid figure-img" alt="Two vertically aligned panels. Above, five peptide rows and eight specimen columns show unchanged intensities 10 through 14. Group 0 has all five measurements; group 1 progressively lacks the lower-response peptides. Below, the corresponding observed-peptide averages are 12 for specimens S1 to S4, then 12.5, 13, 13.5, and 14 for S5 to S8. The complete-data average is 12 throughout, and the apparent group contrast is 1.25." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-protein-peptides-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: An imposed missingness pattern changes the peptide mix used in each average. Every specimen has protein signal 12, zero errors, and fixed peptide responses. Gray crosses mean unobserved, not zero. The naïve group contrast is +1.25 despite a true contrast of zero.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The apparent contrast comes entirely from changing which peptide offsets enter the average. For example, S8 contributes only peptide E, whose response is high in <strong>both</strong> groups. The group-1 summaries rise without a change in any retained peptide’s intensity. A protein-summary method needs a justified way to handle peptide responses and observation patterns; treating each specimen’s available-peptide average as the same quantity can fail.</p>
+<p><strong>A separate example: discordant peptide changes.</strong> For peptide contrasts 1, 1, and 0, the unweighted average is <span class="math inline">2/3</span>, while the concordant pair averages to 1. These log2 contrasts imply factors <span class="math inline">2^{2/3}\approx1.59</span> and 2 for the defined geometric-mean summaries. The discrepancy shows the role of aggregation; it does not identify which summary is the true molecular change.</p>
+<p>Selecting concordant peptides after looking at group effects can bias the downstream comparison. Prespecify mapping/aggregation or account for selection. Keep the original peptide evidence so a protein-level claim can be checked. <a href="https://www.proteomexchange.org/docs/guidelines_px.pdf">ProteomeXchange’s reporting guidance</a> distinguishes identification results, quantification outputs, and reconstruction files.</p>
+</section>
+<section id="missing-signals-do-not-have-a-single-explanation" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="missing-signals-do-not-have-a-single-explanation"><span class="header-section-number">3</span> Missing signals do not have a single explanation</h2>
+<p>An entry can be missing because the analyte was not detected, a peptide was not selected or confidently identified, quality control removed a value, or a sample failed. Some mechanisms depend on abundance; others need a different model. Do not interpret every missing entry as zero concentration or every positive entry as a calibrated molecule count.</p>
+<p>Consider a threshold mechanism: latent log2 intensity <span class="math inline">L</span> is observed only if <span class="math inline">L&gt;c</span>. The observed-data mean is <span class="math inline">E[L\mid L&gt;c]</span>, not <span class="math inline">E[L]</span>. Detection depends directly on the outcome, so the MAR argument for a missing mean cannot be imported without further assumptions.</p>
+<p>The figure uses <span class="math inline">L=\mu+U</span>, with <span class="math inline">U\sim N(0,1)</span>. Detection is the event <span class="math inline">U&gt;c-\mu</span>. The standard-normal tail identity gives</p>
+<p><span class="math display">
+E[L\mid L&gt;c]
+=\mu+\frac{\varphi(c-\mu)}{1-\Phi(c-\mu)},
+</span></p>
+<p>where <span class="math inline">\varphi</span> and <span class="math inline">\Phi</span> are the normal density and CDF. The added term is positive: only an upper tail is observed. At <span class="math inline">c=10</span>, full group means 9 and 10 become detected means about 10.53 and 10.80. Their contrast falls from 1 to about 0.27 because selection differs between groups. This is what <code>DetectedMean()</code> calculates.</p>
+<p>Knowing a threshold tells us that a non-detected value lies below it, but not where it lies. A parametric censored-data model can extrapolate under assumptions; the unseen distribution is not identified nonparametrically from the inequality alone.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>cutoff <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">6</span>, <span class="dv">12</span>, <span class="at">length.out =</span> <span class="dv">150</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>DetectedMean <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, cutoff) {</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> cutoff <span class="sc">-</span> mu</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  mu <span class="sc">+</span> <span class="fu">dnorm</span>(a) <span class="sc">/</span> <span class="fu">pnorm</span>(a, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>observed_difference <span class="ot">&lt;-</span> <span class="fu">DetectedMean</span>(<span class="dv">10</span>, cutoff) <span class="sc">-</span> <span class="fu">DetectedMean</span>(<span class="dv">9</span>, cutoff)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cutoff, observed_difference, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Detection threshold on latent log2 scale"</span>, <span class="at">ylab =</span> <span class="st">"Group 1 minus group 0 mean"</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1.15</span>))</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="fu">c</span>(<span class="st">"Detected-value contrast"</span>, <span class="st">"Full-population contrast"</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#D55E00"</span>, <span class="st">"#2F80C8"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-protein-detection" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two curves show the difference between detected group means changing with the detection threshold, while the full-population contrast stays at one.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-protein-detection-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="proteomics_files/figure-html/fig-protein-detection-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: A teaching censoring model with unit normal errors. Raising the threshold increasingly separates the mean of detected values from the full mean. This is a population calculation, not a universal proteomics detection model."><img src="proteomics_files/figure-html/fig-protein-detection-1.png" class="img-fluid figure-img" alt="Two curves show the difference between detected group means changing with the detection threshold, while the full-population contrast stays at one." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-protein-detection-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: A teaching censoring model with unit normal errors. Raising the threshold increasingly separates the mean of detected values from the full mean. This is a population calculation, not a universal proteomics detection model.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>Filling every missing value with a low constant replaces an uncertain outcome by an assumed value. If detection fractions differ, the number of inserted constants also differs, changing the group contrast. Treating filled values as observed can understate uncertainty. Imputation needs an observation/outcome model and an uncertainty argument; a complete matrix alone supplies neither.</p>
+<p>A detection-frequency target can be legitimate if explicitly defined, but it concerns the assay and detection rule as well as biology. Start with missingness by feature, group, run order, batch, and specimen quality; do not choose imputation by which method yields more discoveries.</p>
+</section>
+<section id="write-the-estimand-on-the-available-scale" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="write-the-estimand-on-the-available-scale"><span class="header-section-number">4</span> Write the estimand on the available scale</h2>
+<p>For a prespecified, fully observed log2 feature summary <span class="math inline">Y</span>, an unadjusted between-group contrast is <span class="math inline">E[Y\mid A=1]-E[Y\mid A=0]</span>. An adjusted population-standardized contrast can instead be</p>
+<p><span class="math display">
+\begin{aligned}
+\psi&amp;=E_{Z\sim P_*}\{m_1(Z)-m_0(Z)\},\\
+m_a(z)&amp;=E[Y\mid A=a,Z=z].
+\end{aligned}
+</span></p>
+<p><span class="math inline">Z</span> contains the chosen covariates and <span class="math inline">P_*</span> defines one covariate population used for both groups. Compare groups at the same <span class="math inline">z</span>, then average using the same weights. For two equally weighted strata with conditional contrasts 1 and 0, the standardized contrast is <span class="math inline">1/2</span>, irrespective of their different frequencies in the observed groups. Both groups need outcome support at the target covariate values; otherwise modeling requires extrapolation. This remains associational unless additional causal assumptions justify more.</p>
+<p>Outcome regression and, when needed, group/observation probabilities are nuisance functions. The <a href="../../guides/semiparametric-methods/influence-function-to-estimator.html">From an influence function to an estimator</a> page explains augmentation and remainder conditions; an assay-specific missingness mechanism must be identified first. Cross-fitting does not supply concentration calibration or a model for unseen outcomes.</p>
+<p>Exponentiating a mean log2 contrast concerns geometric means of the defined positive measurement. Calling it a concentration ratio requires a calibration argument. Equal loading, reference samples, and internal standards address different sources of variation; record which quantity each normalization anchors. Global shifts can be absorbed by an assumed stable reference. Affinity-assay units likewise require their platform’s interpretation rather than an automatic absolute-abundance claim.</p>
+</section>
+<section id="before-differential-abundance-analysis" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="before-differential-abundance-analysis"><span class="header-section-number">5</span> Before differential abundance analysis</h2>
+<p>Check sample IDs and technical replicates; inspect peptide counts/mapping ambiguity, quality measures, missingness patterns, and reference behavior. Check group–batch overlap and the estimability of the chosen contrast. Freeze the feature family, aggregation, scale, and inclusion rules before testing. Report pointwise uncertainty and the multiplicity procedure separately. The <a href="../../guides/analysis-problems/differential-expression-and-abundance.html">Differential expression and abundance</a> page supplies a design/contrast framework; reuse it only after defending the proteomics measurement and variance assumptions.</p>
+</section>
+<section id="exercises" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="exercises"><span class="header-section-number">6</span> Exercises</h2>
+<p>The checkpoint is this assay specialization’s completion target. Additional practice is optional. Try the checkpoint before opening its hint or solution.</p>
+<div id="checkpoint-prot-01" class="checkpoint">
+<section id="checkpoint-prot-01-reconstruct-a-protein-level-claim" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-prot-01-reconstruct-a-protein-level-claim">Checkpoint · PROT-01 — Reconstruct a protein-level claim</h3>
+<p><strong>Task type:</strong> Interpretation and diagnosis.</p>
+<p>A protein group has three peptides, contrasts 1, 1, and 0 on the log2 scale, and 30% missing values concentrated in controls. There are 20 people per group, each run twice. State the independent replication count, calculate the unweighted peptide-average contrast, and identify what is still needed for a claim about absolute protein abundance.</p>
+<p><strong>Ready to continue when:</strong> you can separate biological replication, aggregation, observation, and calibration assumptions.</p>
+<p><strong>Transfer:</strong> Would adding ten technical runs per person identify the concentrations below a detection threshold?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Follow the specimen–peptide–protein chain; a technical run is not a new person.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>There are 40 independent people under independent sampling, not 80. The average peptide contrast is 2/3. Its protein interpretation needs an aggregation model and mapping evidence. Differential missingness can change the detected-value target; a full-data contrast needs an observation model or sensitivity analysis. Absolute abundance additionally needs calibration. Selecting the two increasing peptides after seeing the contrasts introduces selection.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Vary the peptide offsets in the missingness figure while holding every protein signal at 12. Which observed-peptide averages change? What happens if all peptide offsets are zero? Explain which two ingredients create the apparent group difference.</li>
+<li>In the threshold example, calculate the detected fraction in each group at threshold 10 and describe a sensitivity analysis for the unseen values.</li>
+<li>Audit a protein table: distinguish accession, protein group, gene symbol, peptide count, and quantitative unit.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="reading"><span class="header-section-number">7</span> Reading</h2>
+<ul>
+<li><a href="https://bioconductor.org/packages/release/bioc/vignettes/QFeatures/inst/doc/Processing.html">QFeatures processing vignette</a>: linked assay levels, processing, and aggregation.</li>
+<li><a href="https://www.proteomexchange.org/docs/guidelines_px.pdf">ProteomeXchange submission guidance</a>: identification and quantification records.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/data-and-measurement/gene-expression.html" class="pagination-link" aria-label="Gene expression data, for people who have never seen any">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Gene expression data, for people who have never seen any</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/data-and-measurement/metabolomics-and-lipidomics.html" class="pagination-link" aria-label="Metabolomics and lipidomics: features, identities, and scales">
+        <span class="nav-page-text">Metabolomics and lipidomics: features, identities, and scales</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Proteomics: from measured evidence to an estimand"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Peptides, protein groups, detection, and abundance contrasts"</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>**Before reading:** The <span class="co">[</span><span class="ot">Understanding an omics dataset</span><span class="co">](understanding-omics-data.qmd)</span> page, means and logarithms; read <span class="co">[</span><span class="ot">Preprocessing and the quantity being estimated</span><span class="co">](preprocessing-and-estimands.qmd)</span> alongside this page.</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Start with the feature, not the column heading</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>Proteomics measures proteins or evidence about proteins. In **bottom-up mass spectrometry**, proteins are digested into shorter amino-acid sequences called peptides. The instrument measures ions from those peptides, and a pipeline assigns identities and quantities. A protein table is therefore a derived summary, rather than a direct count of intact protein molecules.</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>A peptide sequence can occur in more than one protein. If the detected evidence cannot distinguish the candidates, the pipeline can report a **protein group**. A gene symbol used as its display label does not resolve that ambiguity. A **proteoform** is a particular molecular form, for example one affected by sequence processing or modification; a shared-peptide summary may not distinguish such forms. Affinity assays instead measure reagent binding, with their own specificity and calibration requirements. A change in binding signal needs a platform-specific interpretation.</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>Before analysis, reconstruct the chain from specimen to run to quantified feature. Record the platform, acquisition and processing versions, feature definition, mapping rules, measurement units, normalization, missing-value codes, and identification confidence. <span class="co">[</span><span class="ot">QFeatures</span><span class="co">](https://bioconductor.org/packages/release/bioc/vignettes/QFeatures/inst/doc/Processing.html)</span> keeps peptide and protein assay levels connected. Identification FDR addresses incorrect identifications among accepted identifications; differential-abundance FDR addresses false group-comparison discoveries. Controlling the first does not automatically control the second.</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>::: {.guide-flow}</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> class</span><span class="op">=</span><span class="st">"guide-flow-title"</span><span class="dt">&gt;</span>Which object does the comparison concern?<span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">ol</span><span class="dt">&gt;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;&lt;</span><span class="kw">strong</span><span class="dt">&gt;</span>Independent people and specimens<span class="dt">&lt;/</span><span class="kw">strong</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="dt">&gt;</span>Aliquots, runs, and peptide measurements retain their person and specimen IDs.<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;&lt;</span><span class="kw">strong</span><span class="dt">&gt;</span>Measured evidence<span class="dt">&lt;/</span><span class="kw">strong</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="dt">&gt;</span>Peptide signals or reagent-binding measurements have platform-specific units.<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;&lt;</span><span class="kw">strong</span><span class="dt">&gt;</span>Defined feature summary<span class="dt">&lt;/</span><span class="kw">strong</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="dt">&gt;</span>Mapping and aggregation produce a protein, protein group, or assay target.<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">li</span><span class="dt">&gt;&lt;</span><span class="kw">strong</span><span class="dt">&gt;</span>Population contrast<span class="dt">&lt;/</span><span class="kw">strong</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="dt">&gt;</span>Specify the scale, population, covariates, and observation process before inference.<span class="dt">&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;/</span><span class="kw">li</span><span class="dt">&gt;</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">ol</span><span class="dt">&gt;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>More peptides can improve measurement of one specimen. They do not create more independently sampled people. Technical replicates are useful for studying assay error; their role differs from biological replication.</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Aggregation makes an assumption about a shared signal</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>Suppose the idealized log2 intensity for peptide $p$ in person $i$ is</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>L_{ip}=a_p+Q_i+\epsilon_{ip}.</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>Here $a_p$ is a peptide-specific response and $Q_i$ a common protein-level component. Let $A_i$ denote group and assume errors have mean zero within each group. If $a_p$ is stable across groups, subtraction gives</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">L_{ip}\mid A_i=1</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">L_{ip}\mid A_i=0</span><span class="co">]</span>=E<span class="co">[</span><span class="ot">Q_i\mid A_i=1</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">Q_i\mid A_i=0</span><span class="co">]</span>.</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>The peptide's baseline response cancels even if one peptide is systematically much brighter than another. Averaging a fixed set of peptides then estimates the shared contrast. It does not make raw intensities directly comparable or calibrate $Q_i$ to concentration.</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>If specimens contribute different subsets of peptides, the average offset can change: the mean of $a_p$ among observed peptides need not stay fixed. Missingness can therefore affect aggregation before a group test. Shared peptides, modifications, interference, or changing proteoform mixtures can also break the model. A discordant peptide warrants investigation; it does not identify a particular mechanism by itself.</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>Let $\mathcal S_i$ be the peptides observed in specimen $i$. The naïve average of their log2 intensities is</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>\overline L_i^{\mathrm{obs}}</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>&amp;=Q_i+\overline a_{\mathcal S_i}</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>       +\overline\epsilon_{i,\mathcal S_i}.</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>The bars denote averages over the retained peptides. Even with unchanged protein signal $Q_i$, this summary can change when the mean peptide response $\overline a_{\mathcal S_i}$ changes.</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>The following **noiseless synthetic example** holds $Q_i=12$ in every specimen. Five peptides have fixed response offsets $-2,-1,0,1,2$, giving intensities 10 through 14. All five are observed in group 0. In group 1, progressively more of the lower-response peptides are unobserved. The missingness pattern is imposed for this illustration; the measured values that remain do not change. Follow each matrix column down to its average before reading the result.</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-protein-peptides</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-width: 7</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 7</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "An imposed missingness pattern changes the peptide mix used in each average. Every specimen has protein signal 12, zero errors, and fixed peptide responses. Gray crosses mean unobserved, not zero. The naïve group contrast is +1.25 despite a true contrast of zero."</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Two vertically aligned panels. Above, five peptide rows and eight specimen columns show unchanged intensities 10 through 14. Group 0 has all five measurements; group 1 progressively lacks the lower-response peptides. Below, the corresponding observed-peptide averages are 12 for specimens S1 to S4, then 12.5, 13, 13.5, and 14 for S5 to S8. The complete-data average is 12 throughout, and the apparent group contrast is 1.25."</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>specimen <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"S"</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>)</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>group <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">each =</span> <span class="dv">4</span>)</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>offset <span class="ot">&lt;-</span> <span class="sc">-</span><span class="dv">2</span><span class="sc">:</span><span class="dv">2</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>protein_signal <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="dv">12</span>, <span class="fu">length</span>(specimen))</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>complete <span class="ot">&lt;-</span> <span class="fu">outer</span>(offset, protein_signal, <span class="st">"+"</span>)</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a><span class="fu">dimnames</span>(complete) <span class="ot">&lt;-</span> <span class="fu">list</span>(LETTERS[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>], specimen)</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>observed <span class="ot">&lt;-</span> complete</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">8</span>) observed[<span class="fu">seq_len</span>(j <span class="sc">-</span> <span class="dv">4</span>), j] <span class="ot">&lt;-</span> <span class="cn">NA_real_</span></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>available_mean <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(observed, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>number_used <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="sc">!</span><span class="fu">is.na</span>(observed))</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>group_means <span class="ot">&lt;-</span> <span class="fu">tapply</span>(available_mean, group, mean)</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>old_par <span class="ot">&lt;-</span> <span class="fu">par</span>(<span class="at">no.readonly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="fu">layout</span>(<span class="fu">matrix</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>, <span class="at">ncol =</span> <span class="dv">1</span>), <span class="at">heights =</span> <span class="fu">c</span>(<span class="fl">1.5</span>, <span class="dv">1</span>))</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>group_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>)</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>cell_colors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#EDF4F8"</span>, <span class="st">"#C5DDEB"</span>, <span class="st">"#8CB9D1"</span>, <span class="st">"#457E9E"</span>, <span class="st">"#164A68"</span>)</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="co"># Matrix columns and summary points use the same horizontal positions.</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">4.5</span>, <span class="fl">3.6</span>, <span class="fl">0.8</span>), <span class="at">cex =</span> <span class="fl">1.3</span>, <span class="at">xpd =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.new</span>()</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="fu">plot.window</span>(<span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">8.5</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">6.35</span>), <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>)</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"A  Which peptide measurements enter each average?"</span>, <span class="at">side =</span> <span class="dv">3</span>,</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>      <span class="at">line =</span> <span class="fl">2.1</span>, <span class="at">adj =</span> <span class="dv">0</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"Protein signal stays at 12 in all eight specimens"</span>, <span class="at">side =</span> <span class="dv">3</span>,</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>      <span class="at">line =</span> <span class="fl">1.35</span>, <span class="at">adj =</span> <span class="dv">0</span>, <span class="at">cex =</span> <span class="fl">0.76</span>)</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"Numbers: observed log2 intensity    Gray x: unobserved"</span>, <span class="at">side =</span> <span class="dv">3</span>,</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>      <span class="at">line =</span> <span class="fl">0.6</span>, <span class="at">adj =</span> <span class="dv">0</span>, <span class="at">cex =</span> <span class="fl">0.76</span>)</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (g <span class="cf">in</span> <span class="dv">0</span><span class="sc">:</span><span class="dv">1</span>) {</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>  xx <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">0.55</span>, <span class="fl">4.45</span>) <span class="sc">+</span> <span class="dv">4</span> <span class="sc">*</span> g</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">segments</span>(xx[<span class="dv">1</span>], <span class="fl">5.72</span>, xx[<span class="dv">2</span>], <span class="fl">5.72</span>, <span class="at">col =</span> group_colors[g <span class="sc">+</span> <span class="dv">1</span>], <span class="at">lwd =</span> <span class="dv">3</span>)</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">text</span>(<span class="fu">mean</span>(xx), <span class="fl">6.08</span>, <span class="fu">paste</span>(<span class="st">"Group"</span>, g), <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">0.88</span>)</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (p <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>) <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>) {</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>  yy <span class="ot">&lt;-</span> <span class="dv">6</span> <span class="sc">-</span> p</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>  missing <span class="ot">&lt;-</span> <span class="fu">is.na</span>(observed[p, j])</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rect</span>(j <span class="sc">-</span> <span class="fl">0.47</span>, yy <span class="sc">-</span> <span class="fl">0.44</span>, j <span class="sc">+</span> <span class="fl">0.47</span>, yy <span class="sc">+</span> <span class="fl">0.44</span>,</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="cf">if</span> (missing) <span class="st">"#E7E7E7"</span> <span class="cf">else</span> cell_colors[p], <span class="at">border =</span> <span class="cn">NA</span>)</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (missing) {</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>    <span class="fu">segments</span>(j <span class="sc">-</span> <span class="fl">0.12</span>, yy <span class="sc">-</span> <span class="fl">0.12</span>, j <span class="sc">+</span> <span class="fl">0.12</span>, yy <span class="sc">+</span> <span class="fl">0.12</span>, <span class="at">col =</span> <span class="st">"#666666"</span>, <span class="at">lwd =</span> <span class="fl">1.4</span>)</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>    <span class="fu">segments</span>(j <span class="sc">-</span> <span class="fl">0.12</span>, yy <span class="sc">+</span> <span class="fl">0.12</span>, j <span class="sc">+</span> <span class="fl">0.12</span>, yy <span class="sc">-</span> <span class="fl">0.12</span>, <span class="at">col =</span> <span class="st">"#666666"</span>, <span class="at">lwd =</span> <span class="fl">1.4</span>)</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>    <span class="fu">text</span>(j, yy, observed[p, j], <span class="at">cex =</span> <span class="fl">0.87</span>,</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>         <span class="at">col =</span> <span class="cf">if</span> (p <span class="sc">&gt;=</span> <span class="dv">4</span>) <span class="st">"white"</span> <span class="cf">else</span> <span class="st">"#182C38"</span>)</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="dv">5</span><span class="sc">:</span><span class="dv">1</span>, <span class="at">labels =</span> LETTERS[<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>], <span class="at">las =</span> <span class="dv">1</span>, <span class="at">tick =</span> <span class="cn">FALSE</span>, <span class="at">cex.axis =</span> <span class="fl">0.82</span>)</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"Peptide"</span>, <span class="at">side =</span> <span class="dv">2</span>, <span class="at">line =</span> <span class="fl">2.4</span>, <span class="at">cex =</span> <span class="fl">0.85</span>)</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">0.38</span>, <span class="fl">0.16</span>, <span class="st">"Peptides used"</span>, <span class="at">adj =</span> <span class="dv">1</span>, <span class="at">xpd =</span> <span class="cn">NA</span>, <span class="at">cex =</span> <span class="fl">0.68</span>, <span class="at">col =</span> <span class="st">"#555555"</span>)</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, <span class="fl">0.16</span>, number_used, <span class="at">cex =</span> <span class="fl">0.72</span>, <span class="at">col =</span> <span class="st">"#555555"</span>)</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(<span class="fl">4.5</span>, <span class="fl">0.55</span>, <span class="fl">4.5</span>, <span class="fl">5.45</span>, <span class="at">col =</span> <span class="st">"#888888"</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="fl">3.1</span>, <span class="fl">4.5</span>, <span class="fl">2.8</span>, <span class="fl">0.8</span>), <span class="at">cex =</span> <span class="fl">1.3</span>)</span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, available_mean, <span class="at">type =</span> <span class="st">"n"</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="fl">0.5</span>, <span class="fl">8.5</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">11.65</span>, <span class="fl">14.65</span>),</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>     <span class="at">xaxs =</span> <span class="st">"i"</span>, <span class="at">yaxs =</span> <span class="st">"i"</span>, <span class="at">axes =</span> <span class="cn">FALSE</span>, <span class="at">xlab =</span> <span class="st">""</span>, <span class="at">ylab =</span> <span class="st">""</span>)</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"B  Changing the subset shifts the summary"</span>, <span class="at">side =</span> <span class="dv">3</span>,</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>      <span class="at">line =</span> <span class="fl">1.4</span>, <span class="at">adj =</span> <span class="dv">0</span>, <span class="at">font =</span> <span class="dv">2</span>, <span class="at">cex =</span> <span class="fl">0.95</span>)</span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="fu">sprintf</span>(<span class="st">"Group means: %.2f vs %.2f  |  apparent contrast: +%.2f"</span>,</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>              group_means[<span class="dv">1</span>], group_means[<span class="dv">2</span>], <span class="fu">diff</span>(group_means)),</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>      <span class="at">side =</span> <span class="dv">3</span>, <span class="at">line =</span> <span class="fl">0.1</span>, <span class="at">adj =</span> <span class="dv">0</span>, <span class="at">cex =</span> <span class="fl">0.76</span>)</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">12</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#777777"</span>)</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a><span class="fu">segments</span>(<span class="fl">4.5</span>, <span class="fl">11.65</span>, <span class="fl">4.5</span>, <span class="fl">14.65</span>, <span class="at">col =</span> <span class="st">"#888888"</span>, <span class="at">lty =</span> <span class="dv">3</span>)</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a><span class="fu">points</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, available_mean, <span class="at">pch =</span> <span class="dv">21</span>, <span class="at">bg =</span> group_colors[group <span class="sc">+</span> <span class="dv">1</span>],</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> group_colors[group <span class="sc">+</span> <span class="dv">1</span>], <span class="at">cex =</span> <span class="fl">1.15</span>)</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="dv">5</span><span class="sc">:</span><span class="dv">8</span>, available_mean[<span class="dv">5</span><span class="sc">:</span><span class="dv">8</span>] <span class="sc">+</span> <span class="fl">0.18</span>,</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>     <span class="fu">format</span>(available_mean[<span class="dv">5</span><span class="sc">:</span><span class="dv">8</span>], <span class="at">trim =</span> <span class="cn">TRUE</span>), <span class="at">cex =</span> <span class="fl">0.76</span>)</span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a><span class="fu">text</span>(<span class="fl">0.7</span>, <span class="fl">11.78</span>, <span class="st">"Complete-data mean = 12 for every specimen"</span>, <span class="at">adj =</span> <span class="dv">0</span>,</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>     <span class="at">cex =</span> <span class="fl">0.74</span>, <span class="at">col =</span> <span class="st">"#555555"</span>)</span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">1</span>, <span class="at">at =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">8</span>, <span class="at">labels =</span> specimen, <span class="at">tick =</span> <span class="cn">FALSE</span>, <span class="at">cex.axis =</span> <span class="fl">0.8</span>)</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">2</span>, <span class="at">at =</span> <span class="dv">12</span><span class="sc">:</span><span class="dv">14</span>, <span class="at">las =</span> <span class="dv">1</span>, <span class="at">cex.axis =</span> <span class="fl">0.82</span>)</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"Mean log2 intensity"</span>, <span class="at">side =</span> <span class="dv">2</span>, <span class="at">line =</span> <span class="fl">2.8</span>, <span class="at">cex =</span> <span class="fl">0.85</span>)</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">"Specimen (aligned with the matrix above)"</span>, <span class="at">side =</span> <span class="dv">1</span>, <span class="at">line =</span> <span class="fl">1.6</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(old_par)</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>The apparent contrast comes entirely from changing which peptide offsets enter the average. For example, S8 contributes only peptide E, whose response is high in **both** groups. The group-1 summaries rise without a change in any retained peptide's intensity. A protein-summary method needs a justified way to handle peptide responses and observation patterns; treating each specimen's available-peptide average as the same quantity can fail.</span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>**A separate example: discordant peptide changes.** For peptide contrasts 1, 1, and 0, the unweighted average is $2/3$, while the concordant pair averages to 1. These log2 contrasts imply factors $2^{2/3}\approx1.59$ and 2 for the defined geometric-mean summaries. The discrepancy shows the role of aggregation; it does not identify which summary is the true molecular change.</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>Selecting concordant peptides after looking at group effects can bias the downstream comparison. Prespecify mapping/aggregation or account for selection. Keep the original peptide evidence so a protein-level claim can be checked. <span class="co">[</span><span class="ot">ProteomeXchange's reporting guidance</span><span class="co">](https://www.proteomexchange.org/docs/guidelines_px.pdf)</span> distinguishes identification results, quantification outputs, and reconstruction files.</span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a><span class="fu">## Missing signals do not have a single explanation</span></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>An entry can be missing because the analyte was not detected, a peptide was not selected or confidently identified, quality control removed a value, or a sample failed. Some mechanisms depend on abundance; others need a different model. Do not interpret every missing entry as zero concentration or every positive entry as a calibrated molecule count.</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>Consider a threshold mechanism: latent log2 intensity $L$ is observed only if $L&gt;c$. The observed-data mean is $E<span class="co">[</span><span class="ot">L\mid L&gt;c</span><span class="co">]</span>$, not $E<span class="co">[</span><span class="ot">L</span><span class="co">]</span>$. Detection depends directly on the outcome, so the MAR argument for a missing mean cannot be imported without further assumptions.</span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>The figure uses $L=\mu+U$, with $U\sim N(0,1)$. Detection is the event $U&gt;c-\mu$. The standard-normal tail identity gives</span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">L\mid L&gt;c</span><span class="co">]</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>=\mu+\frac{\varphi(c-\mu)}{1-\Phi(c-\mu)},</span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>where $\varphi$ and $\Phi$ are the normal density and CDF. The added term is positive: only an upper tail is observed. At $c=10$, full group means 9 and 10 become detected means about 10.53 and 10.80. Their contrast falls from 1 to about 0.27 because selection differs between groups. This is what <span class="in">`DetectedMean()`</span> calculates.</span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>Knowing a threshold tells us that a non-detected value lies below it, but not where it lies. A parametric censored-data model can extrapolate under assumptions; the unseen distribution is not identified nonparametrically from the inequality alone.</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-protein-detection</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-height: 5</span></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "A teaching censoring model with unit normal errors. Raising the threshold increasingly separates the mean of detected values from the full mean. This is a population calculation, not a universal proteomics detection model."</span></span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Two curves show the difference between detected group means changing with the detection threshold, while the full-population contrast stays at one."</span></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>cutoff <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="dv">6</span>, <span class="dv">12</span>, <span class="at">length.out =</span> <span class="dv">150</span>)</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>DetectedMean <span class="ot">&lt;-</span> <span class="cf">function</span>(mu, cutoff) {</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>  a <span class="ot">&lt;-</span> cutoff <span class="sc">-</span> mu</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>  mu <span class="sc">+</span> <span class="fu">dnorm</span>(a) <span class="sc">/</span> <span class="fu">pnorm</span>(a, <span class="at">lower.tail =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>observed_difference <span class="ot">&lt;-</span> <span class="fu">DetectedMean</span>(<span class="dv">10</span>, cutoff) <span class="sc">-</span> <span class="fu">DetectedMean</span>(<span class="dv">9</span>, cutoff)</span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cutoff, observed_difference, <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#D55E00"</span>,</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Detection threshold on latent log2 scale"</span>, <span class="at">ylab =</span> <span class="st">"Group 1 minus group 0 mean"</span>,</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">1.15</span>))</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">1</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>)</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="fu">c</span>(<span class="st">"Detected-value contrast"</span>, <span class="st">"Full-population contrast"</span>),</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#D55E00"</span>, <span class="st">"#2F80C8"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">lwd =</span> <span class="dv">2</span>, <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>Filling every missing value with a low constant replaces an uncertain outcome by an assumed value. If detection fractions differ, the number of inserted constants also differs, changing the group contrast. Treating filled values as observed can understate uncertainty. Imputation needs an observation/outcome model and an uncertainty argument; a complete matrix alone supplies neither.</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>A detection-frequency target can be legitimate if explicitly defined, but it concerns the assay and detection rule as well as biology. Start with missingness by feature, group, run order, batch, and specimen quality; do not choose imputation by which method yields more discoveries.</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a><span class="fu">## Write the estimand on the available scale</span></span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>For a prespecified, fully observed log2 feature summary $Y$, an unadjusted between-group contrast is $E<span class="co">[</span><span class="ot">Y\mid A=1</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">Y\mid A=0</span><span class="co">]</span>$. An adjusted population-standardized contrast can instead be</span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>\psi&amp;=E_{Z\sim P_*}<span class="sc">\{</span>m_1(Z)-m_0(Z)<span class="sc">\}</span>,<span class="sc">\\</span></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>m_a(z)&amp;=E<span class="co">[</span><span class="ot">Y\mid A=a,Z=z</span><span class="co">]</span>.</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>$Z$ contains the chosen covariates and $P_*$ defines one covariate population used for both groups. Compare groups at the same $z$, then average using the same weights. For two equally weighted strata with conditional contrasts 1 and 0, the standardized contrast is $1/2$, irrespective of their different frequencies in the observed groups. Both groups need outcome support at the target covariate values; otherwise modeling requires extrapolation. This remains associational unless additional causal assumptions justify more.</span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>Outcome regression and, when needed, group/observation probabilities are nuisance functions. The <span class="co">[</span><span class="ot">From an influence function to an estimator</span><span class="co">](../semiparametric-methods/influence-function-to-estimator.qmd)</span> page explains augmentation and remainder conditions; an assay-specific missingness mechanism must be identified first. Cross-fitting does not supply concentration calibration or a model for unseen outcomes.</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>Exponentiating a mean log2 contrast concerns geometric means of the defined positive measurement. Calling it a concentration ratio requires a calibration argument. Equal loading, reference samples, and internal standards address different sources of variation; record which quantity each normalization anchors. Global shifts can be absorbed by an assumed stable reference. Affinity-assay units likewise require their platform's interpretation rather than an automatic absolute-abundance claim.</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a><span class="fu">## Before differential abundance analysis</span></span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>Check sample IDs and technical replicates; inspect peptide counts/mapping ambiguity, quality measures, missingness patterns, and reference behavior. Check group–batch overlap and the estimability of the chosen contrast. Freeze the feature family, aggregation, scale, and inclusion rules before testing. Report pointwise uncertainty and the multiplicity procedure separately. The <span class="co">[</span><span class="ot">Differential expression and abundance</span><span class="co">](../analysis-problems/differential-expression-and-abundance.qmd)</span> page supplies a design/contrast framework; reuse it only after defending the proteomics measurement and variance assumptions.</span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>The checkpoint is this assay specialization's completion target. Additional practice is optional. Try the checkpoint before opening its hint or solution.</span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-prot-01 .checkpoint}</span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · PROT-01 — Reconstruct a protein-level claim {.unnumbered}</span></span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>**Task type:** Interpretation and diagnosis.</span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>A protein group has three peptides, contrasts 1, 1, and 0 on the log2 scale, and 30% missing values concentrated in controls. There are 20 people per group, each run twice. State the independent replication count, calculate the unweighted peptide-average contrast, and identify what is still needed for a claim about absolute protein abundance.</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can separate biological replication, aggregation, observation, and calibration assumptions.</span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>**Transfer:** Would adding ten technical runs per person identify the concentrations below a detection threshold?</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>Follow the specimen–peptide–protein chain; a technical run is not a new person.</span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>There are 40 independent people under independent sampling, not 80. The average peptide contrast is 2/3. Its protein interpretation needs an aggregation model and mapping evidence. Differential missingness can change the detected-value target; a full-data contrast needs an observation model or sensitivity analysis. Absolute abundance additionally needs calibration. Selecting the two increasing peptides after seeing the contrasts introduces selection.</span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Vary the peptide offsets in the missingness figure while holding every protein signal at 12. Which observed-peptide averages change? What happens if all peptide offsets are zero? Explain which two ingredients create the apparent group difference.</span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>In the threshold example, calculate the detected fraction in each group at threshold 10 and describe a sensitivity analysis for the unseen values.</span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Audit a protein table: distinguish accession, protein group, gene symbol, peptide count, and quantitative unit.</span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">QFeatures processing vignette</span><span class="co">](https://bioconductor.org/packages/release/bioc/vignettes/QFeatures/inst/doc/Processing.html)</span>: linked assay levels, processing, and aggregation.</span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">ProteomeXchange submission guidance</span><span class="co">](https://www.proteomexchange.org/docs/guidelines_px.pdf)</span>: identification and quantification records.</span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

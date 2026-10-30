@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Evaluating a statistical method – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/method-development/sensitivity-analysis.html" rel="next">
+<link href="../../guides/method-development/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Evaluating a statistical method</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/method-development/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Developing and evaluating methods</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/method-development/evaluating-methods.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Evaluating a statistical method</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/method-development/sensitivity-analysis.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sensitivity analysis for assumptions and research decisions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/method-development/simulation-studies.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Simulation studies for methods research</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#evaluate-a-claim-not-a-method-name" id="toc-evaluate-a-claim-not-a-method-name" class="nav-link active" data-scroll-target="#evaluate-a-claim-not-a-method-name"><span class="header-section-number">1</span> Evaluate a claim, not a method name</a></li>
+  <li><a href="#choose-measures-that-answer-the-claim" id="toc-choose-measures-that-answer-the-claim" class="nav-link" data-scroll-target="#choose-measures-that-answer-the-claim"><span class="header-section-number">2</span> Choose measures that answer the claim</a></li>
+  <li><a href="#a-precise-example-shrinkage-toward-zero" id="toc-a-precise-example-shrinkage-toward-zero" class="nav-link" data-scroll-target="#a-precise-example-shrinkage-toward-zero"><span class="header-section-number">3</span> A precise example: shrinkage toward zero</a>
+  <ul class="collapse">
+  <li><a href="#consistency-alone-is-not-enough-for-inference" id="toc-consistency-alone-is-not-enough-for-inference" class="nav-link" data-scroll-target="#consistency-alone-is-not-enough-for-inference"><span class="header-section-number">3.1</span> Consistency alone is not enough for inference</a></li>
+  </ul></li>
+  <li><a href="#compare-procedures-on-the-same-datasets" id="toc-compare-procedures-on-the-same-datasets" class="nav-link" data-scroll-target="#compare-procedures-on-the-same-datasets"><span class="header-section-number">4</span> Compare procedures on the same datasets</a>
+  <ul class="collapse">
+  <li><a href="#calculate-uncertainty-in-a-paired-difference" id="toc-calculate-uncertainty-in-a-paired-difference" class="nav-link" data-scroll-target="#calculate-uncertainty-in-a-paired-difference"><span class="header-section-number">4.1</span> Calculate uncertainty in a paired difference</a></li>
+  </ul></li>
+  <li><a href="#failures-are-part-of-performance" id="toc-failures-are-part-of-performance" class="nav-link" data-scroll-target="#failures-are-part-of-performance"><span class="header-section-number">5</span> Failures are part of performance</a></li>
+  <li><a href="#build-a-useful-evaluation-grid" id="toc-build-a-useful-evaluation-grid" class="nav-link" data-scroll-target="#build-a-useful-evaluation-grid"><span class="header-section-number">6</span> Build a useful evaluation grid</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">7</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-eval-01-separate-target-bias-from-uncertainty-calibration" id="toc-checkpoint-eval-01-separate-target-bias-from-uncertainty-calibration" class="nav-link" data-scroll-target="#checkpoint-eval-01-separate-target-bias-from-uncertainty-calibration">Checkpoint · EVAL-01 — Separate target bias from uncertainty calibration</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">8</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Evaluating a statistical method</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Targets, limits, uncertainty, and computational reliability</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> Read <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a>; basic means, variance, and confidence intervals are assumed.</p>
+<section id="evaluate-a-claim-not-a-method-name" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="evaluate-a-claim-not-a-method-name"><span class="header-section-number">1</span> Evaluate a claim, not a method name</h2>
+<p>A method can have a small standard error and still answer the wrong question. Before comparing procedures, write the population target <span class="math inline">\psi(P)</span>, the limit of each procedure, and the claim being evaluated: consistency, confidence-interval coverage, efficiency, robustness, prediction, or computational reliability. Those claims require different evidence.</p>
+<p>For an omics example, a pooled coefficient, an adjusted group contrast, and a standardized population contrast may differ even with infinitely many participants. First use <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> to determine whether a comparison has a common target. Then assess finite-sample behavior.</p>
+<p>There are three sources of discrepancy to keep apart. <strong>Target mismatch</strong> means the procedure approaches a different population quantity. <strong>Sampling error</strong> is variation caused by which people enter a finite dataset. <strong>Numerical error</strong> arises when the implementation cannot compute its intended answer accurately. Increasing the sample size, increasing simulation replicates, and tightening an optimizer’s tolerance address different problems.</p>
+</section>
+<section id="choose-measures-that-answer-the-claim" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="choose-measures-that-answer-the-claim"><span class="header-section-number">2</span> Choose measures that answer the claim</h2>
+<p>Suppose a scenario has fixed population truth <span class="math inline">\theta</span> and produces R independent datasets. For replicate r, retain the estimate <span class="math inline">\hat\theta_r</span>, reported SE <span class="math inline">\hat s_r</span>, interval <span class="math inline">I_r</span>, and fitting status. Then the main summaries are</p>
+<p><span class="math display">
+\begin{aligned}
+\widehat{\operatorname{Bias}}&amp;=\overline{\hat\theta}-\theta,\\
+s_{\rm emp}^2&amp;=\frac1{R-1}\sum_r
+(\hat\theta_r-\overline{\hat\theta})^2,\\
+\overline{\operatorname{SE}}&amp;=\frac1R\sum_r\hat s_r,\\
+\widehat{\operatorname{MSE}}&amp;=\frac1R\sum_r(\hat\theta_r-\theta)^2,\\
+\widehat{\operatorname{Coverage}}&amp;=\frac1R\sum_r1\{\theta\in I_r\}.
+\end{aligned}
+</span></p>
+<p>Bias measures the average signed error; positive and negative errors can cancel. MSE averages squared errors, penalizing both bias and variation. Empirical SD measures how estimates vary <strong>between datasets</strong>. Mean SE summarizes what the method reports <strong>within datasets</strong>. Coverage asks whether the intervals actually include the common target at the advertised frequency. Comparing interval length is meaningful alongside coverage: very short intervals are easy to produce if they miss the target.</p>
+<p>For testing, rejection under a true scientific null estimates Type I error; rejection under a specified alternative estimates power. For a family of omics hypotheses, estimate FDR by averaging one false discovery proportion per dataset. Genes and edges from the same dataset are not independent simulation replicates. See <a href="../../guides/analysis-problems/multiple-testing.html">Multiple testing when the tests are not independent</a> for that distinction.</p>
+<p>For the formulas above assume all fits return usable results; the failure section below explains the denominators when they do not. If truth changes randomly between replicates, also state whether the summaries average over that random-truth distribution or concern one fixed parameter. Those are different evaluation claims.</p>
+</section>
+<section id="a-precise-example-shrinkage-toward-zero" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="a-precise-example-shrinkage-toward-zero"><span class="header-section-number">3</span> A precise example: shrinkage toward zero</h2>
+<p>Let independent <span class="math inline">Y_i\sim N(\mu,1)</span> and suppose the target is <span class="math inline">\mu</span>. Compare the sample mean with <span class="math inline">\tilde\mu=0.9\bar Y</span>. Their limits are <span class="math inline">\mu</span> and <span class="math inline">0.9\mu</span>. For the second procedure,</p>
+<p><span class="math display">
+\begin{aligned}
+\operatorname{Bias}(\tilde\mu)&amp;=-0.1\mu,\\
+\operatorname{Var}(\tilde\mu)&amp;=0.81/n.
+\end{aligned}
+</span></p>
+<p>Its sampling SD is smaller: multiplying the sample mean by 0.9 multiplies its variance by <span class="math inline">0.9^2</span>. But</p>
+<p><span class="math display">
+\tilde\mu-\mu=0.9(\bar Y-\mu)-0.1\mu.
+</span></p>
+<p>The first term is sampling noise that shrinks with n; the second is a fixed displacement from the target. A smaller SE can describe the first term correctly while omitting the second completely. The bias measured in units of sampling SD is <span class="math inline">-\mu\sqrt n/9</span>, whose magnitude grows when <span class="math inline">\mu\ne0</span>.</p>
+<p>Let <span class="math inline">c_n</span> be the 97.5th percentile of <span class="math inline">t_{n-1}</span>. Compare the usual mean interval with the naively shrunken interval,</p>
+<p><span class="math display">
+\begin{aligned}
+&amp;\bar Y\pm c_n\frac{s}{\sqrt n},\\
+&amp;\tilde\mu\pm c_n\frac{0.9s}{\sqrt n}.
+\end{aligned}
+</span></p>
+<p>Under the normal generator, the first interval has exact 95% coverage for <span class="math inline">\mu</span>. The second is the first interval multiplied by 0.9, so it covers <span class="math inline">0.9\mu</span> at 95%, but generally does not cover <span class="math inline">\mu</span> at that rate. At <span class="math inline">\mu=0</span> those targets coincide. At <span class="math inline">\mu=1</span>, the interval shrinks around 0.9 while the target stays at 1. Dividing the shrunken estimate and both endpoints by 0.9 recovers ordinary mean inference; simply shrinking the center and SE does not provide that correction.</p>
+<p>The MSE decomposition makes a different tradeoff:</p>
+<p><span class="math display">
+\operatorname{MSE}(\tilde\mu)=0.01\mu^2+0.81/n.
+</span></p>
+<p>At <span class="math inline">\mu=1,n=10</span> this is 0.091, less than the sample mean’s 0.1. That point-estimation advantage does not establish consistency or interval coverage. For a nonzero fixed <span class="math inline">\mu</span>, the MSE advantage disappears once <span class="math inline">n\ge19/\mu^2</span>. Always say which loss or inferential property makes one procedure preferable.</p>
+<section id="consistency-alone-is-not-enough-for-inference" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="consistency-alone-is-not-enough-for-inference"><span class="header-section-number">3.1</span> Consistency alone is not enough for inference</h3>
+<p>Now let the multiplier approach one: <span class="math inline">\tilde\mu_n=(1-n^{-1/4})\bar Y</span>. Both the multiplier and the sample mean converge to their desired limits, so this estimator is consistent. Its bias is nevertheless <span class="math inline">-\mu n^{-1/4}</span>, larger than its root-n sampling SD. At a nonzero target, ordinary centered intervals can still fail increasingly badly. A multiplier <span class="math inline">1-n^{-1}</span> instead has bias negligible at the root-n scale. This is the same reason a semiparametric inference argument controls the <strong>rate</strong> of a nuisance remainder, rather than asking only whether it converges to zero.</p>
+</section>
+</section>
+<section id="compare-procedures-on-the-same-datasets" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="compare-procedures-on-the-same-datasets"><span class="header-section-number">4</span> Compare procedures on the same datasets</h2>
+<p>The following experiment uses the same simulated sample for both procedures in each replicate. This keeps the comparison tied to the same scenarios and permits a paired analysis. Pairing reduces Monte Carlo uncertainty when the performance contributions have positive covariance; it is not a universal variance-reduction theorem for any two algorithms. All values are synthetic, with truth supplied by the generator.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">61</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>records <span class="ot">&lt;-</span> <span class="fu">list</span>(); i <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (mu <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="cf">for</span> (n <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">100</span>, <span class="dv">500</span>)) {</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> n_sim, <span class="at">mean =</span> mu), <span class="at">nrow =</span> n)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  average <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(y)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  sample_sd <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">colSums</span>(<span class="fu">sweep</span>(y, <span class="dv">2</span>, average)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> (n <span class="sc">-</span> <span class="dv">1</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (shrink <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.9</span>)) {</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    estimate <span class="ot">&lt;-</span> shrink <span class="sc">*</span> average</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    se <span class="ot">&lt;-</span> shrink <span class="sc">*</span> sample_sd <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    covered <span class="ot">&lt;-</span> <span class="fu">abs</span>(estimate <span class="sc">-</span> mu) <span class="sc">&lt;=</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    i <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>    records[[i]] <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">mu =</span> mu, <span class="at">n =</span> n, <span class="at">replicate =</span> <span class="fu">seq_len</span>(n_sim),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">method =</span> <span class="cf">if</span> (shrink <span class="sc">==</span> <span class="dv">1</span>) <span class="st">"Mean"</span> <span class="cf">else</span> <span class="st">"0.9 x mean"</span>,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>      estimate, se, covered, <span class="at">squared_error =</span> (estimate <span class="sc">-</span> mu)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>records <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, records)</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>cells <span class="ot">&lt;-</span> <span class="fu">split</span>(records, <span class="fu">interaction</span>(records<span class="sc">$</span>mu, records<span class="sc">$</span>n, records<span class="sc">$</span>method))</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>performance <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(cells, <span class="cf">function</span>(d) {</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  R <span class="ot">&lt;-</span> <span class="fu">nrow</span>(d); coverage <span class="ot">&lt;-</span> <span class="fu">mean</span>(d<span class="sc">$</span>covered)</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(d[<span class="dv">1</span>, <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"n"</span>, <span class="st">"method"</span>)],</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">bias =</span> <span class="fu">mean</span>(d<span class="sc">$</span>estimate) <span class="sc">-</span> d<span class="sc">$</span>mu[<span class="dv">1</span>], <span class="at">empirical_sd =</span> <span class="fu">sd</span>(d<span class="sc">$</span>estimate),</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_se =</span> <span class="fu">mean</span>(d<span class="sc">$</span>se), <span class="at">MSE =</span> <span class="fu">mean</span>(d<span class="sc">$</span>squared_error), coverage,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">bias_mcse =</span> <span class="fu">sd</span>(d<span class="sc">$</span>estimate) <span class="sc">/</span> <span class="fu">sqrt</span>(R),</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">coverage_mcse =</span> <span class="fu">sqrt</span>(coverage <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> coverage) <span class="sc">/</span> R))</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(performance, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code> mu   n     method      bias empirical_sd mean_se     MSE coverage bias_mcse
+  0  20 0.9 x mean  0.009122       0.2036  0.1984 0.04148    0.954   0.00644
+  1  20 0.9 x mean -0.105133       0.1997  0.1995 0.05091    0.911   0.00632
+  0 100 0.9 x mean  0.000158       0.0886  0.0899 0.00785    0.950   0.00280
+  1 100 0.9 x mean -0.094711       0.0923  0.0900 0.01749    0.810   0.00292
+  0 500 0.9 x mean  0.000217       0.0413  0.0403 0.00170    0.942   0.00130
+  1 500 0.9 x mean -0.100396       0.0427  0.0402 0.01190    0.300   0.00135
+  0  20       Mean  0.010135       0.2262  0.2204 0.05120    0.954   0.00715
+  1  20       Mean -0.005703       0.2219  0.2217 0.04923    0.946   0.00702
+  0 100       Mean  0.000176       0.0985  0.0999 0.00969    0.950   0.00311
+  1 100       Mean  0.005877       0.1026  0.1000 0.01055    0.946   0.00324
+  0 500       Mean  0.000241       0.0458  0.0447 0.00210    0.942   0.00145
+  1 500       Mean -0.000440       0.0474  0.0447 0.00225    0.935   0.00150
+ coverage_mcse
+       0.00662
+       0.00900
+       0.00689
+       0.01241
+       0.00739
+       0.01449
+       0.00662
+       0.00715
+       0.00689
+       0.00715
+       0.00739
+       0.00780</code></pre>
+</div>
+</div>
+<p>Each row in <code>records</code> belongs to one method on one replicate; the replicate ID is shared across methods within the same scenario. Summaries are computed afterwards. <strong>MCSE</strong> describes uncertainty in such a summary because the simulation uses finitely many datasets. Here bias MCSE is empirical SD divided by <span class="math inline">\sqrt R</span>, whereas the SE reported by a method scales with <span class="math inline">\sqrt n</span>. Increasing R improves knowledge of the method’s behavior at that n; it does not improve the method’s interval for an individual dataset.</p>
+<p>For example, an empirical SD of 0.10 across 1,000 datasets gives a bias MCSE of about 0.0032. It does not give each dataset an estimation SE of 0.0032. This distinction matters when reporting small bias or coverage differences.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (target <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) {</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">650</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="dv">1</span>), <span class="at">log =</span> <span class="st">"x"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Independent observations n"</span>, <span class="at">ylab =</span> <span class="st">"Coverage of mu"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">"mu ="</span>, target))</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">h =</span> <span class="fl">0.95</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"gray50"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    method_name <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"0.9 x mean"</span>)[j]</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> performance[performance<span class="sc">$</span>mu <span class="sc">==</span> target <span class="sc">&amp;</span> performance<span class="sc">$</span>method <span class="sc">==</span> method_name, ]</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> a[<span class="fu">order</span>(a<span class="sc">$</span>n), ]</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    color <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>)[j]</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(a<span class="sc">$</span>n, a<span class="sc">$</span>coverage, <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">pch =</span> j <span class="sc">+</span> <span class="dv">14</span>, <span class="at">col =</span> color)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrows</span>(a<span class="sc">$</span>n, a<span class="sc">$</span>coverage <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> a<span class="sc">$</span>coverage_mcse,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>           a<span class="sc">$</span>n, a<span class="sc">$</span>coverage <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> a<span class="sc">$</span>coverage_mcse,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>           <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">code =</span> <span class="dv">3</span>, <span class="at">length =</span> <span class="fl">0.04</span>, <span class="at">col =</span> color)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"0.9 x mean"</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>),</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">pch =</span> <span class="dv">15</span><span class="sc">:</span><span class="dv">16</span>, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-limit-coverage" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Two coverage panels, for population means zero and one, comparing ordinary and shrunken means as sample size increases.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-limit-coverage-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="evaluating-methods_files/figure-html/fig-limit-coverage-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: A smaller sampling SD does not remove target bias. At mu = 1 the shrunken procedure’s coverage deteriorates with n; the null scenario alone would conceal that problem. Bars show plus/minus two Monte Carlo standard errors."><img src="evaluating-methods_files/figure-html/fig-limit-coverage-1.png" class="img-fluid figure-img" alt="Two coverage panels, for population means zero and one, comparing ordinary and shrunken means as sample size increases." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-limit-coverage-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: A smaller sampling SD does not remove target bias. At mu = 1 the shrunken procedure’s coverage deteriorates with n; the null scenario alone would conceal that problem. Bars show plus/minus two Monte Carlo standard errors.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>At <span class="math inline">\mu=0</span>, both methods have exactly the same coverage indicators in this construction: multiplying the entire interval by a positive constant does not change whether it includes zero. That reassuring null scenario conceals the failure at nonzero targets. In the right panel the shrunken estimator’s SE tracks its sampling SD, yet its intervals increasingly miss <span class="math inline">\mu=1</span>.</p>
+<section id="calculate-uncertainty-in-a-paired-difference" class="level3" data-number="4.1">
+<h3 data-number="4.1" class="anchored" data-anchor-id="calculate-uncertainty-in-a-paired-difference"><span class="header-section-number">4.1</span> Calculate uncertainty in a paired difference</h3>
+<p>Let <span class="math inline">C_{A,r}</span> and <span class="math inline">C_{B,r}</span> indicate coverage by methods A and B on dataset r. Form <span class="math inline">d_r=C_{B,r}-C_{A,r}</span>, which is −1, 0, or 1. Then</p>
+<p><span class="math display">
+\begin{aligned}
+\widehat\Delta_{\rm cov}&amp;=\bar d,\\
+\widehat{\operatorname{MCSE}}(\bar d)&amp;=s_d/\sqrt R.
+\end{aligned}
+</span></p>
+<p>A value −1 means B misses where A covers; zero means they agree; 1 means B alone covers. The variance is based on these <strong>within-dataset differences</strong>. It includes the methods’ covariance, which would be lost by treating the marginal coverage estimates as independent.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">subset</span>(records, mu <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> n <span class="sc">==</span> <span class="dv">500</span> <span class="sc">&amp;</span> method <span class="sc">==</span> <span class="st">"Mean"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">subset</span>(records, mu <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> n <span class="sc">==</span> <span class="dv">500</span> <span class="sc">&amp;</span> method <span class="sc">==</span> <span class="st">"0.9 x mean"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(a<span class="sc">$</span>replicate, b<span class="sc">$</span>replicate))</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(b<span class="sc">$</span>covered) <span class="sc">-</span> <span class="fu">as.integer</span>(a<span class="sc">$</span>covered)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">coverage_difference =</span> <span class="fu">mean</span>(d), <span class="at">paired_MCSE =</span> <span class="fu">sd</span>(d) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">length</span>(d)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>coverage_difference         paired_MCSE 
+        -0.63500000          0.01743786 </code></pre>
+</div>
+</div>
+<p>The same recipe works for differences in squared error, interval length, runtime, or dataset-level FDP: form the relevant pair of contributions, subtract, then summarize across independent datasets. Different performance measures require their own contributions, not a single universal binomial SE.</p>
+</section>
+</section>
+<section id="failures-are-part-of-performance" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="failures-are-part-of-performance"><span class="header-section-number">5</span> Failures are part of performance</h2>
+<p>Suppose an algorithm returns valid intervals in 90 of 100 replicates, and 86 of those cover the target. Report success rate <span class="math inline">90/100</span>, coverage conditional on success <span class="math inline">86/90</span>, and joint success-and-coverage <span class="math inline">86/100</span>. The last quantity treats failure as no usable covering interval and must be labeled that way; it is not a conventional coverage calculation over 100 returned intervals. Do not quietly delete failed replicates or report only the successful methods’ fastest runs.</p>
+<p>Record warnings, convergence, nonfinite results, nuisance clipping, runtime, and memory when relevant. Prespecify retry rules and record each retry. Separate statistical failure (for example, an unidentifiable target) from numerical failure to compute a defined estimate.</p>
+<p>If A succeeds on every dataset but B fails on the difficult ones, comparing A on all datasets with B only on its successes favors B by changing the evaluation population. Report method-specific success rates and conditional summaries, then label any paired comparison restricted to <strong>jointly successful</strong> datasets as such. Keep an attempt-level record so an absent row cannot silently become a successful fit. Runtime should include the prespecified retries and failures when assessing the complete workflow.</p>
+</section>
+<section id="build-a-useful-evaluation-grid" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="build-a-useful-evaluation-grid"><span class="header-section-number">6</span> Build a useful evaluation grid</h2>
+<p>Vary the assumptions that support the claim: independent-unit count, cluster sizes, nuisance-model correctness, smoothness, overlap, sparsity, batch/design confounding, and measurement noise. Include settings where theory predicts success, settings near its boundary, and explicit counterexamples. Change one factor at a time to learn a mechanism, then investigate scientifically plausible combinations.</p>
+<p>For the estimator in <a href="../../guides/semiparametric-methods/influence-function-to-estimator.html">From an influence function to an estimator</a>, compare bias and coverage while changing each nuisance model separately and both together. Record fitted probability ranges and clipping. Compare empirical variance with the known observed-data bound only in scenarios where that bound and the model are specified.</p>
+<p>Real omics data usually do not supply the true effect or network. Agreement with another method, pathway enrichment, or reproducibility across cohorts answers a different question from simulated coverage. State what each piece of evidence can support. An empirical analysis can demonstrate feasibility and interpretation without establishing ground-truth accuracy.</p>
+</section>
+<section id="exercises" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="exercises"><span class="header-section-number">7</span> Exercises</h2>
+<p>Try each checkpoint before opening its hint or solution.</p>
+<div id="checkpoint-eval-01" class="checkpoint">
+<section id="checkpoint-eval-01-separate-target-bias-from-uncertainty-calibration" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-eval-01-separate-target-bias-from-uncertainty-calibration">Checkpoint · EVAL-01 — Separate target bias from uncertainty calibration</h3>
+<p><strong>Task type:</strong> Derivation and evaluation design.</p>
+<p>For the shrunken mean with target <span class="math inline">\mu=1</span>, derive its probability limit, bias, sampling variance, and MSE. Explain why a mean SE close to the empirical SD can coexist with poor coverage. Propose a comparison that would expose the failure, and specify how you would report 10 failed fits among 100 replicates.</p>
+<p>For a coverage comparison on the same R datasets, define the dataset-level paired contribution and derive the MCSE of the estimated difference.</p>
+<p><strong>Ready to continue when:</strong> you can distinguish the target, the procedure’s limit, sampling uncertainty, and Monte Carlo uncertainty, and compute a paired performance difference.</p>
+<p><strong>Transfer:</strong> Would a method with lower MSE necessarily give a better confidence interval for the same target?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Compare the fixed bias with the n-dependent interval width; keep the denominators explicit.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The limit is 0.9, bias is -0.1, variance is 0.81/n, and MSE is 0.01+0.81/n.&nbsp;A correct SE for sampling variability does not center the estimate at 1. At increasing n the bias dominates its SD. Include nonzero targets and increasing n, report bias, empirical SD, mean SE, coverage, and MCSE on paired datasets. Report success as 90/100; coverage among successful fits has denominator 90; joint success-and-coverage has denominator 100. The number covering must also be reported.</p>
+<p>For coverage differences let <span class="math inline">d_r=1\{\theta\in I_{B,r}\}-1\{\theta\in I_{A,r}\}</span>. Estimate the difference by <span class="math inline">\bar d</span> and its MCSE by <span class="math inline">s_d/\sqrt R</span>. This retains the within-dataset pairing; a formula that assumes independent marginal coverages omits their covariance.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Extend the paired calculation to MSE and interval-length differences. State the sign that favors each method and explain why shorter intervals should be judged alongside coverage.</li>
+<li>Evaluate the missing-outcome estimator under one misspecified nuisance and under two; write down the predicted limits first.</li>
+<li>Compare multipliers <span class="math inline">1-n^{-1/4}</span> and <span class="math inline">1-n^{-1}</span> at a nonzero mean. Derive their biases relative to the root-n sampling SD before simulating coverage. How can both estimators be consistent but support different conclusions about centered intervals?</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="reading"><span class="header-section-number">8</span> Reading</h2>
+<ul>
+<li>Morris, White, and Crowther, <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC6492164/">Using simulation studies to evaluate statistical methods</a>.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/method-development/index.html" class="pagination-link" aria-label="Developing and evaluating methods">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Developing and evaluating methods</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/method-development/sensitivity-analysis.html" class="pagination-link" aria-label="Sensitivity analysis for assumptions and research decisions">
+        <span class="nav-page-text">Sensitivity analysis for assumptions and research decisions</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Evaluating a statistical method"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Targets, limits, uncertainty, and computational reliability"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>**Before reading:** Read <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span>; basic means, variance, and confidence intervals are assumed.</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluate a claim, not a method name</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>A method can have a small standard error and still answer the wrong question. Before comparing procedures, write the population target $\psi(P)$, the limit of each procedure, and the claim being evaluated: consistency, confidence-interval coverage, efficiency, robustness, prediction, or computational reliability. Those claims require different evidence.</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>For an omics example, a pooled coefficient, an adjusted group contrast, and a standardized population contrast may differ even with infinitely many participants. First use <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span> to determine whether a comparison has a common target. Then assess finite-sample behavior.</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>There are three sources of discrepancy to keep apart. **Target mismatch** means the procedure approaches a different population quantity. **Sampling error** is variation caused by which people enter a finite dataset. **Numerical error** arises when the implementation cannot compute its intended answer accurately. Increasing the sample size, increasing simulation replicates, and tightening an optimizer's tolerance address different problems.</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Choose measures that answer the claim</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>Suppose a scenario has fixed population truth $\theta$ and produces R independent datasets. For replicate r, retain the estimate $\hat\theta_r$, reported SE $\hat s_r$, interval $I_r$, and fitting status. Then the main summaries are</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>\widehat{\operatorname{Bias}}&amp;=\overline{\hat\theta}-\theta,<span class="sc">\\</span></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>s_{\rm emp}^2&amp;=\frac1{R-1}\sum_r</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a> (\hat\theta_r-\overline{\hat\theta})^2,<span class="sc">\\</span></span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>\overline{\operatorname{SE}}&amp;=\frac1R\sum_r\hat s_r,<span class="sc">\\</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>\widehat{\operatorname{MSE}}&amp;=\frac1R\sum_r(\hat\theta_r-\theta)^2,<span class="sc">\\</span></span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>\widehat{\operatorname{Coverage}}&amp;=\frac1R\sum_r1<span class="sc">\{</span>\theta\in I_r<span class="sc">\}</span>.</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>Bias measures the average signed error; positive and negative errors can cancel. MSE averages squared errors, penalizing both bias and variation. Empirical SD measures how estimates vary **between datasets**. Mean SE summarizes what the method reports **within datasets**. Coverage asks whether the intervals actually include the common target at the advertised frequency. Comparing interval length is meaningful alongside coverage: very short intervals are easy to produce if they miss the target.</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>For testing, rejection under a true scientific null estimates Type I error; rejection under a specified alternative estimates power. For a family of omics hypotheses, estimate FDR by averaging one false discovery proportion per dataset. Genes and edges from the same dataset are not independent simulation replicates. See <span class="co">[</span><span class="ot">Multiple testing when the tests are not independent</span><span class="co">](../analysis-problems/multiple-testing.qmd)</span> for that distinction.</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>For the formulas above assume all fits return usable results; the failure section below explains the denominators when they do not. If truth changes randomly between replicates, also state whether the summaries average over that random-truth distribution or concern one fixed parameter. Those are different evaluation claims.</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## A precise example: shrinkage toward zero</span></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>Let independent $Y_i\sim N(\mu,1)$ and suppose the target is $\mu$. Compare the sample mean with $\tilde\mu=0.9\bar Y$. Their limits are $\mu$ and $0.9\mu$. For the second procedure,</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>\operatorname{Bias}(\tilde\mu)&amp;=-0.1\mu,<span class="sc">\\</span></span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}(\tilde\mu)&amp;=0.81/n.</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>Its sampling SD is smaller: multiplying the sample mean by 0.9 multiplies its variance by $0.9^2$. But</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>\tilde\mu-\mu=0.9(\bar Y-\mu)-0.1\mu.</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>The first term is sampling noise that shrinks with n; the second is a fixed displacement from the target. A smaller SE can describe the first term correctly while omitting the second completely. The bias measured in units of sampling SD is $-\mu\sqrt n/9$, whose magnitude grows when $\mu\ne0$.</span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>Let $c_n$ be the 97.5th percentile of $t_{n-1}$. Compare the usual mean interval with the naively shrunken interval,</span>
+<span id="cb6-59"><a href="#cb6-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-60"><a href="#cb6-60" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-61"><a href="#cb6-61" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-62"><a href="#cb6-62" aria-hidden="true" tabindex="-1"></a>&amp;\bar Y\pm c_n\frac{s}{\sqrt n},<span class="sc">\\</span></span>
+<span id="cb6-63"><a href="#cb6-63" aria-hidden="true" tabindex="-1"></a>&amp;\tilde\mu\pm c_n\frac{0.9s}{\sqrt n}.</span>
+<span id="cb6-64"><a href="#cb6-64" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-65"><a href="#cb6-65" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-66"><a href="#cb6-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-67"><a href="#cb6-67" aria-hidden="true" tabindex="-1"></a>Under the normal generator, the first interval has exact 95% coverage for $\mu$. The second is the first interval multiplied by 0.9, so it covers $0.9\mu$ at 95%, but generally does not cover $\mu$ at that rate. At $\mu=0$ those targets coincide. At $\mu=1$, the interval shrinks around 0.9 while the target stays at 1. Dividing the shrunken estimate and both endpoints by 0.9 recovers ordinary mean inference; simply shrinking the center and SE does not provide that correction.</span>
+<span id="cb6-68"><a href="#cb6-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-69"><a href="#cb6-69" aria-hidden="true" tabindex="-1"></a>The MSE decomposition makes a different tradeoff:</span>
+<span id="cb6-70"><a href="#cb6-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-71"><a href="#cb6-71" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-72"><a href="#cb6-72" aria-hidden="true" tabindex="-1"></a>\operatorname{MSE}(\tilde\mu)=0.01\mu^2+0.81/n.</span>
+<span id="cb6-73"><a href="#cb6-73" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-74"><a href="#cb6-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-75"><a href="#cb6-75" aria-hidden="true" tabindex="-1"></a>At $\mu=1,n=10$ this is 0.091, less than the sample mean's 0.1. That point-estimation advantage does not establish consistency or interval coverage. For a nonzero fixed $\mu$, the MSE advantage disappears once $n\ge19/\mu^2$. Always say which loss or inferential property makes one procedure preferable.</span>
+<span id="cb6-76"><a href="#cb6-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-77"><a href="#cb6-77" aria-hidden="true" tabindex="-1"></a><span class="fu">### Consistency alone is not enough for inference</span></span>
+<span id="cb6-78"><a href="#cb6-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-79"><a href="#cb6-79" aria-hidden="true" tabindex="-1"></a>Now let the multiplier approach one: $\tilde\mu_n=(1-n^{-1/4})\bar Y$. Both the multiplier and the sample mean converge to their desired limits, so this estimator is consistent. Its bias is nevertheless $-\mu n^{-1/4}$, larger than its root-n sampling SD. At a nonzero target, ordinary centered intervals can still fail increasingly badly. A multiplier $1-n^{-1}$ instead has bias negligible at the root-n scale. This is the same reason a semiparametric inference argument controls the **rate** of a nuisance remainder, rather than asking only whether it converges to zero.</span>
+<span id="cb6-80"><a href="#cb6-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-81"><a href="#cb6-81" aria-hidden="true" tabindex="-1"></a><span class="fu">## Compare procedures on the same datasets</span></span>
+<span id="cb6-82"><a href="#cb6-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-83"><a href="#cb6-83" aria-hidden="true" tabindex="-1"></a>The following experiment uses the same simulated sample for both procedures in each replicate. This keeps the comparison tied to the same scenarios and permits a paired analysis. Pairing reduces Monte Carlo uncertainty when the performance contributions have positive covariance; it is not a universal variance-reduction theorem for any two algorithms. All values are synthetic, with truth supplied by the generator.</span>
+<span id="cb6-84"><a href="#cb6-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-87"><a href="#cb6-87" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-88"><a href="#cb6-88" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">61</span>)</span>
+<span id="cb6-89"><a href="#cb6-89" aria-hidden="true" tabindex="-1"></a>n_sim <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb6-90"><a href="#cb6-90" aria-hidden="true" tabindex="-1"></a>records <span class="ot">&lt;-</span> <span class="fu">list</span>(); i <span class="ot">&lt;-</span> <span class="dv">0</span></span>
+<span id="cb6-91"><a href="#cb6-91" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (mu <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) <span class="cf">for</span> (n <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">20</span>, <span class="dv">100</span>, <span class="dv">500</span>)) {</span>
+<span id="cb6-92"><a href="#cb6-92" aria-hidden="true" tabindex="-1"></a>  y <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">rnorm</span>(n <span class="sc">*</span> n_sim, <span class="at">mean =</span> mu), <span class="at">nrow =</span> n)</span>
+<span id="cb6-93"><a href="#cb6-93" aria-hidden="true" tabindex="-1"></a>  average <span class="ot">&lt;-</span> <span class="fu">colMeans</span>(y)</span>
+<span id="cb6-94"><a href="#cb6-94" aria-hidden="true" tabindex="-1"></a>  sample_sd <span class="ot">&lt;-</span> <span class="fu">sqrt</span>(<span class="fu">colSums</span>(<span class="fu">sweep</span>(y, <span class="dv">2</span>, average)<span class="sc">^</span><span class="dv">2</span>) <span class="sc">/</span> (n <span class="sc">-</span> <span class="dv">1</span>))</span>
+<span id="cb6-95"><a href="#cb6-95" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (shrink <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="fl">0.9</span>)) {</span>
+<span id="cb6-96"><a href="#cb6-96" aria-hidden="true" tabindex="-1"></a>    estimate <span class="ot">&lt;-</span> shrink <span class="sc">*</span> average</span>
+<span id="cb6-97"><a href="#cb6-97" aria-hidden="true" tabindex="-1"></a>    se <span class="ot">&lt;-</span> shrink <span class="sc">*</span> sample_sd <span class="sc">/</span> <span class="fu">sqrt</span>(n)</span>
+<span id="cb6-98"><a href="#cb6-98" aria-hidden="true" tabindex="-1"></a>    covered <span class="ot">&lt;-</span> <span class="fu">abs</span>(estimate <span class="sc">-</span> mu) <span class="sc">&lt;=</span> <span class="fu">qt</span>(<span class="fl">0.975</span>, <span class="at">df =</span> n <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se</span>
+<span id="cb6-99"><a href="#cb6-99" aria-hidden="true" tabindex="-1"></a>    i <span class="ot">&lt;-</span> i <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb6-100"><a href="#cb6-100" aria-hidden="true" tabindex="-1"></a>    records[[i]] <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">mu =</span> mu, <span class="at">n =</span> n, <span class="at">replicate =</span> <span class="fu">seq_len</span>(n_sim),</span>
+<span id="cb6-101"><a href="#cb6-101" aria-hidden="true" tabindex="-1"></a>      <span class="at">method =</span> <span class="cf">if</span> (shrink <span class="sc">==</span> <span class="dv">1</span>) <span class="st">"Mean"</span> <span class="cf">else</span> <span class="st">"0.9 x mean"</span>,</span>
+<span id="cb6-102"><a href="#cb6-102" aria-hidden="true" tabindex="-1"></a>      estimate, se, covered, <span class="at">squared_error =</span> (estimate <span class="sc">-</span> mu)<span class="sc">^</span><span class="dv">2</span>)</span>
+<span id="cb6-103"><a href="#cb6-103" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-104"><a href="#cb6-104" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-105"><a href="#cb6-105" aria-hidden="true" tabindex="-1"></a>records <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, records)</span>
+<span id="cb6-106"><a href="#cb6-106" aria-hidden="true" tabindex="-1"></a>cells <span class="ot">&lt;-</span> <span class="fu">split</span>(records, <span class="fu">interaction</span>(records<span class="sc">$</span>mu, records<span class="sc">$</span>n, records<span class="sc">$</span>method))</span>
+<span id="cb6-107"><a href="#cb6-107" aria-hidden="true" tabindex="-1"></a>performance <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(cells, <span class="cf">function</span>(d) {</span>
+<span id="cb6-108"><a href="#cb6-108" aria-hidden="true" tabindex="-1"></a>  R <span class="ot">&lt;-</span> <span class="fu">nrow</span>(d); coverage <span class="ot">&lt;-</span> <span class="fu">mean</span>(d<span class="sc">$</span>covered)</span>
+<span id="cb6-109"><a href="#cb6-109" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(d[<span class="dv">1</span>, <span class="fu">c</span>(<span class="st">"mu"</span>, <span class="st">"n"</span>, <span class="st">"method"</span>)],</span>
+<span id="cb6-110"><a href="#cb6-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">bias =</span> <span class="fu">mean</span>(d<span class="sc">$</span>estimate) <span class="sc">-</span> d<span class="sc">$</span>mu[<span class="dv">1</span>], <span class="at">empirical_sd =</span> <span class="fu">sd</span>(d<span class="sc">$</span>estimate),</span>
+<span id="cb6-111"><a href="#cb6-111" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_se =</span> <span class="fu">mean</span>(d<span class="sc">$</span>se), <span class="at">MSE =</span> <span class="fu">mean</span>(d<span class="sc">$</span>squared_error), coverage,</span>
+<span id="cb6-112"><a href="#cb6-112" aria-hidden="true" tabindex="-1"></a>    <span class="at">bias_mcse =</span> <span class="fu">sd</span>(d<span class="sc">$</span>estimate) <span class="sc">/</span> <span class="fu">sqrt</span>(R),</span>
+<span id="cb6-113"><a href="#cb6-113" aria-hidden="true" tabindex="-1"></a>    <span class="at">coverage_mcse =</span> <span class="fu">sqrt</span>(coverage <span class="sc">*</span> (<span class="dv">1</span> <span class="sc">-</span> coverage) <span class="sc">/</span> R))</span>
+<span id="cb6-114"><a href="#cb6-114" aria-hidden="true" tabindex="-1"></a>}))</span>
+<span id="cb6-115"><a href="#cb6-115" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(performance, <span class="at">digits =</span> <span class="dv">3</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-116"><a href="#cb6-116" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-117"><a href="#cb6-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-118"><a href="#cb6-118" aria-hidden="true" tabindex="-1"></a>Each row in <span class="in">`records`</span> belongs to one method on one replicate; the replicate ID is shared across methods within the same scenario. Summaries are computed afterwards. **MCSE** describes uncertainty in such a summary because the simulation uses finitely many datasets. Here bias MCSE is empirical SD divided by $\sqrt R$, whereas the SE reported by a method scales with $\sqrt n$. Increasing R improves knowledge of the method's behavior at that n; it does not improve the method's interval for an individual dataset.</span>
+<span id="cb6-119"><a href="#cb6-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-120"><a href="#cb6-120" aria-hidden="true" tabindex="-1"></a>For example, an empirical SD of 0.10 across 1,000 datasets gives a bias MCSE of about 0.0032. It does not give each dataset an estimation SE of 0.0032. This distinction matters when reporting small bias or coverage differences.</span>
+<span id="cb6-121"><a href="#cb6-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-124"><a href="#cb6-124" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-125"><a href="#cb6-125" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-limit-coverage</span></span>
+<span id="cb6-126"><a href="#cb6-126" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "A smaller sampling SD does not remove target bias. At mu = 1 the shrunken procedure's coverage deteriorates with n; the null scenario alone would conceal that problem. Bars show plus/minus two Monte Carlo standard errors."</span></span>
+<span id="cb6-127"><a href="#cb6-127" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Two coverage panels, for population means zero and one, comparing ordinary and shrunken means as sample size increases."</span></span>
+<span id="cb6-128"><a href="#cb6-128" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">1</span>))</span>
+<span id="cb6-129"><a href="#cb6-129" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (target <span class="cf">in</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">1</span>)) {</span>
+<span id="cb6-130"><a href="#cb6-130" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>(<span class="cn">NA</span>, <span class="at">xlim =</span> <span class="fu">c</span>(<span class="dv">15</span>, <span class="dv">650</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="fl">0.2</span>, <span class="dv">1</span>), <span class="at">log =</span> <span class="st">"x"</span>,</span>
+<span id="cb6-131"><a href="#cb6-131" aria-hidden="true" tabindex="-1"></a>       <span class="at">xlab =</span> <span class="st">"Independent observations n"</span>, <span class="at">ylab =</span> <span class="st">"Coverage of mu"</span>,</span>
+<span id="cb6-132"><a href="#cb6-132" aria-hidden="true" tabindex="-1"></a>       <span class="at">main =</span> <span class="fu">paste</span>(<span class="st">"mu ="</span>, target))</span>
+<span id="cb6-133"><a href="#cb6-133" aria-hidden="true" tabindex="-1"></a>  <span class="fu">abline</span>(<span class="at">h =</span> <span class="fl">0.95</span>, <span class="at">lty =</span> <span class="dv">2</span>, <span class="at">col =</span> <span class="st">"gray50"</span>)</span>
+<span id="cb6-134"><a href="#cb6-134" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>) {</span>
+<span id="cb6-135"><a href="#cb6-135" aria-hidden="true" tabindex="-1"></a>    method_name <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"0.9 x mean"</span>)[j]</span>
+<span id="cb6-136"><a href="#cb6-136" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> performance[performance<span class="sc">$</span>mu <span class="sc">==</span> target <span class="sc">&amp;</span> performance<span class="sc">$</span>method <span class="sc">==</span> method_name, ]</span>
+<span id="cb6-137"><a href="#cb6-137" aria-hidden="true" tabindex="-1"></a>    a <span class="ot">&lt;-</span> a[<span class="fu">order</span>(a<span class="sc">$</span>n), ]</span>
+<span id="cb6-138"><a href="#cb6-138" aria-hidden="true" tabindex="-1"></a>    color <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>)[j]</span>
+<span id="cb6-139"><a href="#cb6-139" aria-hidden="true" tabindex="-1"></a>    <span class="fu">lines</span>(a<span class="sc">$</span>n, a<span class="sc">$</span>coverage, <span class="at">type =</span> <span class="st">"b"</span>, <span class="at">pch =</span> j <span class="sc">+</span> <span class="dv">14</span>, <span class="at">col =</span> color)</span>
+<span id="cb6-140"><a href="#cb6-140" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrows</span>(a<span class="sc">$</span>n, a<span class="sc">$</span>coverage <span class="sc">-</span> <span class="dv">2</span> <span class="sc">*</span> a<span class="sc">$</span>coverage_mcse,</span>
+<span id="cb6-141"><a href="#cb6-141" aria-hidden="true" tabindex="-1"></a>           a<span class="sc">$</span>n, a<span class="sc">$</span>coverage <span class="sc">+</span> <span class="dv">2</span> <span class="sc">*</span> a<span class="sc">$</span>coverage_mcse,</span>
+<span id="cb6-142"><a href="#cb6-142" aria-hidden="true" tabindex="-1"></a>           <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">code =</span> <span class="dv">3</span>, <span class="at">length =</span> <span class="fl">0.04</span>, <span class="at">col =</span> color)</span>
+<span id="cb6-143"><a href="#cb6-143" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-144"><a href="#cb6-144" aria-hidden="true" tabindex="-1"></a>  <span class="fu">legend</span>(<span class="st">"bottomleft"</span>, <span class="fu">c</span>(<span class="st">"Mean"</span>, <span class="st">"0.9 x mean"</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>),</span>
+<span id="cb6-145"><a href="#cb6-145" aria-hidden="true" tabindex="-1"></a>         <span class="at">pch =</span> <span class="dv">15</span><span class="sc">:</span><span class="dv">16</span>, <span class="at">lty =</span> <span class="dv">1</span>, <span class="at">bty =</span> <span class="st">"n"</span>, <span class="at">cex =</span> <span class="fl">0.8</span>)</span>
+<span id="cb6-146"><a href="#cb6-146" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-147"><a href="#cb6-147" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-148"><a href="#cb6-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-149"><a href="#cb6-149" aria-hidden="true" tabindex="-1"></a>At $\mu=0$, both methods have exactly the same coverage indicators in this construction: multiplying the entire interval by a positive constant does not change whether it includes zero. That reassuring null scenario conceals the failure at nonzero targets. In the right panel the shrunken estimator's SE tracks its sampling SD, yet its intervals increasingly miss $\mu=1$.</span>
+<span id="cb6-150"><a href="#cb6-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-151"><a href="#cb6-151" aria-hidden="true" tabindex="-1"></a><span class="fu">### Calculate uncertainty in a paired difference</span></span>
+<span id="cb6-152"><a href="#cb6-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-153"><a href="#cb6-153" aria-hidden="true" tabindex="-1"></a>Let $C_{A,r}$ and $C_{B,r}$ indicate coverage by methods A and B on dataset r. Form $d_r=C_{B,r}-C_{A,r}$, which is −1, 0, or 1. Then</span>
+<span id="cb6-154"><a href="#cb6-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-155"><a href="#cb6-155" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-156"><a href="#cb6-156" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb6-157"><a href="#cb6-157" aria-hidden="true" tabindex="-1"></a>\widehat\Delta_{\rm cov}&amp;=\bar d,<span class="sc">\\</span></span>
+<span id="cb6-158"><a href="#cb6-158" aria-hidden="true" tabindex="-1"></a>\widehat{\operatorname{MCSE}}(\bar d)&amp;=s_d/\sqrt R.</span>
+<span id="cb6-159"><a href="#cb6-159" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb6-160"><a href="#cb6-160" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb6-161"><a href="#cb6-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-162"><a href="#cb6-162" aria-hidden="true" tabindex="-1"></a>A value −1 means B misses where A covers; zero means they agree; 1 means B alone covers. The variance is based on these **within-dataset differences**. It includes the methods' covariance, which would be lost by treating the marginal coverage estimates as independent.</span>
+<span id="cb6-163"><a href="#cb6-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-166"><a href="#cb6-166" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb6-167"><a href="#cb6-167" aria-hidden="true" tabindex="-1"></a>a <span class="ot">&lt;-</span> <span class="fu">subset</span>(records, mu <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> n <span class="sc">==</span> <span class="dv">500</span> <span class="sc">&amp;</span> method <span class="sc">==</span> <span class="st">"Mean"</span>)</span>
+<span id="cb6-168"><a href="#cb6-168" aria-hidden="true" tabindex="-1"></a>b <span class="ot">&lt;-</span> <span class="fu">subset</span>(records, mu <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> n <span class="sc">==</span> <span class="dv">500</span> <span class="sc">&amp;</span> method <span class="sc">==</span> <span class="st">"0.9 x mean"</span>)</span>
+<span id="cb6-169"><a href="#cb6-169" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">identical</span>(a<span class="sc">$</span>replicate, b<span class="sc">$</span>replicate))</span>
+<span id="cb6-170"><a href="#cb6-170" aria-hidden="true" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">as.integer</span>(b<span class="sc">$</span>covered) <span class="sc">-</span> <span class="fu">as.integer</span>(a<span class="sc">$</span>covered)</span>
+<span id="cb6-171"><a href="#cb6-171" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">coverage_difference =</span> <span class="fu">mean</span>(d), <span class="at">paired_MCSE =</span> <span class="fu">sd</span>(d) <span class="sc">/</span> <span class="fu">sqrt</span>(<span class="fu">length</span>(d)))</span>
+<span id="cb6-172"><a href="#cb6-172" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb6-173"><a href="#cb6-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-174"><a href="#cb6-174" aria-hidden="true" tabindex="-1"></a>The same recipe works for differences in squared error, interval length, runtime, or dataset-level FDP: form the relevant pair of contributions, subtract, then summarize across independent datasets. Different performance measures require their own contributions, not a single universal binomial SE.</span>
+<span id="cb6-175"><a href="#cb6-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-176"><a href="#cb6-176" aria-hidden="true" tabindex="-1"></a><span class="fu">## Failures are part of performance</span></span>
+<span id="cb6-177"><a href="#cb6-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-178"><a href="#cb6-178" aria-hidden="true" tabindex="-1"></a>Suppose an algorithm returns valid intervals in 90 of 100 replicates, and 86 of those cover the target. Report success rate $90/100$, coverage conditional on success $86/90$, and joint success-and-coverage $86/100$. The last quantity treats failure as no usable covering interval and must be labeled that way; it is not a conventional coverage calculation over 100 returned intervals. Do not quietly delete failed replicates or report only the successful methods' fastest runs.</span>
+<span id="cb6-179"><a href="#cb6-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-180"><a href="#cb6-180" aria-hidden="true" tabindex="-1"></a>Record warnings, convergence, nonfinite results, nuisance clipping, runtime, and memory when relevant. Prespecify retry rules and record each retry. Separate statistical failure (for example, an unidentifiable target) from numerical failure to compute a defined estimate.</span>
+<span id="cb6-181"><a href="#cb6-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-182"><a href="#cb6-182" aria-hidden="true" tabindex="-1"></a>If A succeeds on every dataset but B fails on the difficult ones, comparing A on all datasets with B only on its successes favors B by changing the evaluation population. Report method-specific success rates and conditional summaries, then label any paired comparison restricted to **jointly successful** datasets as such. Keep an attempt-level record so an absent row cannot silently become a successful fit. Runtime should include the prespecified retries and failures when assessing the complete workflow.</span>
+<span id="cb6-183"><a href="#cb6-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-184"><a href="#cb6-184" aria-hidden="true" tabindex="-1"></a><span class="fu">## Build a useful evaluation grid</span></span>
+<span id="cb6-185"><a href="#cb6-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-186"><a href="#cb6-186" aria-hidden="true" tabindex="-1"></a>Vary the assumptions that support the claim: independent-unit count, cluster sizes, nuisance-model correctness, smoothness, overlap, sparsity, batch/design confounding, and measurement noise. Include settings where theory predicts success, settings near its boundary, and explicit counterexamples. Change one factor at a time to learn a mechanism, then investigate scientifically plausible combinations.</span>
+<span id="cb6-187"><a href="#cb6-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-188"><a href="#cb6-188" aria-hidden="true" tabindex="-1"></a>For the estimator in <span class="co">[</span><span class="ot">From an influence function to an estimator</span><span class="co">](../semiparametric-methods/influence-function-to-estimator.qmd)</span>, compare bias and coverage while changing each nuisance model separately and both together. Record fitted probability ranges and clipping. Compare empirical variance with the known observed-data bound only in scenarios where that bound and the model are specified.</span>
+<span id="cb6-189"><a href="#cb6-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-190"><a href="#cb6-190" aria-hidden="true" tabindex="-1"></a>Real omics data usually do not supply the true effect or network. Agreement with another method, pathway enrichment, or reproducibility across cohorts answers a different question from simulated coverage. State what each piece of evidence can support. An empirical analysis can demonstrate feasibility and interpretation without establishing ground-truth accuracy.</span>
+<span id="cb6-191"><a href="#cb6-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-192"><a href="#cb6-192" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb6-193"><a href="#cb6-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-194"><a href="#cb6-194" aria-hidden="true" tabindex="-1"></a>Try each checkpoint before opening its hint or solution.</span>
+<span id="cb6-195"><a href="#cb6-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-196"><a href="#cb6-196" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-eval-01 .checkpoint}</span>
+<span id="cb6-197"><a href="#cb6-197" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · EVAL-01 — Separate target bias from uncertainty calibration {.unnumbered}</span></span>
+<span id="cb6-198"><a href="#cb6-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-199"><a href="#cb6-199" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and evaluation design.</span>
+<span id="cb6-200"><a href="#cb6-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-201"><a href="#cb6-201" aria-hidden="true" tabindex="-1"></a>For the shrunken mean with target $\mu=1$, derive its probability limit, bias, sampling variance, and MSE. Explain why a mean SE close to the empirical SD can coexist with poor coverage. Propose a comparison that would expose the failure, and specify how you would report 10 failed fits among 100 replicates.</span>
+<span id="cb6-202"><a href="#cb6-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-203"><a href="#cb6-203" aria-hidden="true" tabindex="-1"></a>For a coverage comparison on the same R datasets, define the dataset-level paired contribution and derive the MCSE of the estimated difference.</span>
+<span id="cb6-204"><a href="#cb6-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-205"><a href="#cb6-205" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can distinguish the target, the procedure’s limit, sampling uncertainty, and Monte Carlo uncertainty, and compute a paired performance difference.</span>
+<span id="cb6-206"><a href="#cb6-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-207"><a href="#cb6-207" aria-hidden="true" tabindex="-1"></a>**Transfer:** Would a method with lower MSE necessarily give a better confidence interval for the same target?</span>
+<span id="cb6-208"><a href="#cb6-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-209"><a href="#cb6-209" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb6-210"><a href="#cb6-210" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb6-211"><a href="#cb6-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-212"><a href="#cb6-212" aria-hidden="true" tabindex="-1"></a>Compare the fixed bias with the n-dependent interval width; keep the denominators explicit.</span>
+<span id="cb6-213"><a href="#cb6-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-214"><a href="#cb6-214" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb6-215"><a href="#cb6-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-216"><a href="#cb6-216" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb6-217"><a href="#cb6-217" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb6-218"><a href="#cb6-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-219"><a href="#cb6-219" aria-hidden="true" tabindex="-1"></a>The limit is 0.9, bias is -0.1, variance is 0.81/n, and MSE is 0.01+0.81/n. A correct SE for sampling variability does not center the estimate at 1. At increasing n the bias dominates its SD. Include nonzero targets and increasing n, report bias, empirical SD, mean SE, coverage, and MCSE on paired datasets. Report success as 90/100; coverage among successful fits has denominator 90; joint success-and-coverage has denominator 100. The number covering must also be reported.</span>
+<span id="cb6-220"><a href="#cb6-220" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-221"><a href="#cb6-221" aria-hidden="true" tabindex="-1"></a>For coverage differences let $d_r=1<span class="sc">\{</span>\theta\in I_{B,r}<span class="sc">\}</span>-1<span class="sc">\{</span>\theta\in I_{A,r}<span class="sc">\}</span>$. Estimate the difference by $\bar d$ and its MCSE by $s_d/\sqrt R$. This retains the within-dataset pairing; a formula that assumes independent marginal coverages omits their covariance.</span>
+<span id="cb6-222"><a href="#cb6-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-223"><a href="#cb6-223" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb6-224"><a href="#cb6-224" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb6-225"><a href="#cb6-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-226"><a href="#cb6-226" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb6-227"><a href="#cb6-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-228"><a href="#cb6-228" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Extend the paired calculation to MSE and interval-length differences. State the sign that favors each method and explain why shorter intervals should be judged alongside coverage.</span>
+<span id="cb6-229"><a href="#cb6-229" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Evaluate the missing-outcome estimator under one misspecified nuisance and under two; write down the predicted limits first.</span>
+<span id="cb6-230"><a href="#cb6-230" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Compare multipliers $1-n^{-1/4}$ and $1-n^{-1}$ at a nonzero mean. Derive their biases relative to the root-n sampling SD before simulating coverage. How can both estimators be consistent but support different conclusions about centered intervals?</span>
+<span id="cb6-231"><a href="#cb6-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-232"><a href="#cb6-232" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb6-233"><a href="#cb6-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-234"><a href="#cb6-234" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Morris, White, and Crowther, <span class="co">[</span><span class="ot">Using simulation studies to evaluate statistical methods</span><span class="co">](https://pmc.ncbi.nlm.nih.gov/articles/PMC6492164/)</span>.</span>
+<span id="cb6-235"><a href="#cb6-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-236"><a href="#cb6-236" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

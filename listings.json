@@ -1,0 +1,37 @@
+[
+  {
+    "listing": "/posts.html",
+    "items": []
+  },
+  {
+    "listing": "/talks.html",
+    "items": [
+      "/talks/2022_UMBC/index.html",
+      "/talks/2020_CMStatistics/index.html",
+      "/talks/2018_ISMB/index.html",
+      "/talks/2017_ISMB/index.html"
+    ]
+  },
+  {
+    "listing": "/notes.html",
+    "items": [
+      "/notes/how-to-write-a-paper.html",
+      "/notes/adjusting-class-threshold-by-strata2.html",
+      "/notes/lme-heteroskedastic-t-test.html",
+      "/notes/partial-cor-vis-3-var.html",
+      "/notes/class-imbalance-strategies-on-calibration.html"
+    ]
+  },
+  {
+    "listing": "/publications.html",
+    "items": [
+      "/publications/2023_BMC_Bio_pseudo/index.html",
+      "/publications/2021_plosone_prob/index.html",
+      "/publications/2021_frontiers_tumor_purity/index.html",
+      "/publications/2020_jss_seqnet/index.html",
+      "/publications/2019_pathways_in_dc/index.html",
+      "/publications/2017_camda_neuroblastoma/index.html",
+      "/publications/2017_camda_metasub/index.html"
+    ]
+  }
+]

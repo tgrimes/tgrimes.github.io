@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Residual covariance and nuisance-estimation error – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/analysis-problems/multivariate-comparisons.html" rel="next">
+<link href="../../guides/analysis-problems/jackknife-pseudo-values.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Residual covariance and nuisance-estimation error</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Omics analysis problems</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/differential-expression-and-abundance.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Differential expression and abundance</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/multiple-testing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multiple testing when the tests are not independent</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/network-inference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Network inference from omics data</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/association-targets-and-bias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Association targets, pooling, and imperfect adjustment</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/jackknife-pseudo-values.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Jackknife pseudo-values</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/residual-covariance-and-nuisance-error.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Residual covariance and nuisance-estimation error</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/multivariate-comparisons.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Multivariate comparisons: permutation and distance-based tests</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/adjusted-expression-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An end-to-end expression analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/analysis-problems/residual-network-case-study.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">An end-to-end residual-network analysis</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-problem-this-page-solves" id="toc-the-problem-this-page-solves" class="nav-link active" data-scroll-target="#the-problem-this-page-solves"><span class="header-section-number">1</span> The problem this page solves</a></li>
+  <li><a href="#the-conditional-covariance-two-ways" id="toc-the-conditional-covariance-two-ways" class="nav-link" data-scroll-target="#the-conditional-covariance-two-ways"><span class="header-section-number">2</span> The conditional covariance, two ways</a></li>
+  <li><a href="#neyman-orthogonality" id="toc-neyman-orthogonality" class="nav-link" data-scroll-target="#neyman-orthogonality"><span class="header-section-number">3</span> Neyman orthogonality</a></li>
+  <li><a href="#the-connection-to-the-efficient-influence-function" id="toc-the-connection-to-the-efficient-influence-function" class="nav-link" data-scroll-target="#the-connection-to-the-efficient-influence-function"><span class="header-section-number">4</span> The connection to the efficient influence function</a></li>
+  <li><a href="#cross-fitting" id="toc-cross-fitting" class="nav-link" data-scroll-target="#cross-fitting"><span class="header-section-number">5</span> Cross-fitting</a>
+  <ul class="collapse">
+  <li><a href="#a-counterexample-separated-folds-with-a-bad-nuisance-learner" id="toc-a-counterexample-separated-folds-with-a-bad-nuisance-learner" class="nav-link" data-scroll-target="#a-counterexample-separated-folds-with-a-bad-nuisance-learner"><span class="header-section-number">5.1</span> A counterexample: separated folds with a bad nuisance learner</a></li>
+  </ul></li>
+  <li><a href="#the-fold-includes-the-fitting-pipeline" id="toc-the-fold-includes-the-fitting-pipeline" class="nav-link" data-scroll-target="#the-fold-includes-the-fitting-pipeline"><span class="header-section-number">6</span> The fold includes the fitting pipeline</a></li>
+  <li><a href="#conditions-connecting-the-formula-to-an-se" id="toc-conditions-connecting-the-formula-to-an-se" class="nav-link" data-scroll-target="#conditions-connecting-the-formula-to-an-se"><span class="header-section-number">7</span> Conditions connecting the formula to an SE</a></li>
+  <li><a href="#putting-it-together-the-recipe-we-use" id="toc-putting-it-together-the-recipe-we-use" class="nav-link" data-scroll-target="#putting-it-together-the-recipe-we-use"><span class="header-section-number">8</span> Putting it together: the recipe we use</a></li>
+  <li><a href="#words-you-will-meet" id="toc-words-you-will-meet" class="nav-link" data-scroll-target="#words-you-will-meet"><span class="header-section-number">9</span> Words you will meet</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">10</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-cov-01-separate-nuisance-bias-from-held-out-fluctuation" id="toc-checkpoint-cov-01-separate-nuisance-bias-from-held-out-fluctuation" class="nav-link" data-scroll-target="#checkpoint-cov-01-separate-nuisance-bias-from-held-out-fluctuation">Checkpoint · COV-01 — Separate nuisance bias from held-out fluctuation</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">11</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Residual covariance and nuisance-estimation error</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Population nuisance bias, held-out evaluation, and conditions for first-order inference</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> <a href="../../guides/statistical-models/conditional-expectation.html">Conditional expectation and L2 geometry</a>, <a href="../../guides/statistical-models/models-and-efficiency.html">Model restrictions and efficiency</a>, and <a href="../../guides/semiparametric-methods/influence-function-to-estimator.html">From an influence function to an estimator</a>. This application reuses the capstone’s nuisance-bias and held-out empirical-term arguments for a covariance target.</p>
+<section id="the-problem-this-page-solves" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="the-problem-this-page-solves"><span class="header-section-number">1</span> The problem this page solves</h2>
+<p>The <a href="../../guides/statistical-models/models-and-efficiency.html">Model restrictions and efficiency</a> page introduced an asymptotic efficiency benchmark and showed how its influence function can depend on unknown nuisance quantities. Here the nuisance is a regression function: how a gene’s mean, or variance, depends on covariates such as cell composition, age, batch, or an interferon score. The estimand here is the average conditional covariance between two genes after removing their conditional means given <span class="math inline">Z</span>, rather than a causal or conditional-independence claim. We do not want to assume the regressions are linear, so we estimate them flexibly, and then we need to know how the error in those flexible estimates propagates into the estimand. For this target, an orthogonal residual-product equation removes the first-order population nuisance error. Its exact remaining bias and its empirical fluctuation still need control.</p>
+<p>This transfer application reuses Neyman orthogonality and cross-fitting for a different target. The task is to determine which derivatives and remainder terms change for covariance.</p>
+<p><span id="the-efficient-influence-function-briefly"></span></p>
+</section>
+<section id="the-conditional-covariance-two-ways" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="the-conditional-covariance-two-ways"><span class="header-section-number">2</span> The conditional covariance, two ways</h2>
+<p>Let <span class="math inline">Z</span> be a covariate (say, a cell-composition score), and let <span class="math inline">m_X(z) = E[X \mid Z = z]</span> and <span class="math inline">m_Y(z) = E[Y \mid Z = z]</span>. The estimand is the average conditional covariance</p>
+<p><span class="math display">
+\psi = E\big[\operatorname{Cov}(X, Y \mid Z)\big].
+</span></p>
+<p>This is the covariance between two genes after removing what each shares with <span class="math inline">Z</span>, averaged over the population. There are at least two correct formulas for it:</p>
+<p><span class="math display">
+\psi = E\big[(X-m_X(Z))(Y-m_Y(Z))\big]
+</span></p>
+<p><span class="math display">
+\psi = E[XY]-E[m_X(Z)m_Y(Z)]
+</span></p>
+<p>The first is the <strong>residual form</strong> and the second the <strong>difference form</strong>. Both are exactly right if <span class="math inline">m_X</span> and <span class="math inline">m_Y</span> are the true regression functions. Both can be turned into estimators by plugging in estimates <span class="math inline">\hat m_X</span> and <span class="math inline">\hat m_Y</span> and averaging. They behave completely differently when the estimates are imperfect.</p>
+<p>To verify their equality, expand the residual product. The tower property gives <span class="math inline">E[Xm_Y(Z)]=E[m_X(Z)m_Y(Z)]</span>, and the same identity holds with X and Y reversed. Two subtractions and one addition of that mean-product term leave the difference form. Algebraic equivalence <strong>at the truth</strong> does not imply equal sensitivity to estimated inputs.</p>
+<p>Write <span class="math inline">W=(X,Y,Z)</span> for one person’s record. Throughout, <span class="math inline">P f=E[f(W)]</span> denotes a population average, <span class="math inline">P_n f=n^{-1}\sum_i f(W_i)</span> a sample average, and <span class="math inline">\|f\|_2=\{E[f(W)^2]\}^{1/2}</span> the population root-mean-square size. Existence of the covariance needs second moments of X and Y. A CLT for their residual product needs the product itself to have finite variance; suitable fourth moments are a convenient stronger condition.</p>
+</section>
+<section id="neyman-orthogonality" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="neyman-orthogonality"><span class="header-section-number">3</span> Neyman orthogonality</h2>
+<p>We want a formula whose population value changes little when a fitted conditional mean is slightly wrong. Write the trained errors as <span class="math inline">\delta_X=\hat m_X-m_X</span> and <span class="math inline">\delta_Y=\hat m_Y-m_Y</span>. A fitted residual is <span class="math inline">U_X-\delta_X</span>, so the exact expansion is</p>
+<p><span class="math display">
+\begin{aligned}
+E[(U_X-\delta_X)(U_Y-\delta_Y)]&amp;=\psi-E[U_X\delta_Y]-E[U_Y\delta_X] +E[\delta_X\delta_Y]\\
+&amp;=\psi+E[\delta_X\delta_Y].
+\end{aligned}
+</span></p>
+<p>The two single-error terms vanish because each error is a function of Z and each true residual has conditional mean zero given Z. Only their product remains. In contrast, plugging into the difference form leaves <span class="math inline">-E[m_X\delta_Y+m_Y\delta_X+\delta_X\delta_Y]</span>, including single-error terms. This exact comparison motivates the derivative definition that follows.</p>
+<p>Hold the population law <span class="math inline">P</span> fixed and write the population estimating map as <span class="math inline">M(m)</span>, with nuisance arguments <span class="math inline">m</span> and true pair <span class="math inline">m_0=(m_X,m_Y)</span> satisfying <span class="math inline">M(m_0)=\psi</span>. The target is fixed; we are varying the nuisance arguments supplied to the formula. Perturb them along an admissible direction <span class="math inline">h</span>. The equation is <strong>Neyman orthogonal</strong> when</p>
+<p><span class="math display">
+\frac{\partial}{\partial\varepsilon}M(m_0+\varepsilon h)
+\Big|_{\varepsilon=0}=0.
+</span></p>
+<p>The derivative is taken at the true nuisance for the permitted directions. A quadratic remainder additionally needs smoothness and norm controls; a zero derivative alone is not a universal rate theorem. For the residual product below, the second-order term follows from exact algebra.</p>
+<p><strong>Residual form.</strong> Write <span class="math inline">U_X=X-m_X(Z)</span> and <span class="math inline">U_Y=Y-m_Y(Z)</span> for the true conditional-mean residuals. Perturb <span class="math inline">m_X</span> by <span class="math inline">\varepsilon h_X(Z)</span>:</p>
+<p><span class="math display">
+\begin{aligned}
+\frac{\partial}{\partial\varepsilon}E[(U_X-\varepsilon h_X)U_Y]\Big|_0&amp;=-E[h_X(Z)U_Y]\\
+&amp;=-E[h_X(Z)E(U_Y\mid Z)]\\
+&amp;=0,
+\end{aligned}
+</span></p>
+<p>because <span class="math inline">E[Y - m_Y(Z) \mid Z] = 0</span> by definition of <span class="math inline">m_Y</span>. The same holds for <span class="math inline">m_Y</span>. The residual form is orthogonal. Its second-order term is <span class="math inline">E[h_X(Z) h_Y(Z)]\,\varepsilon^2</span>: the product of the two nuisance errors.</p>
+<p><strong>Difference form.</strong> Perturb <span class="math inline">m_X</span>:</p>
+<p><span class="math display">
+\frac{\partial}{\partial\varepsilon} \{E[XY]-E[(m_X+\varepsilon h_X)m_Y]\}\Big|_0=-E[h_X(Z)m_Y(Z)],
+</span></p>
+<p>This derivative is generally nonzero, so the difference-form plug-in is not generally orthogonal. Particular directions can still give zero derivative; orthogonality requires the condition for every relevant direction.</p>
+<p>Here it is numerically. Inject a known error into the nuisance (inflate the true regression function by a factor <span class="math inline">1 + \varepsilon</span>) and watch the two formulas.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">20000</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n); e1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); e2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> z <span class="sc">+</span> e1                 <span class="co"># m_X(z) = z</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> z <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> e1 <span class="sc">+</span> e2      <span class="co"># m_Y(z) = z;  Cov(X, Y | Z) = 0.5 exactly</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>m_x <span class="ot">&lt;-</span> z; m_y <span class="ot">&lt;-</span> z          <span class="co"># the true nuisances</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>Residual   <span class="ot">&lt;-</span> <span class="cf">function</span>(mx, my) <span class="fu">mean</span>((x <span class="sc">-</span> mx) <span class="sc">*</span> (y <span class="sc">-</span> my))</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>Difference <span class="ot">&lt;-</span> <span class="cf">function</span>(mx, my) <span class="fu">mean</span>(x <span class="sc">*</span> y) <span class="sc">-</span> <span class="fu">mean</span>(mx <span class="sc">*</span> my)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.4</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">sapply</span>(eps, <span class="cf">function</span>(e) <span class="fu">c</span>(<span class="at">residual_form =</span> <span class="fu">Residual</span>((<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_x, (<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_y),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">difference_form =</span> <span class="fu">Difference</span>((<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_x, (<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_y)))</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(out) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"eps="</span>, eps)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(out, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                eps=0 eps=0.05 eps=0.1 eps=0.2 eps=0.4
+residual_form   0.494    0.495   0.498   0.508   0.548
+difference_form 0.493    0.459   0.423   0.346   0.173</code></pre>
+</div>
+</div>
+<p>With <span class="math inline">m_X = m_Y = Z</span> and <span class="math inline">Z</span> uniform, the residual form’s error is <span class="math inline">\varepsilon^2 E[Z^2] = \varepsilon^2/3</span> (about 0.003 at <span class="math inline">\varepsilon = 0.1</span>) and the difference form’s is <span class="math inline">-2\varepsilon/3 - \varepsilon^2/3</span> (about <span class="math inline">-0.07</span> at <span class="math inline">\varepsilon = 0.1</span>). Those are population biases for this perturbation. The displayed sample averages also contain Monte Carlo fluctuation; these numerical biases are specific to the perturbation.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="at">length.out =</span> <span class="dv">201</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(grid, <span class="fu">cbind</span>(<span class="at">residual =</span> grid<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>, <span class="at">difference =</span> <span class="sc">-</span>(<span class="dv">2</span><span class="sc">*</span>grid <span class="sc">+</span> grid<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span><span class="dv">3</span>),</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Nuisance perturbation epsilon"</span>, <span class="at">ylab =</span> <span class="st">"Population bias"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">v =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">"gray70"</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"Residual form"</span>, <span class="st">"Difference form"</span>), <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-orthogonal-sensitivity" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Bias curves show a flat tangent at zero for the residual form and a downward linear component for the difference form.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-orthogonal-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="residual-covariance-and-nuisance-error_files/figure-html/fig-orthogonal-sensitivity-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Exact population bias in the stated synthetic perturbation. The residual formula changes quadratically; the difference formula has a nonzero first-order slope. These curves are not sampled estimates."><img src="residual-covariance-and-nuisance-error_files/figure-html/fig-orthogonal-sensitivity-1.png" class="img-fluid figure-img" alt="Bias curves show a flat tangent at zero for the residual form and a downward linear component for the difference form." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-orthogonal-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Exact population bias in the stated synthetic perturbation. The residual formula changes quadratically; the difference formula has a nonzero first-order slope. These curves are not sampled estimates.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The remainder of the residual form is a <em>product</em> of the two nuisance errors, so it also vanishes when either regression function is exactly right. Keep <span class="math inline">m_X</span> exact and make <span class="math inline">m_Y</span> badly wrong:</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>m_y_wrong <span class="ot">&lt;-</span> <span class="dv">3</span> <span class="sc">*</span> z <span class="sc">+</span> <span class="dv">1</span>                                   <span class="co"># a badly wrong nuisance function</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">c</span>(<span class="at">residual_form   =</span> <span class="fu">Residual</span>(m_x, m_y_wrong),      <span class="co"># still near 0.5 (Monte Carlo SE about 0.02)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">difference_form =</span> <span class="fu">Difference</span>(m_x, m_y_wrong)),   <span class="co"># far from 0.5</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>      <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>  residual_form difference_form 
+          0.488          -0.675 </code></pre>
+</div>
+</div>
+<p>The important condition is on the product of nuisance errors, not on the name of the learning algorithm. For root-<span class="math inline">n</span> inference centered at the target, a usual sufficient condition here is</p>
+<p><span class="math display">
+\|\delta_X\|_2\,\|\delta_Y\|_2=o_p(n^{-1/2}),
+</span></p>
+<p>along with moment, consistency, and sampling conditions. Errors of exactly order <span class="math inline">n^{-1/4}</span> each give a product of order <span class="math inline">n^{-1/2}</span>, which need not be negligible; both being <span class="math inline">o_p(n^{-1/4})</span> is sufficient, and faster convergence of one can compensate for slower convergence of the other. Orthogonality removes the first-order population term, while cross-fitting helps control the empirical term. Neither promises valid inference for arbitrary nuisance fits. <a href="https://arxiv.org/abs/1608.00060">Chernozhukov et al.</a> develop this distinction.</p>
+</section>
+<section id="the-connection-to-the-efficient-influence-function" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-connection-to-the-efficient-influence-function"><span class="header-section-number">4</span> The connection to the efficient influence function</h2>
+<p>Efficient influence functions provide a systematic route to orthogonal equations. Orthogonality to nuisance <em>scores</em> is a model-geometric statement; Neyman orthogonality concerns derivatives of the chosen estimating equation in its nuisance arguments. For a valid influence-function construction these properties are connected under regularity conditions. We can verify the nuisance derivative directly for this residual-product equation. For <span class="math inline">\psi</span> above, the EIF is</p>
+<p><span class="math display">
+\operatorname{EIF}(X,Y,Z)=U_XU_Y-\psi,
+</span></p>
+<p>and setting its sample average to zero gives the residual form. The naive difference-form plug-in has first-order nuisance sensitivity. It is not automatically an estimator with a different valid influence function: its behavior also depends on how the regressions are estimated. So the recipe for an orthogonal estimator is: find the EIF, and estimate by solving its empirical mean equals zero. The <strong>one-step estimator</strong> adds an estimated influence-function correction to an initial estimate. Writing <span class="math inline">P_n</span> for a sample average,</p>
+<p><span class="math display">
+\hat\psi_{\rm step}=\hat\psi_{\rm initial} +P_n\phi(W;\hat\psi_{\rm initial},\hat m).
+</span></p>
+<p>Here the centering parameter is included in the estimated influence function. For this residual-covariance equation the initial centering cancels algebraically, leaving the residual-product average. Equivalence to an estimating-equation solution must be checked for the particular target and construction, including how the initial target estimate enters the estimated EIF.</p>
+<p>Why is this the influence function of a target that itself contains conditional means? Along a smooth path with score <span class="math inline">s</span>, differentiating <span class="math inline">E_t[U_{X,t}U_{Y,t}]</span> gives a law-change term <span class="math inline">E[U_XU_Ys]</span> and two mean-change terms. Each mean-change term vanishes by conditional residual centering, just as in the calculation above. Since <span class="math inline">E[s]=0</span>, the derivative is <span class="math inline">E[(U_XU_Y-\psi)s]</span>. In the unrestricted model this identifies the canonical gradient. It is a derivative of the <strong>whole functional</strong>, including its changing conditional means, rather than a calculation that assumes those means are known.</p>
+<p>Deriving EIFs is a skill; Hines et al.&nbsp;(2022) teach it with the Gateaux-derivative method from the <a href="../../guides/statistical-models/influence-functions.html">Influence functions</a> page, and Kennedy (2022) catalogs common examples. Residual correlation requires a further normalization step below.</p>
+</section>
+<section id="cross-fitting" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="cross-fitting"><span class="header-section-number">5</span> Cross-fitting</h2>
+<p>Cross-fitting separates a held-out observation from its own training fit. It does not make nuisance predictions correct or all held-out contributions jointly independent: different folds share training observations.</p>
+<p>One more problem. If <span class="math inline">\hat m_X</span> is fit on the same observations it is then evaluated on, the fit absorbs some of each observation’s own noise. The residual <span class="math inline">X_i - \hat m_X(Z_i)</span> is then too small, and because <span class="math inline">Y_i - \hat m_Y(Z_i)</span> is shrunk in a correlated way, the residual product is biased. For a fixed common linear smoother <span class="math inline">S</span>, an error-covariance contribution is scaled by <span class="math inline">\operatorname{tr}\{(I-S)^\top(I-S)\}/N</span>; a projection fit loses its rank in this trace. A smoothing spline is not generally a projection, and adaptive fits need their own analysis. The direction and size of the total finite-sample bias also depend on approximation error.</p>
+<p><strong>Cross-fitting</strong> prevents a held-out outcome from being used to train its own prediction. Split the sample into <span class="math inline">K</span> folds. For each fold, fit the nuisances on the other <span class="math inline">K - 1</span> folds and evaluate the residuals on the held-out fold. Average the residual products over all folds. Each observation’s residual now uses a nuisance fit that never saw it.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Nonlinear nuisance so that a smoother is needed. Cov(X, Y | Z) = 0.5 again.</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>OneRep <span class="ot">&lt;-</span> <span class="cf">function</span>(n, <span class="at">df =</span> <span class="dv">15</span>, <span class="at">K =</span> <span class="dv">5</span>) {</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n); e1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); e2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> m <span class="sc">+</span> e1; y <span class="ot">&lt;-</span> m <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> e1 <span class="sc">+</span> e2</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  Fit <span class="ot">&lt;-</span> <span class="cf">function</span>(zt, xt, ze) <span class="fu">predict</span>(<span class="fu">smooth.spline</span>(zt, xt, <span class="at">df =</span> df), ze)<span class="sc">$</span>y</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  in_sample <span class="ot">&lt;-</span> <span class="fu">mean</span>((x <span class="sc">-</span> <span class="fu">Fit</span>(z, x, z)) <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">Fit</span>(z, y, z)))</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  fold <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">rep</span>(<span class="fu">seq_len</span>(K), <span class="at">length.out =</span> n))</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_len</span>(K)) {</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    tr <span class="ot">&lt;-</span> fold <span class="sc">!=</span> k; te <span class="ot">&lt;-</span> fold <span class="sc">==</span> k</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    r[te] <span class="ot">&lt;-</span> (x[te] <span class="sc">-</span> <span class="fu">Fit</span>(z[tr], x[tr], z[te])) <span class="sc">*</span> (y[te] <span class="sc">-</span> <span class="fu">Fit</span>(z[tr], y[tr], z[te]))</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">in_sample =</span> in_sample, <span class="at">cross_fit =</span> <span class="fu">mean</span>(r))</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Bias is measured against the truth (0.5) and compared with the SD of the estimator.</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>Summarize <span class="ot">&lt;-</span> <span class="cf">function</span>(n, <span class="at">R =</span> <span class="dv">150</span>) {</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">replicate</span>(R, <span class="fu">OneRep</span>(n))</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  bias <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(res) <span class="sc">-</span> <span class="fl">0.5</span></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  sd_hat <span class="ot">&lt;-</span> <span class="fu">apply</span>(res, <span class="dv">1</span>, sd)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">n =</span> n, <span class="at">estimator =</span> <span class="fu">rownames</span>(res), <span class="at">bias =</span> <span class="fu">round</span>(bias, <span class="dv">3</span>),</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>             <span class="at">bias_mcse =</span> <span class="fu">round</span>(sd_hat <span class="sc">/</span> <span class="fu">sqrt</span>(R), <span class="dv">4</span>),</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>             <span class="at">sd =</span> <span class="fu">round</span>(sd_hat, <span class="dv">3</span>), <span class="at">bias_over_sd =</span> <span class="fu">round</span>(bias <span class="sc">/</span> sd_hat, <span class="dv">2</span>), <span class="at">row.names =</span> <span class="cn">NULL</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a><span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">c</span>(<span class="dv">200</span>, <span class="dv">800</span>, <span class="dv">3200</span>), Summarize))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>     n estimator   bias bias_mcse    sd bias_over_sd
+1  200 in_sample -0.042    0.0070 0.086        -0.48
+2  200 cross_fit  0.044    0.0083 0.102         0.43
+3  800 in_sample -0.008    0.0036 0.044        -0.19
+4  800 cross_fit  0.013    0.0038 0.047         0.27
+5 3200 in_sample -0.002    0.0017 0.021        -0.09
+6 3200 cross_fit  0.004    0.0017 0.021         0.17</code></pre>
+</div>
+</div>
+<p>Read bias against its Monte Carlo SE and the estimator’s sampling SD. The common-smoother trace can explain downward in-sample noise absorption. Cross-fitting can leave positive bias because the two estimated regression errors are correlated through shared training noise.</p>
+<p><strong>This experiment does not prove root-<span class="math inline">n</span> inference.</strong> Keeping the spline’s nominal degrees of freedom fixed does not generally make its approximation error vanish for every nonlinear mean. Three sample sizes do not establish an asymptotic rate, and changing the fold count need not decrease bias monotonically. Tuning, approximation, moments, and the full remainder still matter.</p>
+<section id="a-counterexample-separated-folds-with-a-bad-nuisance-learner" class="level3" data-number="5.1">
+<h3 data-number="5.1" class="anchored" data-anchor-id="a-counterexample-separated-folds-with-a-bad-nuisance-learner"><span class="header-section-number">5.1</span> A counterexample: separated folds with a bad nuisance learner</h3>
+<p>Here both true conditional means are zero and the true residual covariance is 0.5. A one-nearest-neighbor fit interpolates its training outcomes, giving zero in-sample residual products. Out of fold, it predicts a different person’s noise. Because the same neighbor supplies both predictions, their errors have covariance 0.5: the cross-fitted residual product has expectation 1, not 0.5. The learner’s nuisance error does not vanish. A training-set mean is a consistent nuisance fit in this deliberately flat model.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">22</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>BadLearner <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n =</span> <span class="dv">250</span>, <span class="at">K =</span> <span class="dv">5</span>) {</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n); x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); y <span class="ot">&lt;-</span> <span class="fl">0.5</span><span class="sc">*</span>x <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  fold <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">rep</span>(<span class="fu">seq_len</span>(K), <span class="at">length.out =</span> n))</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>  nearest <span class="ot">&lt;-</span> constant <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_len</span>(K)) {</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    tr <span class="ot">&lt;-</span> <span class="fu">which</span>(fold <span class="sc">!=</span> k); te <span class="ot">&lt;-</span> <span class="fu">which</span>(fold <span class="sc">==</span> k)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    neighbor <span class="ot">&lt;-</span> tr[<span class="fu">max.col</span>(<span class="sc">-</span><span class="fu">outer</span>(z[te], z[tr], <span class="st">"-"</span>)<span class="sc">^</span><span class="dv">2</span>, <span class="at">ties.method =</span> <span class="st">"first"</span>)]</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    nearest[te] <span class="ot">&lt;-</span> (x[te]<span class="sc">-</span>x[neighbor])<span class="sc">*</span>(y[te]<span class="sc">-</span>y[neighbor])</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    constant[te] <span class="ot">&lt;-</span> (x[te]<span class="sc">-</span><span class="fu">mean</span>(x[tr]))<span class="sc">*</span>(y[te]<span class="sc">-</span><span class="fu">mean</span>(y[tr]))</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">in_sample_1NN =</span> <span class="dv">0</span>, <span class="at">cross_fit_1NN =</span> <span class="fu">mean</span>(nearest), <span class="at">cross_fit_mean =</span> <span class="fu">mean</span>(constant))</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>bad_fit <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">120</span>, <span class="fu">BadLearner</span>())</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(<span class="fu">t</span>(bad_fit), <span class="at">names =</span> <span class="fu">c</span>(<span class="st">"In-sample</span><span class="sc">\n</span><span class="st">1NN"</span>, <span class="st">"Cross-fit</span><span class="sc">\n</span><span class="st">1NN"</span>, <span class="st">"Cross-fit</span><span class="sc">\n</span><span class="st">mean"</span>),</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"gray80"</span>, <span class="st">"#D55E0033"</span>, <span class="st">"#2F80C833"</span>), <span class="at">ylab =</span> <span class="st">"Estimated residual covariance"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fl">0.5</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div id="fig-crossfit-counterexample" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Boxplots compare an in-sample nearest-neighbor estimate near zero, a cross-fitted nearest-neighbor estimate near one, and a cross-fitted training-mean estimate near the true covariance one half.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-crossfit-counterexample-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="residual-covariance-and-nuisance-error_files/figure-html/fig-crossfit-counterexample-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-2" title="Figure&nbsp;2: An interpolation counterexample with 120 independent synthetic datasets. Separating folds removes own-outcome reuse, but a one-nearest-neighbor nuisance still leaves population bias. A training mean works here because the true means are zero."><img src="residual-covariance-and-nuisance-error_files/figure-html/fig-crossfit-counterexample-1.png" class="img-fluid figure-img" alt="Boxplots compare an in-sample nearest-neighbor estimate near zero, a cross-fitted nearest-neighbor estimate near one, and a cross-fitted training-mean estimate near the true covariance one half." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-crossfit-counterexample-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: An interpolation counterexample with 120 independent synthetic datasets. Separating folds removes own-outcome reuse, but a one-nearest-neighbor nuisance still leaves population bias. A training mean works here because the true means are zero.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A finite-sample spread in the plot does not change the exact expectation argument. To see the mechanism directly, the held-out person and their selected training neighbor have independent residual pairs, each with covariance 0.5. Expanding <span class="math inline">(X_i-X_{\rm neighbor})(Y_i-Y_{\rm neighbor})</span> leaves <strong>two</strong> covariance terms, totaling 1, because predicting with one neighbor retains its noise even as the training set grows. Predicting with a training mean instead adds only <span class="math inline">0.5/n_{\rm train}</span> in expectation. That extra term vanishes as the training set grows. Cross-fitting removes self-use in both cases, but only the second learner estimates the zero conditional means consistently in this example.</p>
+</section>
+</section>
+<section id="the-fold-includes-the-fitting-pipeline" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="the-fold-includes-the-fitting-pipeline"><span class="header-section-number">6</span> The fold includes the fitting pipeline</h2>
+<p>For an independent-subject analysis, put all observations from one subject in the same fold. Estimate outcome-dependent preprocessing, feature selection, tuning, and nuisance regressions within the training data when they belong to the fitting pipeline; then apply those fitted operations to held-out observations. A fixed transformation chosen independently of the analysis can be applied consistently across folds. Shared preprocessing learned from all observations needs its own justification and can otherwise leak evaluation information into training.</p>
+<p>For this average covariance, the held-out contribution and estimator are</p>
+<p><span class="math display">
+\begin{aligned}
+R_i&amp;=\{X_i-\hat m_X^{(-k)}(Z_i)\} \times\{Y_i-\hat m_Y^{(-k)}(Z_i)\},\\
+\hat\psi&amp;=n^{-1}\sum_iR_i.
+\end{aligned}
+</span></p>
+<p>The estimated influence contributions are <span class="math inline">R_i-\hat\psi</span>. For a residual correlation, estimate the covariance and both residual variances jointly; averaging stratum-specific correlations is a different target. Put <span class="math inline">v_X=E[U_X^2]</span>, <span class="math inline">v_Y=E[U_Y^2]</span>, and <span class="math inline">\rho=\psi/\sqrt{v_Xv_Y}</span>, with both variances positive. The delta method gives</p>
+<p><span class="math display">
+\phi_\rho=\frac{U_XU_Y-\psi}{\sqrt{v_Xv_Y}} -\frac{\rho}{2}\left\{ \frac{U_X^2-v_X}{v_X}+\frac{U_Y^2-v_Y}{v_Y}\right\}.
+</span></p>
+<p>The first term tracks covariance uncertainty; the second tracks uncertainty in both normalizers. Replace all components by held-out estimates, then take the SD of the resulting influence values divided by <span class="math inline">\sqrt n</span> under the inference conditions below. Reusing only the covariance SE would omit denominator uncertainty. Also, an exact <span class="math inline">m_X</span> alone does not repair the Y variance: its population bias is <span class="math inline">E[\delta_Y^2]</span>. The covariance’s either-mean-correct property therefore does not automatically transfer to correlation.</p>
+</section>
+<section id="conditions-connecting-the-formula-to-an-se" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="conditions-connecting-the-formula-to-an-se"><span class="header-section-number">7</span> Conditions connecting the formula to an SE</h2>
+<p>Let <span class="math inline">D_0=(X-m_X)(Y-m_Y)</span>, and for fold <span class="math inline">k</span> let <span class="math inline">H_k=D_{\hat m_k}-D_0</span>. With <span class="math inline">w_k=n_k/n</span>,</p>
+<p><span class="math display">
+\hat\psi-\psi=(P_n-P)(D_0-\psi) +\sum_k w_k(P_{n,k}-P)H_k +\sum_k w_kE[\Delta_{X,k}\Delta_{Y,k}].
+</span></p>
+<p>For i.i.d. units and a fixed number of nonvanishing folds, require <span class="math inline">0&lt;\operatorname{Var}(D_0)&lt;\infty</span>, <span class="math inline">\|H_k\|_2=o_p(1)</span>, and the product bias <span class="math inline">o_p(n^{-1/2})</span> in every fold. Conditional variance within each held-out fold controls the middle term; the proof in <a href="../../guides/semiparametric-methods/influence-function-to-estimator.html#checkpoint-sp-12">From an influence function to an estimator</a> shows that step. Do not assume joint conditional independence across all folds.</p>
+<p>Under these controls, averaging the true contributions gives a CLT and the sample SD of the estimated contributions divided by <span class="math inline">\sqrt n</span> consistently estimates the SE. L2 consistency of mean fits alone need not imply L2 consistency of their products. Bounded outcomes/fits plus L2 nuisance consistency are one sufficient setup; suitable L4 moments and L4 nuisance consistency are another route. See <a href="../../guides/semiparametric-methods/nuisance-estimation.html">Estimating nuisance functions for inference</a> for a concrete learning-rate calculation.</p>
+</section>
+<section id="putting-it-together-the-recipe-we-use" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="putting-it-together-the-recipe-we-use"><span class="header-section-number">8</span> Putting it together: the recipe we use</h2>
+<p>For an estimand with nuisances, the group’s estimators are built in this order.</p>
+<ol type="1">
+<li>Write the estimand as a functional <span class="math inline">\psi(F)</span> and derive its efficient influence function.</li>
+<li>Estimate the nuisances flexibly, with cross-fitting.</li>
+<li>Construct the orthogonal formula or EIF estimating equation. Verify any claimed equivalence with a one-step or targeted construction for this particular target.</li>
+<li>Standard error: for independent units and valid remainder conditions, use the sample standard deviation of estimated EIF values divided by <span class="math inline">\sqrt n</span>. With clustered observations, aggregate contributions and use a design-appropriate variance calculation. Orthogonality alone does not establish these conditions.</li>
+</ol>
+<p>For sample-specific network summaries, define the population quantity and derive the relevant correction before assigning an observation-level interpretation. The <a href="../../guides/analysis-problems/jackknife-pseudo-values.html">Jackknife pseudo-values</a> page explains why simply recentering a cohort-derived score is not by itself an inferential argument.</p>
+</section>
+<section id="words-you-will-meet" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="words-you-will-meet"><span class="header-section-number">9</span> Words you will meet</h2>
+<ul>
+<li><strong>Double robustness.</strong> A separate robustness property of some estimating equations with two nuisances (an outcome regression and a propensity or censoring model) where the estimator is consistent if <em>either</em> nuisance is correct. The residual form of <span class="math inline">\psi</span> has this property: its remainder is the product <span class="math inline">E[h_X h_Y]</span>, so it is zero when either <span class="math inline">m_X</span> or <span class="math inline">m_Y</span> is exactly right, whatever the other is (see the check above). This same either-correct guarantee does not generally transfer to residual <em>correlation</em>: its two residual-variance denominators each have a squared-error remainder for their own mean fit.</li>
+<li><strong>Targeted learning, TMLE, double machine learning (DML).</strong> Related frameworks that can use orthogonal estimating constructions and sample splitting. Targeted learning emphasizes distributional updates, while DML emphasizes orthogonal moments with learned nuisances; neither label alone specifies a complete algorithm or proof. Some valid procedures avoid splitting by imposing different empirical-process conditions. For the same target and efficiency conditions, particular estimators can share an efficient first-order expansion. The frameworks are not interchangeable in every model or finite sample.</li>
+</ul>
+</section>
+<section id="exercises" class="level2" data-number="10">
+<h2 data-number="10" class="anchored" data-anchor-id="exercises"><span class="header-section-number">10</span> Exercises</h2>
+<p><strong>The checkpoint is this page’s completion target. Additional practice is optional.</strong> Use the missing-mean argument as a reference, but derive the covariance remainder rather than assuming it is unchanged.</p>
+<div id="checkpoint-cov-01" class="checkpoint">
+<section id="checkpoint-cov-01-separate-nuisance-bias-from-held-out-fluctuation" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-cov-01-separate-nuisance-bias-from-held-out-fluctuation">Checkpoint · COV-01 — Separate nuisance bias from held-out fluctuation</h3>
+<p><strong>Task type:</strong> Derivation and rate reasoning.</p>
+<p>Let <span class="math inline">m_X(Z)=E[X\mid Z]</span>, <span class="math inline">m_Y(Z)=E[Y\mid Z]</span>, and <span class="math inline">\psi=E[(X-m_X(Z))(Y-m_Y(Z))]</span>. Hold training fits fixed, with errors <span class="math inline">\delta_X=\hat m_X-m_X</span> and <span class="math inline">\delta_Y=\hat m_Y-m_Y</span>. Assume the variables and fitted means have finite second moments.</p>
+<ol type="1">
+<li>Derive the population bias of the residual-product formula and of the difference formula <span class="math inline">E[XY]-E[\hat m_X(Z)\hat m_Y(Z)]</span>. Which formula removes the terms involving only one nuisance error?</li>
+<li>Take both errors to be the positive constant <span class="math inline">n^{-1/5}</span>. Calculate the residual-product bias and its size after multiplication by <span class="math inline">\sqrt n</span>. Would evaluating on held-out people remove it?</li>
+<li>State a sufficient product-of-L2-errors condition for negligible root-<span class="math inline">n</span> bias. Identify the separate fitted-minus-true empirical term and variance conditions still needed before reporting an influence-function SE.</li>
+</ol>
+<p><strong>Ready to continue when:</strong> you can derive the covariance nuisance-bias remainder and distinguish its rate requirement from cross-fitting and variance consistency.</p>
+<p><strong>Transfer:</strong> If one conditional mean is exactly correct and the other is misspecified, what happens to the population bias? Does that alone establish the efficient-SE argument?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Write each fitted residual as its true residual minus <span class="math inline">\delta</span>. Condition on <span class="math inline">Z</span> to remove the single-error terms in the residual product. For the rate comparison, multiply the product bias by <span class="math inline">\sqrt n</span> before judging whether it disappears.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>Writing <span class="math inline">U_X=X-m_X(Z)</span> and <span class="math inline">U_Y=Y-m_Y(Z)</span> gives</p>
+<p><span class="math display">
+E[(U_X-\delta_X)(U_Y-\delta_Y)]-\psi
+=E[\delta_X\delta_Y],
+</span></p>
+<p>because both true residuals have conditional mean zero given <span class="math inline">Z</span>. The difference formula instead has bias <span class="math inline">-E[m_X\delta_Y+m_Y\delta_X+\delta_X\delta_Y]</span>, which generally includes single-error terms.</p>
+<p>With both errors equal to <span class="math inline">n^{-1/5}</span>, the residual-product bias is <span class="math inline">n^{-2/5}</span> and its scaled size is <span class="math inline">n^{1/10}</span>, which diverges. Cross-fitting does not change this population expectation.</p>
+<p>Cauchy–Schwarz bounds the bias by <span class="math inline">\|\delta_X\|_2\|\delta_Y\|_2</span>, so a product <span class="math inline">o_p(n^{-1/2})</span> is sufficient. The held-out empirical term is <span class="math inline">(P_{n,k}-P)H_k</span>, where <span class="math inline">H_k</span> is the fitted-minus-true residual product. Its L2 size must vanish under the stated fold conditions. A CLT for the true contribution and consistent estimation of its finite, positive variance are also required; L2 consistency of the mean fits alone need not control their product’s L2 size.</p>
+<p>If either error is zero, the population bias is zero. The remaining fit can still change the leading contribution and its variance, so this alone does not establish the efficient-SE argument.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<p>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</p>
+<ol type="1">
+<li>Show that the variance <span class="math inline">\sigma^2 = E[(X - \mu)^2]</span>, viewed as a formula with nuisance <span class="math inline">\mu</span>, is Neyman orthogonal in <span class="math inline">\mu</span>. Then show that the formula <span class="math inline">E[X^2] - \mu^2</span> is not. Check both numerically by inflating <span class="math inline">\mu</span> by <span class="math inline">1 + \varepsilon</span>.</li>
+<li>In the orthogonality simulation, replace the inflation error with an additive error <span class="math inline">m + \varepsilon(Z - 1/2)</span> and predict, before running, the leading term of each formula’s bias.</li>
+<li>Change <code>df</code> in the cross-fitting example to 5 and to 40 and re-run at <span class="math inline">N = 200</span>. How do the two biases change, and which grows faster with <code>df</code>? Then replace the smoothing spline with an average of 20 deep regression trees, each grown on a bootstrap resample (<code>rpart</code> is a recommended R package; use <code>rpart.control()</code> with <code>cp=0</code>, <code>minsplit=5</code>, and <code>minbucket=3</code>). Compare the in-sample and cross-fit biases. Why does a deep tree fit its own noise?</li>
+<li>The residual correlation is <span class="math inline">\psi / \sqrt{\psi_{XX}\,\psi_{YY}}</span> with <span class="math inline">\psi_{XX} = E[\operatorname{Var}(X \mid Z)]</span>. Write the orthogonal estimators of the three pieces and combine them. What does the delta method say about the standard error?</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="11">
+<h2 data-number="11" class="anchored" data-anchor-id="reading"><span class="header-section-number">11</span> Reading</h2>
+<p>The <a href="https://arxiv.org/abs/1608.00060">DML paper</a> and <a href="https://arxiv.org/html/2203.06469v2">Kennedy review</a> provide the formal conditions behind the constructions.</p>
+<ul>
+<li>Hines, O., Dukes, O., Diaz-Ordaz, K., and Vansteelandt, S. (2022). Demystifying statistical learning based on efficient influence functions. <em>The American Statistician</em>, 76(3), 292 to 304. An introductory derivation-focused treatment.</li>
+<li>Kennedy, E. H. (2022). Semiparametric doubly robust targeted double machine learning: a review. arXiv:2203.06469. Influence-function construction, remainder decomposition, and efficiency conditions.</li>
+<li>Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., and Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. <em>The Econometrics Journal</em>, 21(1), C1 to C68. Section 2 for Neyman orthogonality and cross-fitting.</li>
+<li>Vansteelandt, S. and Dukes, O. (2022). Assumption-lean inference for generalised linear model parameters. <em>Journal of the Royal Statistical Society B</em>, 84(3), 657 to 685. Asks what a regression coefficient estimates when the model is wrong, defines an estimand that does not depend on the model being right, and builds the orthogonal estimator for it. The target remains defined independently of the correctness of the working regression model.</li>
+<li>Tsiatis, A. A. (2006). <em>Semiparametric Theory and Missing Data</em>. Springer. Chapters 3 and 4 for the geometry, when you want the full version.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/analysis-problems/jackknife-pseudo-values.html" class="pagination-link" aria-label="Jackknife pseudo-values">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Jackknife pseudo-values</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/analysis-problems/multivariate-comparisons.html" class="pagination-link" aria-label="Multivariate comparisons: permutation and distance-based tests">
+        <span class="nav-page-text">Multivariate comparisons: permutation and distance-based tests</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Residual covariance and nuisance-estimation error"</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Population nuisance bias, held-out evaluation, and conditions for first-order inference"</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>**Before reading:** <span class="co">[</span><span class="ot">Conditional expectation and L2 geometry</span><span class="co">](../statistical-models/conditional-expectation.qmd)</span>, <span class="co">[</span><span class="ot">Model restrictions and efficiency</span><span class="co">](../statistical-models/models-and-efficiency.qmd)</span>, and <span class="co">[</span><span class="ot">From an influence function to an estimator</span><span class="co">](../semiparametric-methods/influence-function-to-estimator.qmd)</span>. This application reuses the capstone's nuisance-bias and held-out empirical-term arguments for a covariance target.</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## The problem this page solves</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">Model restrictions and efficiency</span><span class="co">](../statistical-models/models-and-efficiency.qmd)</span> page introduced an asymptotic efficiency benchmark and showed how its influence function can depend on unknown nuisance quantities. Here the nuisance is a regression function: how a gene's mean, or variance, depends on covariates such as cell composition, age, batch, or an interferon score. The estimand here is the average conditional covariance between two genes after removing their conditional means given $Z$, rather than a causal or conditional-independence claim. We do not want to assume the regressions are linear, so we estimate them flexibly, and then we need to know how the error in those flexible estimates propagates into the estimand. For this target, an orthogonal residual-product equation removes the first-order population nuisance error. Its exact remaining bias and its empirical fluctuation still need control.</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>This transfer application reuses Neyman orthogonality and cross-fitting for a different target. The task is to determine which derivatives and remainder terms change for covariance.</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"the-efficient-influence-function-briefly"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## The conditional covariance, two ways</span></span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>Let $Z$ be a covariate (say, a cell-composition score), and let $m_X(z) = E<span class="co">[</span><span class="ot">X \mid Z = z</span><span class="co">]</span>$ and $m_Y(z) = E<span class="co">[</span><span class="ot">Y \mid Z = z</span><span class="co">]</span>$. The estimand is the average conditional covariance</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>\psi = E\big<span class="co">[</span><span class="ot">\operatorname{Cov}(X, Y \mid Z)\big</span><span class="co">]</span>.</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>This is the covariance between two genes after removing what each shares with $Z$, averaged over the population. There are at least two correct formulas for it:</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>\psi = E\big<span class="co">[</span><span class="ot">(X-m_X(Z))(Y-m_Y(Z))\big</span><span class="co">]</span></span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>\psi = E<span class="co">[</span><span class="ot">XY</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">m_X(Z)m_Y(Z)</span><span class="co">]</span></span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>The first is the **residual form** and the second the **difference form**. Both are exactly right if $m_X$ and $m_Y$ are the true regression functions. Both can be turned into estimators by plugging in estimates $\hat m_X$ and $\hat m_Y$ and averaging. They behave completely differently when the estimates are imperfect.</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>To verify their equality, expand the residual product. The tower property gives $E<span class="co">[</span><span class="ot">Xm_Y(Z)</span><span class="co">]</span>=E<span class="co">[</span><span class="ot">m_X(Z)m_Y(Z)</span><span class="co">]</span>$, and the same identity holds with X and Y reversed. Two subtractions and one addition of that mean-product term leave the difference form. Algebraic equivalence **at the truth** does not imply equal sensitivity to estimated inputs.</span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>Write $W=(X,Y,Z)$ for one person's record. Throughout, $P f=E<span class="co">[</span><span class="ot">f(W)</span><span class="co">]</span>$ denotes a population average, $P_n f=n^{-1}\sum_i f(W_i)$ a sample average, and $<span class="sc">\|</span>f<span class="sc">\|</span>_2=<span class="sc">\{</span>E<span class="co">[</span><span class="ot">f(W)^2</span><span class="co">]</span><span class="sc">\}</span>^{1/2}$ the population root-mean-square size. Existence of the covariance needs second moments of X and Y. A CLT for their residual product needs the product itself to have finite variance; suitable fourth moments are a convenient stronger condition.</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a><span class="fu">## Neyman orthogonality</span></span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>We want a formula whose population value changes little when a fitted conditional mean is slightly wrong. Write the trained errors as $\delta_X=\hat m_X-m_X$ and $\delta_Y=\hat m_Y-m_Y$. A fitted residual is $U_X-\delta_X$, so the exact expansion is</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">(U_X-\delta_X)(U_Y-\delta_Y)</span><span class="co">]</span>&amp;=\psi-E<span class="co">[</span><span class="ot">U_X\delta_Y</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">U_Y\delta_X</span><span class="co">]</span> +E<span class="co">[</span><span class="ot">\delta_X\delta_Y</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>&amp;=\psi+E<span class="co">[</span><span class="ot">\delta_X\delta_Y</span><span class="co">]</span>.</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>The two single-error terms vanish because each error is a function of Z and each true residual has conditional mean zero given Z. Only their product remains. In contrast, plugging into the difference form leaves $-E<span class="co">[</span><span class="ot">m_X\delta_Y+m_Y\delta_X+\delta_X\delta_Y</span><span class="co">]</span>$, including single-error terms. This exact comparison motivates the derivative definition that follows.</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>Hold the population law $P$ fixed and write the population estimating map as $M(m)$, with nuisance arguments $m$ and true pair $m_0=(m_X,m_Y)$ satisfying $M(m_0)=\psi$. The target is fixed; we are varying the nuisance arguments supplied to the formula. Perturb them along an admissible direction $h$. The equation is **Neyman orthogonal** when</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>\frac{\partial}{\partial\varepsilon}M(m_0+\varepsilon h)</span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>\Big|_{\varepsilon=0}=0.</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>The derivative is taken at the true nuisance for the permitted directions. A quadratic remainder additionally needs smoothness and norm controls; a zero derivative alone is not a universal rate theorem. For the residual product below, the second-order term follows from exact algebra.</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>**Residual form.** Write $U_X=X-m_X(Z)$ and $U_Y=Y-m_Y(Z)$ for the true conditional-mean residuals. Perturb $m_X$ by $\varepsilon h_X(Z)$:</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>\frac{\partial}{\partial\varepsilon}E<span class="co">[</span><span class="ot">(U_X-\varepsilon h_X)U_Y</span><span class="co">]</span>\Big|_0&amp;=-E<span class="co">[</span><span class="ot">h_X(Z)U_Y</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>&amp;=-E<span class="co">[</span><span class="ot">h_X(Z)E(U_Y\mid Z)</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>&amp;=0,</span>
+<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>because $E<span class="co">[</span><span class="ot">Y - m_Y(Z) \mid Z</span><span class="co">]</span> = 0$ by definition of $m_Y$. The same holds for $m_Y$. The residual form is orthogonal. Its second-order term is $E<span class="co">[</span><span class="ot">h_X(Z) h_Y(Z)</span><span class="co">]</span>\,\varepsilon^2$: the product of the two nuisance errors.</span>
+<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>**Difference form.** Perturb $m_X$:</span>
+<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>\frac{\partial}{\partial\varepsilon} <span class="sc">\{</span>E<span class="co">[</span><span class="ot">XY</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">(m_X+\varepsilon h_X)m_Y</span><span class="co">]</span><span class="sc">\}</span>\Big|_0=-E<span class="co">[</span><span class="ot">h_X(Z)m_Y(Z)</span><span class="co">]</span>,</span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>This derivative is generally nonzero, so the difference-form plug-in is not generally orthogonal. Particular directions can still give zero derivative; orthogonality requires the condition for every relevant direction.</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>Here it is numerically. Inject a known error into the nuisance (inflate the true regression function by a factor $1 + \varepsilon$) and watch the two formulas.</span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">20000</span></span>
+<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n); e1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); e2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> z <span class="sc">+</span> e1                 <span class="co"># m_X(z) = z</span></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> z <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> e1 <span class="sc">+</span> e2      <span class="co"># m_Y(z) = z;  Cov(X, Y | Z) = 0.5 exactly</span></span>
+<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>m_x <span class="ot">&lt;-</span> z; m_y <span class="ot">&lt;-</span> z          <span class="co"># the true nuisances</span></span>
+<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>Residual   <span class="ot">&lt;-</span> <span class="cf">function</span>(mx, my) <span class="fu">mean</span>((x <span class="sc">-</span> mx) <span class="sc">*</span> (y <span class="sc">-</span> my))</span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>Difference <span class="ot">&lt;-</span> <span class="cf">function</span>(mx, my) <span class="fu">mean</span>(x <span class="sc">*</span> y) <span class="sc">-</span> <span class="fu">mean</span>(mx <span class="sc">*</span> my)</span>
+<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>eps <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.05</span>, <span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.4</span>)</span>
+<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">sapply</span>(eps, <span class="cf">function</span>(e) <span class="fu">c</span>(<span class="at">residual_form =</span> <span class="fu">Residual</span>((<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_x, (<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_y),</span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>                                 <span class="at">difference_form =</span> <span class="fu">Difference</span>((<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_x, (<span class="dv">1</span> <span class="sc">+</span> e) <span class="sc">*</span> m_y)))</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(out) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"eps="</span>, eps)</span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(out, <span class="dv">3</span>)</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>With $m_X = m_Y = Z$ and $Z$ uniform, the residual form's error is $\varepsilon^2 E<span class="co">[</span><span class="ot">Z^2</span><span class="co">]</span> = \varepsilon^2/3$ (about 0.003 at $\varepsilon = 0.1$) and the difference form's is $-2\varepsilon/3 - \varepsilon^2/3$ (about $-0.07$ at $\varepsilon = 0.1$). Those are population biases for this perturbation. The displayed sample averages also contain Monte Carlo fluctuation; these numerical biases are specific to the perturbation.</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-orthogonal-sensitivity</span></span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Exact population bias in the stated synthetic perturbation. The residual formula changes quadratically; the difference formula has a nonzero first-order slope. These curves are not sampled estimates."</span></span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Bias curves show a flat tangent at zero for the residual form and a downward linear component for the difference form."</span></span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="sc">-</span><span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="at">length.out =</span> <span class="dv">201</span>)</span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a><span class="fu">matplot</span>(grid, <span class="fu">cbind</span>(<span class="at">residual =</span> grid<span class="sc">^</span><span class="dv">2</span><span class="sc">/</span><span class="dv">3</span>, <span class="at">difference =</span> <span class="sc">-</span>(<span class="dv">2</span><span class="sc">*</span>grid <span class="sc">+</span> grid<span class="sc">^</span><span class="dv">2</span>)<span class="sc">/</span><span class="dv">3</span>),</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>        <span class="at">type =</span> <span class="st">"l"</span>, <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>),</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>        <span class="at">xlab =</span> <span class="st">"Nuisance perturbation epsilon"</span>, <span class="at">ylab =</span> <span class="st">"Population bias"</span>)</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="dv">0</span>, <span class="at">v =</span> <span class="dv">0</span>, <span class="at">col =</span> <span class="st">"gray70"</span>)</span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="st">"Residual form"</span>, <span class="st">"Difference form"</span>), <span class="at">lty =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>,</span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>The remainder of the residual form is a *product* of the two nuisance errors, so it also vanishes when either regression function is exactly right. Keep $m_X$ exact and make $m_Y$ badly wrong:</span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>m_y_wrong <span class="ot">&lt;-</span> <span class="dv">3</span> <span class="sc">*</span> z <span class="sc">+</span> <span class="dv">1</span>                                   <span class="co"># a badly wrong nuisance function</span></span>
+<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a><span class="fu">round</span>(<span class="fu">c</span>(<span class="at">residual_form   =</span> <span class="fu">Residual</span>(m_x, m_y_wrong),      <span class="co"># still near 0.5 (Monte Carlo SE about 0.02)</span></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>        <span class="at">difference_form =</span> <span class="fu">Difference</span>(m_x, m_y_wrong)),   <span class="co"># far from 0.5</span></span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>      <span class="dv">3</span>)</span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>The important condition is on the product of nuisance errors, not on the name of the learning algorithm. For root-$n$ inference centered at the target, a usual sufficient condition here is</span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="sc">\|</span>\delta_X<span class="sc">\|</span>_2\,<span class="sc">\|</span>\delta_Y<span class="sc">\|</span>_2=o_p(n^{-1/2}),</span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>along with moment, consistency, and sampling conditions. Errors of exactly order $n^{-1/4}$ each give a product of order $n^{-1/2}$, which need not be negligible; both being $o_p(n^{-1/4})$ is sufficient, and faster convergence of one can compensate for slower convergence of the other. Orthogonality removes the first-order population term, while cross-fitting helps control the empirical term. Neither promises valid inference for arbitrary nuisance fits. <span class="co">[</span><span class="ot">Chernozhukov et al.</span><span class="co">](https://arxiv.org/abs/1608.00060)</span> develop this distinction.</span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a><span class="fu">## The connection to the efficient influence function</span></span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>Efficient influence functions provide a systematic route to orthogonal equations. Orthogonality to nuisance *scores* is a model-geometric statement; Neyman orthogonality concerns derivatives of the chosen estimating equation in its nuisance arguments. For a valid influence-function construction these properties are connected under regularity conditions. We can verify the nuisance derivative directly for this residual-product equation. For $\psi$ above, the EIF is</span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>\operatorname{EIF}(X,Y,Z)=U_XU_Y-\psi,</span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>and setting its sample average to zero gives the residual form. The naive difference-form plug-in has first-order nuisance sensitivity. It is not automatically an estimator with a different valid influence function: its behavior also depends on how the regressions are estimated. So the recipe for an orthogonal estimator is: find the EIF, and estimate by solving its empirical mean equals zero. The **one-step estimator** adds an estimated influence-function correction to an initial estimate. Writing $P_n$ for a sample average,</span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a>\hat\psi_{\rm step}=\hat\psi_{\rm initial} +P_n\phi(W;\hat\psi_{\rm initial},\hat m).</span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>Here the centering parameter is included in the estimated influence function. For this residual-covariance equation the initial centering cancels algebraically, leaving the residual-product average. Equivalence to an estimating-equation solution must be checked for the particular target and construction, including how the initial target estimate enters the estimated EIF.</span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>Why is this the influence function of a target that itself contains conditional means? Along a smooth path with score $s$, differentiating $E_t<span class="co">[</span><span class="ot">U_{X,t}U_{Y,t}</span><span class="co">]</span>$ gives a law-change term $E<span class="co">[</span><span class="ot">U_XU_Ys</span><span class="co">]</span>$ and two mean-change terms. Each mean-change term vanishes by conditional residual centering, just as in the calculation above. Since $E<span class="co">[</span><span class="ot">s</span><span class="co">]</span>=0$, the derivative is $E<span class="co">[</span><span class="ot">(U_XU_Y-\psi)s</span><span class="co">]</span>$. In the unrestricted model this identifies the canonical gradient. It is a derivative of the **whole functional**, including its changing conditional means, rather than a calculation that assumes those means are known.</span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>Deriving EIFs is a skill; Hines et al. (2022) teach it with the Gateaux-derivative method from the <span class="co">[</span><span class="ot">Influence functions</span><span class="co">](../statistical-models/influence-functions.qmd)</span> page, and Kennedy (2022) catalogs common examples. Residual correlation requires a further normalization step below.</span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cross-fitting</span></span>
+<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>Cross-fitting separates a held-out observation from its own training fit. It does not make nuisance predictions correct or all held-out contributions jointly independent: different folds share training observations.</span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>One more problem. If $\hat m_X$ is fit on the same observations it is then evaluated on, the fit absorbs some of each observation's own noise. The residual $X_i - \hat m_X(Z_i)$ is then too small, and because $Y_i - \hat m_Y(Z_i)$ is shrunk in a correlated way, the residual product is biased. For a fixed common linear smoother $S$, an error-covariance contribution is scaled by $\operatorname{tr}<span class="sc">\{</span>(I-S)^\top(I-S)<span class="sc">\}</span>/N$; a projection fit loses its rank in this trace. A smoothing spline is not generally a projection, and adaptive fits need their own analysis. The direction and size of the total finite-sample bias also depend on approximation error.</span>
+<span id="cb9-167"><a href="#cb9-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-168"><a href="#cb9-168" aria-hidden="true" tabindex="-1"></a>**Cross-fitting** prevents a held-out outcome from being used to train its own prediction. Split the sample into $K$ folds. For each fold, fit the nuisances on the other $K - 1$ folds and evaluate the residuals on the held-out fold. Average the residual products over all folds. Each observation's residual now uses a nuisance fit that never saw it.</span>
+<span id="cb9-169"><a href="#cb9-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-172"><a href="#cb9-172" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-173"><a href="#cb9-173" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb9-174"><a href="#cb9-174" aria-hidden="true" tabindex="-1"></a><span class="co"># Nonlinear nuisance so that a smoother is needed. Cov(X, Y | Z) = 0.5 again.</span></span>
+<span id="cb9-175"><a href="#cb9-175" aria-hidden="true" tabindex="-1"></a>OneRep <span class="ot">&lt;-</span> <span class="cf">function</span>(n, <span class="at">df =</span> <span class="dv">15</span>, <span class="at">K =</span> <span class="dv">5</span>) {</span>
+<span id="cb9-176"><a href="#cb9-176" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n); e1 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); e2 <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb9-177"><a href="#cb9-177" aria-hidden="true" tabindex="-1"></a>  m <span class="ot">&lt;-</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z)</span>
+<span id="cb9-178"><a href="#cb9-178" aria-hidden="true" tabindex="-1"></a>  x <span class="ot">&lt;-</span> m <span class="sc">+</span> e1; y <span class="ot">&lt;-</span> m <span class="sc">+</span> <span class="fl">0.5</span> <span class="sc">*</span> e1 <span class="sc">+</span> e2</span>
+<span id="cb9-179"><a href="#cb9-179" aria-hidden="true" tabindex="-1"></a>  Fit <span class="ot">&lt;-</span> <span class="cf">function</span>(zt, xt, ze) <span class="fu">predict</span>(<span class="fu">smooth.spline</span>(zt, xt, <span class="at">df =</span> df), ze)<span class="sc">$</span>y</span>
+<span id="cb9-180"><a href="#cb9-180" aria-hidden="true" tabindex="-1"></a>  in_sample <span class="ot">&lt;-</span> <span class="fu">mean</span>((x <span class="sc">-</span> <span class="fu">Fit</span>(z, x, z)) <span class="sc">*</span> (y <span class="sc">-</span> <span class="fu">Fit</span>(z, y, z)))</span>
+<span id="cb9-181"><a href="#cb9-181" aria-hidden="true" tabindex="-1"></a>  fold <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">rep</span>(<span class="fu">seq_len</span>(K), <span class="at">length.out =</span> n))</span>
+<span id="cb9-182"><a href="#cb9-182" aria-hidden="true" tabindex="-1"></a>  r <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb9-183"><a href="#cb9-183" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_len</span>(K)) {</span>
+<span id="cb9-184"><a href="#cb9-184" aria-hidden="true" tabindex="-1"></a>    tr <span class="ot">&lt;-</span> fold <span class="sc">!=</span> k; te <span class="ot">&lt;-</span> fold <span class="sc">==</span> k</span>
+<span id="cb9-185"><a href="#cb9-185" aria-hidden="true" tabindex="-1"></a>    r[te] <span class="ot">&lt;-</span> (x[te] <span class="sc">-</span> <span class="fu">Fit</span>(z[tr], x[tr], z[te])) <span class="sc">*</span> (y[te] <span class="sc">-</span> <span class="fu">Fit</span>(z[tr], y[tr], z[te]))</span>
+<span id="cb9-186"><a href="#cb9-186" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-187"><a href="#cb9-187" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">in_sample =</span> in_sample, <span class="at">cross_fit =</span> <span class="fu">mean</span>(r))</span>
+<span id="cb9-188"><a href="#cb9-188" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-189"><a href="#cb9-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-190"><a href="#cb9-190" aria-hidden="true" tabindex="-1"></a><span class="co"># Bias is measured against the truth (0.5) and compared with the SD of the estimator.</span></span>
+<span id="cb9-191"><a href="#cb9-191" aria-hidden="true" tabindex="-1"></a>Summarize <span class="ot">&lt;-</span> <span class="cf">function</span>(n, <span class="at">R =</span> <span class="dv">150</span>) {</span>
+<span id="cb9-192"><a href="#cb9-192" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">replicate</span>(R, <span class="fu">OneRep</span>(n))</span>
+<span id="cb9-193"><a href="#cb9-193" aria-hidden="true" tabindex="-1"></a>  bias <span class="ot">&lt;-</span> <span class="fu">rowMeans</span>(res) <span class="sc">-</span> <span class="fl">0.5</span></span>
+<span id="cb9-194"><a href="#cb9-194" aria-hidden="true" tabindex="-1"></a>  sd_hat <span class="ot">&lt;-</span> <span class="fu">apply</span>(res, <span class="dv">1</span>, sd)</span>
+<span id="cb9-195"><a href="#cb9-195" aria-hidden="true" tabindex="-1"></a>  <span class="fu">data.frame</span>(<span class="at">n =</span> n, <span class="at">estimator =</span> <span class="fu">rownames</span>(res), <span class="at">bias =</span> <span class="fu">round</span>(bias, <span class="dv">3</span>),</span>
+<span id="cb9-196"><a href="#cb9-196" aria-hidden="true" tabindex="-1"></a>             <span class="at">bias_mcse =</span> <span class="fu">round</span>(sd_hat <span class="sc">/</span> <span class="fu">sqrt</span>(R), <span class="dv">4</span>),</span>
+<span id="cb9-197"><a href="#cb9-197" aria-hidden="true" tabindex="-1"></a>             <span class="at">sd =</span> <span class="fu">round</span>(sd_hat, <span class="dv">3</span>), <span class="at">bias_over_sd =</span> <span class="fu">round</span>(bias <span class="sc">/</span> sd_hat, <span class="dv">2</span>), <span class="at">row.names =</span> <span class="cn">NULL</span>)</span>
+<span id="cb9-198"><a href="#cb9-198" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-199"><a href="#cb9-199" aria-hidden="true" tabindex="-1"></a><span class="fu">do.call</span>(rbind, <span class="fu">lapply</span>(<span class="fu">c</span>(<span class="dv">200</span>, <span class="dv">800</span>, <span class="dv">3200</span>), Summarize))</span>
+<span id="cb9-200"><a href="#cb9-200" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-201"><a href="#cb9-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-202"><a href="#cb9-202" aria-hidden="true" tabindex="-1"></a>Read bias against its Monte Carlo SE and the estimator's sampling SD. The common-smoother trace can explain downward in-sample noise absorption. Cross-fitting can leave positive bias because the two estimated regression errors are correlated through shared training noise.</span>
+<span id="cb9-203"><a href="#cb9-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-204"><a href="#cb9-204" aria-hidden="true" tabindex="-1"></a>**This experiment does not prove root-$n$ inference.** Keeping the spline's nominal degrees of freedom fixed does not generally make its approximation error vanish for every nonlinear mean. Three sample sizes do not establish an asymptotic rate, and changing the fold count need not decrease bias monotonically. Tuning, approximation, moments, and the full remainder still matter.</span>
+<span id="cb9-205"><a href="#cb9-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-206"><a href="#cb9-206" aria-hidden="true" tabindex="-1"></a><span class="fu">### A counterexample: separated folds with a bad nuisance learner</span></span>
+<span id="cb9-207"><a href="#cb9-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-208"><a href="#cb9-208" aria-hidden="true" tabindex="-1"></a>Here both true conditional means are zero and the true residual covariance is 0.5. A one-nearest-neighbor fit interpolates its training outcomes, giving zero in-sample residual products. Out of fold, it predicts a different person's noise. Because the same neighbor supplies both predictions, their errors have covariance 0.5: the cross-fitted residual product has expectation 1, not 0.5. The learner's nuisance error does not vanish. A training-set mean is a consistent nuisance fit in this deliberately flat model.</span>
+<span id="cb9-209"><a href="#cb9-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-212"><a href="#cb9-212" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb9-213"><a href="#cb9-213" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-crossfit-counterexample</span></span>
+<span id="cb9-214"><a href="#cb9-214" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "An interpolation counterexample with 120 independent synthetic datasets. Separating folds removes own-outcome reuse, but a one-nearest-neighbor nuisance still leaves population bias. A training mean works here because the true means are zero."</span></span>
+<span id="cb9-215"><a href="#cb9-215" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Boxplots compare an in-sample nearest-neighbor estimate near zero, a cross-fitted nearest-neighbor estimate near one, and a cross-fitted training-mean estimate near the true covariance one half."</span></span>
+<span id="cb9-216"><a href="#cb9-216" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">22</span>)</span>
+<span id="cb9-217"><a href="#cb9-217" aria-hidden="true" tabindex="-1"></a>BadLearner <span class="ot">&lt;-</span> <span class="cf">function</span>(<span class="at">n =</span> <span class="dv">250</span>, <span class="at">K =</span> <span class="dv">5</span>) {</span>
+<span id="cb9-218"><a href="#cb9-218" aria-hidden="true" tabindex="-1"></a>  z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n); x <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n); y <span class="ot">&lt;-</span> <span class="fl">0.5</span><span class="sc">*</span>x <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb9-219"><a href="#cb9-219" aria-hidden="true" tabindex="-1"></a>  fold <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="fu">rep</span>(<span class="fu">seq_len</span>(K), <span class="at">length.out =</span> n))</span>
+<span id="cb9-220"><a href="#cb9-220" aria-hidden="true" tabindex="-1"></a>  nearest <span class="ot">&lt;-</span> constant <span class="ot">&lt;-</span> <span class="fu">numeric</span>(n)</span>
+<span id="cb9-221"><a href="#cb9-221" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> (k <span class="cf">in</span> <span class="fu">seq_len</span>(K)) {</span>
+<span id="cb9-222"><a href="#cb9-222" aria-hidden="true" tabindex="-1"></a>    tr <span class="ot">&lt;-</span> <span class="fu">which</span>(fold <span class="sc">!=</span> k); te <span class="ot">&lt;-</span> <span class="fu">which</span>(fold <span class="sc">==</span> k)</span>
+<span id="cb9-223"><a href="#cb9-223" aria-hidden="true" tabindex="-1"></a>    neighbor <span class="ot">&lt;-</span> tr[<span class="fu">max.col</span>(<span class="sc">-</span><span class="fu">outer</span>(z[te], z[tr], <span class="st">"-"</span>)<span class="sc">^</span><span class="dv">2</span>, <span class="at">ties.method =</span> <span class="st">"first"</span>)]</span>
+<span id="cb9-224"><a href="#cb9-224" aria-hidden="true" tabindex="-1"></a>    nearest[te] <span class="ot">&lt;-</span> (x[te]<span class="sc">-</span>x[neighbor])<span class="sc">*</span>(y[te]<span class="sc">-</span>y[neighbor])</span>
+<span id="cb9-225"><a href="#cb9-225" aria-hidden="true" tabindex="-1"></a>    constant[te] <span class="ot">&lt;-</span> (x[te]<span class="sc">-</span><span class="fu">mean</span>(x[tr]))<span class="sc">*</span>(y[te]<span class="sc">-</span><span class="fu">mean</span>(y[tr]))</span>
+<span id="cb9-226"><a href="#cb9-226" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb9-227"><a href="#cb9-227" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(<span class="at">in_sample_1NN =</span> <span class="dv">0</span>, <span class="at">cross_fit_1NN =</span> <span class="fu">mean</span>(nearest), <span class="at">cross_fit_mean =</span> <span class="fu">mean</span>(constant))</span>
+<span id="cb9-228"><a href="#cb9-228" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb9-229"><a href="#cb9-229" aria-hidden="true" tabindex="-1"></a>bad_fit <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">120</span>, <span class="fu">BadLearner</span>())</span>
+<span id="cb9-230"><a href="#cb9-230" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(<span class="fu">t</span>(bad_fit), <span class="at">names =</span> <span class="fu">c</span>(<span class="st">"In-sample</span><span class="sc">\n</span><span class="st">1NN"</span>, <span class="st">"Cross-fit</span><span class="sc">\n</span><span class="st">1NN"</span>, <span class="st">"Cross-fit</span><span class="sc">\n</span><span class="st">mean"</span>),</span>
+<span id="cb9-231"><a href="#cb9-231" aria-hidden="true" tabindex="-1"></a>        <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"gray80"</span>, <span class="st">"#D55E0033"</span>, <span class="st">"#2F80C833"</span>), <span class="at">ylab =</span> <span class="st">"Estimated residual covariance"</span>)</span>
+<span id="cb9-232"><a href="#cb9-232" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fl">0.5</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb9-233"><a href="#cb9-233" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-234"><a href="#cb9-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-235"><a href="#cb9-235" aria-hidden="true" tabindex="-1"></a>A finite-sample spread in the plot does not change the exact expectation argument. To see the mechanism directly, the held-out person and their selected training neighbor have independent residual pairs, each with covariance 0.5. Expanding $(X_i-X_{\rm neighbor})(Y_i-Y_{\rm neighbor})$ leaves **two** covariance terms, totaling 1, because predicting with one neighbor retains its noise even as the training set grows. Predicting with a training mean instead adds only $0.5/n_{\rm train}$ in expectation. That extra term vanishes as the training set grows. Cross-fitting removes self-use in both cases, but only the second learner estimates the zero conditional means consistently in this example.</span>
+<span id="cb9-236"><a href="#cb9-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-237"><a href="#cb9-237" aria-hidden="true" tabindex="-1"></a><span class="fu">## The fold includes the fitting pipeline</span></span>
+<span id="cb9-238"><a href="#cb9-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-239"><a href="#cb9-239" aria-hidden="true" tabindex="-1"></a>For an independent-subject analysis, put all observations from one subject in the same fold. Estimate outcome-dependent preprocessing, feature selection, tuning, and nuisance regressions within the training data when they belong to the fitting pipeline; then apply those fitted operations to held-out observations. A fixed transformation chosen independently of the analysis can be applied consistently across folds. Shared preprocessing learned from all observations needs its own justification and can otherwise leak evaluation information into training.</span>
+<span id="cb9-240"><a href="#cb9-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-241"><a href="#cb9-241" aria-hidden="true" tabindex="-1"></a>For this average covariance, the held-out contribution and estimator are</span>
+<span id="cb9-242"><a href="#cb9-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-243"><a href="#cb9-243" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-244"><a href="#cb9-244" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb9-245"><a href="#cb9-245" aria-hidden="true" tabindex="-1"></a>R_i&amp;=<span class="sc">\{</span>X_i-\hat m_X^{(-k)}(Z_i)<span class="sc">\}</span> \times<span class="sc">\{</span>Y_i-\hat m_Y^{(-k)}(Z_i)<span class="sc">\}</span>,<span class="sc">\\</span></span>
+<span id="cb9-246"><a href="#cb9-246" aria-hidden="true" tabindex="-1"></a>\hat\psi&amp;=n^{-1}\sum_iR_i.</span>
+<span id="cb9-247"><a href="#cb9-247" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb9-248"><a href="#cb9-248" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-249"><a href="#cb9-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-250"><a href="#cb9-250" aria-hidden="true" tabindex="-1"></a>The estimated influence contributions are $R_i-\hat\psi$. For a residual correlation, estimate the covariance and both residual variances jointly; averaging stratum-specific correlations is a different target. Put $v_X=E<span class="co">[</span><span class="ot">U_X^2</span><span class="co">]</span>$, $v_Y=E<span class="co">[</span><span class="ot">U_Y^2</span><span class="co">]</span>$, and $\rho=\psi/\sqrt{v_Xv_Y}$, with both variances positive. The delta method gives</span>
+<span id="cb9-251"><a href="#cb9-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-252"><a href="#cb9-252" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-253"><a href="#cb9-253" aria-hidden="true" tabindex="-1"></a>\phi_\rho=\frac{U_XU_Y-\psi}{\sqrt{v_Xv_Y}} -\frac{\rho}{2}\left<span class="sc">\{</span> \frac{U_X^2-v_X}{v_X}+\frac{U_Y^2-v_Y}{v_Y}\right<span class="sc">\}</span>.</span>
+<span id="cb9-254"><a href="#cb9-254" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-255"><a href="#cb9-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-256"><a href="#cb9-256" aria-hidden="true" tabindex="-1"></a>The first term tracks covariance uncertainty; the second tracks uncertainty in both normalizers. Replace all components by held-out estimates, then take the SD of the resulting influence values divided by $\sqrt n$ under the inference conditions below. Reusing only the covariance SE would omit denominator uncertainty. Also, an exact $m_X$ alone does not repair the Y variance: its population bias is $E<span class="co">[</span><span class="ot">\delta_Y^2</span><span class="co">]</span>$. The covariance's either-mean-correct property therefore does not automatically transfer to correlation.</span>
+<span id="cb9-257"><a href="#cb9-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-258"><a href="#cb9-258" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conditions connecting the formula to an SE</span></span>
+<span id="cb9-259"><a href="#cb9-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-260"><a href="#cb9-260" aria-hidden="true" tabindex="-1"></a>Let $D_0=(X-m_X)(Y-m_Y)$, and for fold $k$ let $H_k=D_{\hat m_k}-D_0$. With $w_k=n_k/n$,</span>
+<span id="cb9-261"><a href="#cb9-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-262"><a href="#cb9-262" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-263"><a href="#cb9-263" aria-hidden="true" tabindex="-1"></a>\hat\psi-\psi=(P_n-P)(D_0-\psi) +\sum_k w_k(P_{n,k}-P)H_k +\sum_k w_kE<span class="co">[</span><span class="ot">\Delta_{X,k}\Delta_{Y,k}</span><span class="co">]</span>.</span>
+<span id="cb9-264"><a href="#cb9-264" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-265"><a href="#cb9-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-266"><a href="#cb9-266" aria-hidden="true" tabindex="-1"></a>For i.i.d. units and a fixed number of nonvanishing folds, require $0&lt;\operatorname{Var}(D_0)&lt;\infty$, $<span class="sc">\|</span>H_k<span class="sc">\|</span>_2=o_p(1)$, and the product bias $o_p(n^{-1/2})$ in every fold. Conditional variance within each held-out fold controls the middle term; the proof in <span class="co">[</span><span class="ot">From an influence function to an estimator</span><span class="co">](../semiparametric-methods/influence-function-to-estimator.qmd#checkpoint-sp-12)</span> shows that step. Do not assume joint conditional independence across all folds.</span>
+<span id="cb9-267"><a href="#cb9-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-268"><a href="#cb9-268" aria-hidden="true" tabindex="-1"></a>Under these controls, averaging the true contributions gives a CLT and the sample SD of the estimated contributions divided by $\sqrt n$ consistently estimates the SE. L2 consistency of mean fits alone need not imply L2 consistency of their products. Bounded outcomes/fits plus L2 nuisance consistency are one sufficient setup; suitable L4 moments and L4 nuisance consistency are another route. See <span class="co">[</span><span class="ot">Estimating nuisance functions for inference</span><span class="co">](../semiparametric-methods/nuisance-estimation.qmd)</span> for a concrete learning-rate calculation.</span>
+<span id="cb9-269"><a href="#cb9-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-270"><a href="#cb9-270" aria-hidden="true" tabindex="-1"></a><span class="fu">## Putting it together: the recipe we use</span></span>
+<span id="cb9-271"><a href="#cb9-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-272"><a href="#cb9-272" aria-hidden="true" tabindex="-1"></a>For an estimand with nuisances, the group's estimators are built in this order.</span>
+<span id="cb9-273"><a href="#cb9-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-274"><a href="#cb9-274" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Write the estimand as a functional $\psi(F)$ and derive its efficient influence function.</span>
+<span id="cb9-275"><a href="#cb9-275" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Estimate the nuisances flexibly, with cross-fitting.</span>
+<span id="cb9-276"><a href="#cb9-276" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Construct the orthogonal formula or EIF estimating equation. Verify any claimed equivalence with a one-step or targeted construction for this particular target.</span>
+<span id="cb9-277"><a href="#cb9-277" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Standard error: for independent units and valid remainder conditions, use the sample standard deviation of estimated EIF values divided by $\sqrt n$. With clustered observations, aggregate contributions and use a design-appropriate variance calculation. Orthogonality alone does not establish these conditions.</span>
+<span id="cb9-278"><a href="#cb9-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-279"><a href="#cb9-279" aria-hidden="true" tabindex="-1"></a>For sample-specific network summaries, define the population quantity and derive the relevant correction before assigning an observation-level interpretation. The <span class="co">[</span><span class="ot">Jackknife pseudo-values</span><span class="co">](jackknife-pseudo-values.qmd)</span> page explains why simply recentering a cohort-derived score is not by itself an inferential argument.</span>
+<span id="cb9-280"><a href="#cb9-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-281"><a href="#cb9-281" aria-hidden="true" tabindex="-1"></a><span class="fu">## Words you will meet</span></span>
+<span id="cb9-282"><a href="#cb9-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-283"><a href="#cb9-283" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Double robustness.** A separate robustness property of some estimating equations with two nuisances (an outcome regression and a propensity or censoring model) where the estimator is consistent if *either* nuisance is correct. The residual form of $\psi$ has this property: its remainder is the product $E[h_X h_Y]$, so it is zero when either $m_X$ or $m_Y$ is exactly right, whatever the other is (see the check above). This same either-correct guarantee does not generally transfer to residual *correlation*: its two residual-variance denominators each have a squared-error remainder for their own mean fit.</span>
+<span id="cb9-284"><a href="#cb9-284" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Targeted learning, TMLE, double machine learning (DML).** Related frameworks that can use orthogonal estimating constructions and sample splitting. Targeted learning emphasizes distributional updates, while DML emphasizes orthogonal moments with learned nuisances; neither label alone specifies a complete algorithm or proof. Some valid procedures avoid splitting by imposing different empirical-process conditions. For the same target and efficiency conditions, particular estimators can share an efficient first-order expansion. The frameworks are not interchangeable in every model or finite sample.</span>
+<span id="cb9-285"><a href="#cb9-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-286"><a href="#cb9-286" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb9-287"><a href="#cb9-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-288"><a href="#cb9-288" aria-hidden="true" tabindex="-1"></a>**The checkpoint is this page's completion target. Additional practice is optional.** Use the missing-mean argument as a reference, but derive the covariance remainder rather than assuming it is unchanged.</span>
+<span id="cb9-289"><a href="#cb9-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-290"><a href="#cb9-290" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-cov-01 .checkpoint}</span>
+<span id="cb9-291"><a href="#cb9-291" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · COV-01 — Separate nuisance bias from held-out fluctuation {.unnumbered}</span></span>
+<span id="cb9-292"><a href="#cb9-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-293"><a href="#cb9-293" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and rate reasoning.</span>
+<span id="cb9-294"><a href="#cb9-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-295"><a href="#cb9-295" aria-hidden="true" tabindex="-1"></a>Let $m_X(Z)=E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span>$, $m_Y(Z)=E<span class="co">[</span><span class="ot">Y\mid Z</span><span class="co">]</span>$, and $\psi=E<span class="co">[</span><span class="ot">(X-m_X(Z))(Y-m_Y(Z))</span><span class="co">]</span>$. Hold training fits fixed, with errors $\delta_X=\hat m_X-m_X$ and $\delta_Y=\hat m_Y-m_Y$. Assume the variables and fitted means have finite second moments.</span>
+<span id="cb9-296"><a href="#cb9-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-297"><a href="#cb9-297" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Derive the population bias of the residual-product formula and of the difference formula $E<span class="co">[</span><span class="ot">XY</span><span class="co">]</span>-E<span class="co">[</span><span class="ot">\hat m_X(Z)\hat m_Y(Z)</span><span class="co">]</span>$. Which formula removes the terms involving only one nuisance error?</span>
+<span id="cb9-298"><a href="#cb9-298" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Take both errors to be the positive constant $n^{-1/5}$. Calculate the residual-product bias and its size after multiplication by $\sqrt n$. Would evaluating on held-out people remove it?</span>
+<span id="cb9-299"><a href="#cb9-299" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>State a sufficient product-of-L2-errors condition for negligible root-$n$ bias. Identify the separate fitted-minus-true empirical term and variance conditions still needed before reporting an influence-function SE.</span>
+<span id="cb9-300"><a href="#cb9-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-301"><a href="#cb9-301" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can derive the covariance nuisance-bias remainder and distinguish its rate requirement from cross-fitting and variance consistency.</span>
+<span id="cb9-302"><a href="#cb9-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-303"><a href="#cb9-303" aria-hidden="true" tabindex="-1"></a>**Transfer:** If one conditional mean is exactly correct and the other is misspecified, what happens to the population bias? Does that alone establish the efficient-SE argument?</span>
+<span id="cb9-304"><a href="#cb9-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-305"><a href="#cb9-305" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb9-306"><a href="#cb9-306" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb9-307"><a href="#cb9-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-308"><a href="#cb9-308" aria-hidden="true" tabindex="-1"></a>Write each fitted residual as its true residual minus $\delta$. Condition on $Z$ to remove the single-error terms in the residual product. For the rate comparison, multiply the product bias by $\sqrt n$ before judging whether it disappears.</span>
+<span id="cb9-309"><a href="#cb9-309" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-310"><a href="#cb9-310" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb9-311"><a href="#cb9-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-312"><a href="#cb9-312" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb9-313"><a href="#cb9-313" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb9-314"><a href="#cb9-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-315"><a href="#cb9-315" aria-hidden="true" tabindex="-1"></a>Writing $U_X=X-m_X(Z)$ and $U_Y=Y-m_Y(Z)$ gives</span>
+<span id="cb9-316"><a href="#cb9-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-317"><a href="#cb9-317" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-318"><a href="#cb9-318" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">(U_X-\delta_X)(U_Y-\delta_Y)</span><span class="co">]</span>-\psi</span>
+<span id="cb9-319"><a href="#cb9-319" aria-hidden="true" tabindex="-1"></a>=E<span class="co">[</span><span class="ot">\delta_X\delta_Y</span><span class="co">]</span>,</span>
+<span id="cb9-320"><a href="#cb9-320" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb9-321"><a href="#cb9-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-322"><a href="#cb9-322" aria-hidden="true" tabindex="-1"></a>because both true residuals have conditional mean zero given $Z$. The difference formula instead has bias $-E<span class="co">[</span><span class="ot">m_X\delta_Y+m_Y\delta_X+\delta_X\delta_Y</span><span class="co">]</span>$, which generally includes single-error terms.</span>
+<span id="cb9-323"><a href="#cb9-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-324"><a href="#cb9-324" aria-hidden="true" tabindex="-1"></a>With both errors equal to $n^{-1/5}$, the residual-product bias is $n^{-2/5}$ and its scaled size is $n^{1/10}$, which diverges. Cross-fitting does not change this population expectation.</span>
+<span id="cb9-325"><a href="#cb9-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-326"><a href="#cb9-326" aria-hidden="true" tabindex="-1"></a>Cauchy–Schwarz bounds the bias by $<span class="sc">\|</span>\delta_X<span class="sc">\|</span>_2\|\delta_Y\|_2$, so a product $o_p(n^{-1/2})$ is sufficient. The held-out empirical term is $(P_{n,k}-P)H_k$, where $H_k$ is the fitted-minus-true residual product. Its L2 size must vanish under the stated fold conditions. A CLT for the true contribution and consistent estimation of its finite, positive variance are also required; L2 consistency of the mean fits alone need not control their product's L2 size.</span>
+<span id="cb9-327"><a href="#cb9-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-328"><a href="#cb9-328" aria-hidden="true" tabindex="-1"></a>If either error is zero, the population bias is zero. The remaining fit can still change the leading contribution and its variance, so this alone does not establish the efficient-SE argument.</span>
+<span id="cb9-329"><a href="#cb9-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-330"><a href="#cb9-330" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb9-331"><a href="#cb9-331" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-332"><a href="#cb9-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-333"><a href="#cb9-333" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb9-334"><a href="#cb9-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-335"><a href="#cb9-335" aria-hidden="true" tabindex="-1"></a>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</span>
+<span id="cb9-336"><a href="#cb9-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-337"><a href="#cb9-337" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Show that the variance $\sigma^2 = E<span class="co">[</span><span class="ot">(X - \mu)^2</span><span class="co">]</span>$, viewed as a formula with nuisance $\mu$, is Neyman orthogonal in $\mu$. Then show that the formula $E<span class="co">[</span><span class="ot">X^2</span><span class="co">]</span> - \mu^2$ is not. Check both numerically by inflating $\mu$ by $1 + \varepsilon$.</span>
+<span id="cb9-338"><a href="#cb9-338" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>In the orthogonality simulation, replace the inflation error with an additive error $m + \varepsilon(Z - 1/2)$ and predict, before running, the leading term of each formula's bias.</span>
+<span id="cb9-339"><a href="#cb9-339" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Change <span class="in">`df`</span> in the cross-fitting example to 5 and to 40 and re-run at $N = 200$. How do the two biases change, and which grows faster with <span class="in">`df`</span>? Then replace the smoothing spline with an average of 20 deep regression trees, each grown on a bootstrap resample (<span class="in">`rpart`</span> is a recommended R package; use <span class="in">`rpart.control()`</span> with <span class="in">`cp=0`</span>, <span class="in">`minsplit=5`</span>, and <span class="in">`minbucket=3`</span>). Compare the in-sample and cross-fit biases. Why does a deep tree fit its own noise?</span>
+<span id="cb9-340"><a href="#cb9-340" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>The residual correlation is $\psi / \sqrt{\psi_{XX}\,\psi_{YY}}$ with $\psi_{XX} = E<span class="co">[</span><span class="ot">\operatorname{Var}(X \mid Z)</span><span class="co">]</span>$. Write the orthogonal estimators of the three pieces and combine them. What does the delta method say about the standard error?</span>
+<span id="cb9-341"><a href="#cb9-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-342"><a href="#cb9-342" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb9-343"><a href="#cb9-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-344"><a href="#cb9-344" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">DML paper</span><span class="co">](https://arxiv.org/abs/1608.00060)</span> and <span class="co">[</span><span class="ot">Kennedy review</span><span class="co">](https://arxiv.org/html/2203.06469v2)</span> provide the formal conditions behind the constructions.</span>
+<span id="cb9-345"><a href="#cb9-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-346"><a href="#cb9-346" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hines, O., Dukes, O., Diaz-Ordaz, K., and Vansteelandt, S. (2022). Demystifying statistical learning based on efficient influence functions. *The American Statistician*, 76(3), 292 to 304. An introductory derivation-focused treatment.</span>
+<span id="cb9-347"><a href="#cb9-347" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kennedy, E. H. (2022). Semiparametric doubly robust targeted double machine learning: a review. arXiv:2203.06469. Influence-function construction, remainder decomposition, and efficiency conditions.</span>
+<span id="cb9-348"><a href="#cb9-348" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Chernozhukov, V., Chetverikov, D., Demirer, M., Duflo, E., Hansen, C., Newey, W., and Robins, J. (2018). Double/debiased machine learning for treatment and structural parameters. *The Econometrics Journal*, 21(1), C1 to C68. Section 2 for Neyman orthogonality and cross-fitting.</span>
+<span id="cb9-349"><a href="#cb9-349" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Vansteelandt, S. and Dukes, O. (2022). Assumption-lean inference for generalised linear model parameters. *Journal of the Royal Statistical Society B*, 84(3), 657 to 685. Asks what a regression coefficient estimates when the model is wrong, defines an estimand that does not depend on the model being right, and builds the orthogonal estimator for it. The target remains defined independently of the correctness of the working regression model.</span>
+<span id="cb9-350"><a href="#cb9-350" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tsiatis, A. A. (2006). *Semiparametric Theory and Missing Data*. Springer. Chapters 3 and 4 for the geometry, when you want the full version.</span>
+<span id="cb9-351"><a href="#cb9-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-352"><a href="#cb9-352" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

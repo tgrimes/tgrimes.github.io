@@ -1,0 +1,1415 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Quantiles and local expansions – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/statistical-models/survival-extension.html" rel="next">
+<link href="../../guides/statistical-models/models-and-efficiency.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script src="../../site_libs/quarto-contrib/glightbox/glightbox.min.js"></script>
+<link href="../../site_libs/quarto-contrib/glightbox/glightbox.min.css" rel="stylesheet">
+<link href="../../site_libs/quarto-contrib/glightbox/lightbox.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Quantiles and local expansions</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Statistical models, influence functions, and efficiency</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/model-target-paths.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Statistical models, targets, and paths</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/conditional-expectation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Conditional expectation and L2 geometry</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/influence-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Influence functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/likelihood-and-information.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Likelihood, scores, and parametric efficiency</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/models-and-efficiency.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model restrictions and efficiency</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Extensions</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/quantiles-and-local-expansions.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Quantiles and local expansions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/survival-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival models and efficiency (optional)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#a-quantile-has-a-nonsmooth-sample-equation" id="toc-a-quantile-has-a-nonsmooth-sample-equation" class="nav-link active" data-scroll-target="#a-quantile-has-a-nonsmooth-sample-equation"><span class="header-section-number">1</span> A quantile has a nonsmooth sample equation</a>
+  <ul class="collapse">
+  <li><a href="#establish-consistency-and-the-local-rate" id="toc-establish-consistency-and-the-local-rate" class="nav-link" data-scroll-target="#establish-consistency-and-the-local-rate"><span class="header-section-number">1.1</span> Establish consistency and the local rate</a></li>
+  <li><a href="#use-the-stated-empirical-cdf-lemma" id="toc-use-the-stated-empirical-cdf-lemma" class="nav-link" data-scroll-target="#use-the-stated-empirical-cdf-lemma"><span class="header-section-number">1.2</span> Use the stated empirical-CDF lemma</a></li>
+  <li><a href="#invert-the-population-slope" id="toc-invert-the-population-slope" class="nav-link" data-scroll-target="#invert-the-population-slope"><span class="header-section-number">1.3</span> Invert the population slope</a></li>
+  </ul></li>
+  <li><a href="#derive-the-population-path-derivative-separately" id="toc-derive-the-population-path-derivative-separately" class="nav-link" data-scroll-target="#derive-the-population-path-derivative-separately"><span class="header-section-number">2</span> Derive the population path derivative separately</a></li>
+  <li><a href="#obtain-and-interpret-uncertainty" id="toc-obtain-and-interpret-uncertainty" class="nav-link" data-scroll-target="#obtain-and-interpret-uncertainty"><span class="header-section-number">3</span> Obtain and interpret uncertainty</a></li>
+  <li><a href="#check-the-approximation-in-a-simulation" id="toc-check-the-approximation-in-a-simulation" class="nav-link" data-scroll-target="#check-the-approximation-in-a-simulation"><span class="header-section-number">4</span> Check the approximation in a simulation</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">5</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-sp-06-derive-the-quantile-expansion-and-influence-function" id="toc-checkpoint-sp-06-derive-the-quantile-expansion-and-influence-function" class="nav-link" data-scroll-target="#checkpoint-sp-06-derive-the-quantile-expansion-and-influence-function">Checkpoint · SP-06 — Derive the quantile expansion and influence function</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Quantiles and local expansions</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">A transfer from smooth means to a nonsmooth sample equation</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> <a href="../../guides/statistical-models/model-target-paths.html">Statistical models, targets, and paths</a>, <a href="../../guides/statistical-models/influence-functions.html">Influence functions</a>, and the LLN/CLT and stochastic orders from <a href="../../guides/estimation-and-inference/large-sample-reasoning.html">Large-sample reasoning for methods research</a>.</p>
+<p>This transfer page keeps the same goal: connect a population derivative to a sample expansion and a justified standard error. A stated empirical-CDF lemma supplies the extra probability step; proving its general empirical-process version is additional theory.</p>
+<p>For i.i.d. observations, <span class="math inline">P_nf=n^{-1}\sum_i f(Y_i)</span> and <span class="math inline">Pf=E[f(Y)]</span>.</p>
+<section id="a-quantile-has-a-nonsmooth-sample-equation" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="a-quantile-has-a-nonsmooth-sample-equation"><span class="header-section-number">1</span> A quantile has a nonsmooth sample equation</h2>
+<p>Let <span class="math inline">F(u)=\Pr(Y\le u)</span> be the population CDF and fix <span class="math inline">0&lt;\tau&lt;1</span>. The target is the quantile <span class="math inline">q=\inf\{u:F(u)\ge\tau\}</span>. The median uses <span class="math inline">\tau=1/2</span>. Assume i.i.d. observations, a continuous distribution with a unique interior quantile, and a density <span class="math inline">f</span> continuous and positive near <span class="math inline">q</span>. These conditions give <span class="math inline">F(q)=\tau</span> and a nonzero population slope <span class="math inline">f(q)</span>.</p>
+<p>The empirical CDF is <span class="math inline">F_n(u)=n^{-1}\sum_i1\{Y_i\le u\}</span>. Use the order-statistic quantile <span class="math inline">\hat q=Y_{(k)}</span> with <span class="math inline">k=\lceil n\tau\rceil</span>, corresponding to R’s <code>type = 1</code>. With no ties, <span class="math inline">F_n(\hat q)=k/n</span>, so</p>
+<p><span class="math display">
+\begin{aligned}
+0&amp;\le F_n(\hat q)-\tau\\
+&amp;&lt;1/n.
+\end{aligned}
+</span></p>
+<p>For five ordered values <span class="math inline">(1,2,4,6,9)</span>, the median is 4 and the empirical CDF there is <span class="math inline">3/5</span>. The sample equation misses <span class="math inline">1/2</span> by <span class="math inline">1/10</span>. This small root error is acceptable because <span class="math inline">1/n</span> is negligible on the root-<span class="math inline">n</span> scale.</p>
+<p>The sample CDF is a step function: between observations its derivative is zero, and at jumps an ordinary derivative is unavailable. We cannot Taylor-expand that random step function as if its derivative were the population density. Instead, write <span class="math inline">E_n(u)=F_n(u)-F(u)</span> for the empirical CDF error and <span class="math inline">\Delta_n=E_n(\hat q)-E_n(q)</span>. The exact decomposition is</p>
+<p><span class="math display">
+F_n(\hat q)-\tau=F_n(q)-\tau +\{F(\hat q)-F(q)\}+\Delta_n.
+</span></p>
+<p>The three right-hand terms have different jobs: sampling fluctuation at the fixed <span class="math inline">q</span>, a smooth population-CDF change, and an empirical increment caused by evaluating at a random argument.</p>
+<section id="establish-consistency-and-the-local-rate" class="level3" data-number="1.1">
+<h3 data-number="1.1" class="anchored" data-anchor-id="establish-consistency-and-the-local-rate"><span class="header-section-number">1.1</span> Establish consistency and the local rate</h3>
+<p>Use the uniform CDF consistency result <span class="math inline">\sup_u|F_n(u)-F(u)|\xrightarrow{p}0</span>. For any sufficiently small fixed <span class="math inline">\delta&gt;0</span>, positive density gives <span class="math inline">F(q-\delta)&lt;\tau&lt;F(q+\delta)</span>. Once the empirical CDF is uniformly close enough, its crossing of <span class="math inline">\tau</span> lies between these two endpoints. This proves <span class="math inline">\hat q\xrightarrow{p}q</span>.</p>
+<p>To obtain a rate, examine the deterministic thresholds <span class="math inline">q\pm C/\sqrt n</span> for fixed <span class="math inline">C</span>. Their population CDF values differ from <span class="math inline">\tau</span> by approximately <span class="math inline">\pm Cf(q)/\sqrt n</span>. The count of observations below either threshold is binomial. Its CLT shows that crossing beyond the threshold requires a fluctuation in a corresponding normal tail. Choosing <span class="math inline">C</span> large makes both tail probabilities small, giving <span class="math inline">\hat q-q=O_p(n^{-1/2})</span>. This rate argument uses binomial fluctuations, rather than a derivative of the sample indicator.</p>
+</section>
+<section id="use-the-stated-empirical-cdf-lemma" class="level3" data-number="1.2">
+<h3 data-number="1.2" class="anchored" data-anchor-id="use-the-stated-empirical-cdf-lemma"><span class="header-section-number">1.2</span> Use the stated empirical-CDF lemma</h3>
+<p>We supply the additional probability result needed for the random argument. For every fixed <span class="math inline">C&lt;\infty</span>,</p>
+<p><span class="math display">
+\sqrt n\sup_{|u-q|\le C/\sqrt n}
+|E_n(u)-E_n(q)|\xrightarrow{p}0.
+</span></p>
+<p>This is <strong>stochastic equicontinuity</strong> over shrinking neighborhoods: on that local scale, changing the evaluation point changes the empirical error by less than root-<span class="math inline">n</span> fluctuation. The rate established above places <span class="math inline">\hat q</span> in such a neighborhood with arbitrarily high probability after choosing <span class="math inline">C</span> large. Consequently <span class="math inline">\Delta_n=o_p(n^{-1/2})</span>.</p>
+<p>The full empirical-process proof of this lemma is additional theory. The completion task uses it as a stated result, with its role and required neighborhood made explicit.</p>
+</section>
+<section id="invert-the-population-slope" class="level3" data-number="1.3">
+<h3 data-number="1.3" class="anchored" data-anchor-id="invert-the-population-slope"><span class="header-section-number">1.3</span> Invert the population slope</h3>
+<p>Taylor-expand only the population CDF. Its differentiability and the local rate give</p>
+<p><span class="math display">
+F(\hat q)-F(q)=f(q)(\hat q-q) +o_p(n^{-1/2}).
+</span></p>
+<p>In the exact decomposition, the sample-root error is <span class="math inline">O(1/n)</span> and the empirical increment is negligible. Move the fixed-point fluctuation to the other side and divide by the nonzero <span class="math inline">f(q)</span>:</p>
+<p><span class="math display">
+\begin{aligned}
+\hat q-q&amp;=P_n\phi_q+o_p(n^{-1/2}),\\
+\phi_q(Y)&amp;=\frac{\tau-1\{Y\le q\}}{f(q)}.
+\end{aligned}
+</span></p>
+<p>An observation below <span class="math inline">q</span> has negative influence, pulling the quantile downward; one above it has positive influence. The factor <span class="math inline">1/f(q)</span> translates CDF noise into outcome units. A flat population CDF near the quantile makes its location harder to determine precisely.</p>
+</section>
+</section>
+<section id="derive-the-population-path-derivative-separately" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="derive-the-population-path-derivative-separately"><span class="header-section-number">2</span> Derive the population path derivative separately</h2>
+<p>For a bounded, mean-zero-score path <span class="math inline">dP_t=(1+ts)dP</span>, let <span class="math inline">F_t</span> be its CDF and <span class="math inline">q_t</span> its quantile. At a fixed endpoint <span class="math inline">u</span>,</p>
+<p><span class="math display">
+F_t(u)=F(u)+tE[1\{Y\le u\}s(Y)].
+</span></p>
+<p>The identity <span class="math inline">F_t(q_t)=\tau</span> changes both the distribution and the endpoint. Differentiating at zero gives</p>
+<p><span class="math display">
+0=E[1\{Y\le q\}s(Y)]+f(q)\dot q.
+</span></p>
+<p>Solving and using <span class="math inline">E[s]=0</span> yields <span class="math inline">\dot q=E[\phi_q(Y)s(Y)]</span>, with the same <span class="math inline">\phi_q</span> as the sample expansion. The path derivative is a deterministic sensitivity calculation for populations. The empirical-CDF lemma above was the extra step needed for the random sample quantile.</p>
+</section>
+<section id="obtain-and-interpret-uncertainty" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="obtain-and-interpret-uncertainty"><span class="header-section-number">3</span> Obtain and interpret uncertainty</h2>
+<p>Because <span class="math inline">1\{Y\le q\}</span> is Bernoulli with probability <span class="math inline">\tau</span>, <span class="math inline">E[\phi_q]=0</span> and</p>
+<p><span class="math display">
+\begin{aligned}
+\operatorname{Var}(\phi_q)&amp;=\frac{\tau(1-\tau)}{f(q)^2},\\
+\operatorname{Var}(\hat q)&amp;\approx\frac{\tau(1-\tau)}{nf(q)^2}.
+\end{aligned}
+</span></p>
+<p>The first is the limiting variance of the scaled error; the second is the estimator’s first-order variance. A feasible SE can use <span class="math inline">\sqrt{\tau(1-\tau)}/\{\sqrt n\,\hat f(\hat q)\}</span> if the density estimate at the fitted quantile converges to <span class="math inline">f(q)&gt;0</span>. Such consistency needs an appropriate density estimator and its own conditions; another justified quantile-uncertainty procedure is also possible.</p>
+<p>The influence contribution is bounded under the stated positive-density conditions, so this CLT does not require the raw outcome to have finite variance. If the density is zero at <span class="math inline">q</span>, or the CDF has a jump there, the displayed inversion and regularity argument must be reconsidered. Nonsmoothness of the <em>sample equation</em> alone is therefore a different issue from failure of the population derivative or local empirical control.</p>
+</section>
+<section id="check-the-approximation-in-a-simulation" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="check-the-approximation-in-a-simulation"><span class="header-section-number">4</span> Check the approximation in a simulation</h2>
+<p>For a standard-normal median, <span class="math inline">f(0)=1/\sqrt{2\pi}</span>, giving limiting variance <span class="math inline">\pi/2</span> for <span class="math inline">\sqrt n\hat q</span>. The code uses known density only to assess the theory in a known simulation, not as an available input in a real cohort.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">21</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>ns <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">160</span>, <span class="dv">640</span>); R <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">lapply</span>(ns, <span class="cf">function</span>(n) {</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replicate</span>(R, <span class="fu">sqrt</span>(n) <span class="sc">*</span> <span class="fu">quantile</span>(<span class="fu">rnorm</span>(n), <span class="fl">0.5</span>, <span class="at">type =</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">sqrt</span>(pi <span class="sc">/</span> <span class="dv">2</span>))</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(z[[<span class="dv">1</span>]]), <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>),</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Scaled median error"</span>, <span class="at">main =</span> <span class="st">"Quantile normal approximation"</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(z[[<span class="dv">2</span>]]), <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(z[[<span class="dv">3</span>]]), <span class="at">col =</span> <span class="st">"#009E73"</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="fu">paste</span>(<span class="st">"n ="</span>, ns), <span class="st">"N(0,1)"</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#009E73"</span>, <span class="st">"black"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">n =</span> ns, <span class="at">variance =</span> <span class="fu">sapply</span>(z, var),</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>           <span class="at">coverage =</span> <span class="fu">sapply</span>(z, <span class="cf">function</span>(a) <span class="fu">mean</span>(<span class="fu">abs</span>(a) <span class="sc">&lt;=</span> <span class="fl">1.96</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>    n  variance coverage
+1  40 1.0349580    0.952
+2 160 1.0011091    0.940
+3 640 0.8686863    0.966</code></pre>
+</div>
+<div class="cell-output-display">
+<div id="fig-quantile-limit" class="quarto-float quarto-figure quarto-figure-center anchored" alt="Density curves for standardized sample medians at sample sizes 40, 160, and 640, compared with a standard normal density.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-quantile-limit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<a href="quantiles-and-local-expansions_files/figure-html/fig-quantile-limit-1.png" class="lightbox" data-gallery="quarto-lightbox-gallery-1" title="Figure&nbsp;1: Synthetic normal medians, scaled by their theoretical asymptotic standard deviation. Increasing sample size is compared on a common N(0,1) scale."><img src="quantiles-and-local-expansions_files/figure-html/fig-quantile-limit-1.png" class="img-fluid figure-img" alt="Density curves for standardized sample medians at sample sizes 40, 160, and 640, compared with a standard normal density." width="672"></a>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-quantile-limit-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Synthetic normal medians, scaled by their theoretical asymptotic standard deviation. Increasing sample size is compared on a common N(0,1) scale.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>The reported variances concern the standardized errors and should approach 1; they are not variances of the unscaled medians. The coverage calculation uses the known density to assess an idealized normal interval in this simulation. A real-data procedure would need to estimate the required uncertainty or use another justified method.</p>
+<p>Across 500 replications, coverage near 0.95 has Monte Carlo SE about 0.01. Both the numerical variances and coverages fluctuate. A familiar-looking density is evidence about this experiment, not a substitute for the assumptions and proof.</p>
+</section>
+<section id="exercises" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="exercises"><span class="header-section-number">5</span> Exercises</h2>
+<p>The checkpoint is this page’s completion target. Additional practice is optional.</p>
+<div id="checkpoint-sp-06" class="checkpoint">
+<section id="checkpoint-sp-06-derive-the-quantile-expansion-and-influence-function" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-sp-06-derive-the-quantile-expansion-and-influence-function">Checkpoint · SP-06 — Derive the quantile expansion and influence function</h3>
+<p><strong>Task type:</strong> Derivation using a stated stochastic lemma.</p>
+<p>Under the quantile conditions in this page, derive the expansion using the displayed CDF decomposition and stated stochastic-equicontinuity fact. Identify the influence function, its variance, and the additional requirement for a feasible standard error. Independently derive the path derivative by differentiating <span class="math inline">F_t(q_t)=\tau</span> along a valid bounded-score path. Explain why a pointwise derivative of the sample indicator cannot replace the argument.</p>
+<p><strong>Ready to continue when:</strong> you can distinguish the population derivative from the stochastic increment and obtain both the expansion and pathwise representation.</p>
+<p><strong>Transfer:</strong> For the standard-normal median, compute the variance. Which step fails when the density is zero at the target?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>The approximate sample root has an error of order 1/n.&nbsp;Along a path, differentiating the CDF changes both its distribution and its endpoint.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The approximate-root error and empirical-CDF increment are <span class="math inline">o_p(n^{-1/2})</span>. The population change is <span class="math inline">f(q)(\hat q-q)</span> plus a negligible remainder, so inversion gives <span class="math inline">\hat q-q=(\tau-F_n(q))/f(q)+o_p(n^{-1/2})</span>. The influence function is <span class="math inline">(\tau-1\{Y\le q\})/f(q)</span> with variance <span class="math inline">\tau(1-\tau)/f(q)^2</span>. For a score <span class="math inline">s</span>, differentiation gives <span class="math inline">0=E[1\{Y\le q\}s]+f(q)\dot q</span>; using <span class="math inline">E[s]=0</span> recovers <span class="math inline">\dot q=E[\phi_qs]</span>. A feasible variance estimate needs density consistency at <span class="math inline">q</span> or another justified method. The sample CDF is discontinuous, so its pointwise derivative does not supply the population density. For a standard-normal median the influence variance is <span class="math inline">\pi/2</span>, giving first-order estimator variance <span class="math inline">\pi/(2n)</span>; a zero density prevents the displayed derivative inversion.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Compare R quantile types 1 and 7 and explain why their first-order limits can agree.</li>
+<li>Identify the derivative step that fails when the density vanishes at the target.</li>
+</ol>
+
+
+<!-- -->
+
+</section>
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/statistical-models/models-and-efficiency.html" class="pagination-link" aria-label="Model restrictions and efficiency">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Model restrictions and efficiency</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/statistical-models/survival-extension.html" class="pagination-link" aria-label="Survival models and efficiency (optional)">
+        <span class="nav-page-text">Survival models and efficiency (optional)</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Quantiles and local expansions"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "A transfer from smooth means to a nonsmooth sample equation"</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>**Before reading:** <span class="co">[</span><span class="ot">Statistical models, targets, and paths</span><span class="co">](model-target-paths.qmd)</span>, <span class="co">[</span><span class="ot">Influence functions</span><span class="co">](influence-functions.qmd)</span>, and the LLN/CLT and stochastic orders from <span class="co">[</span><span class="ot">Large-sample reasoning for methods research</span><span class="co">](../estimation-and-inference/large-sample-reasoning.qmd)</span>.</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>This transfer page keeps the same goal: connect a population derivative to a sample expansion and a justified standard error. A stated empirical-CDF lemma supplies the extra probability step; proving its general empirical-process version is additional theory.</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>For i.i.d. observations, $P_nf=n^{-1}\sum_i f(Y_i)$ and $Pf=E<span class="co">[</span><span class="ot">f(Y)</span><span class="co">]</span>$.</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## A quantile has a nonsmooth sample equation</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>Let $F(u)=\Pr(Y\le u)$ be the population CDF and fix $0&lt;\tau&lt;1$. The target is the quantile $q=\inf<span class="sc">\{</span>u:F(u)\ge\tau<span class="sc">\}</span>$. The median uses $\tau=1/2$. Assume i.i.d. observations, a continuous distribution with a unique interior quantile, and a density $f$ continuous and positive near $q$. These conditions give $F(q)=\tau$ and a nonzero population slope $f(q)$.</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>The empirical CDF is $F_n(u)=n^{-1}\sum_i1<span class="sc">\{</span>Y_i\le u<span class="sc">\}</span>$. Use the order-statistic quantile $\hat q=Y_{(k)}$ with $k=\lceil n\tau\rceil$, corresponding to R's <span class="in">`type = 1`</span>. With no ties, $F_n(\hat q)=k/n$, so</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>0&amp;\le F_n(\hat q)-\tau<span class="sc">\\</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>&amp;&lt;1/n.</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>For five ordered values $(1,2,4,6,9)$, the median is 4 and the empirical CDF there is $3/5$. The sample equation misses $1/2$ by $1/10$. This small root error is acceptable because $1/n$ is negligible on the root-$n$ scale.</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>The sample CDF is a step function: between observations its derivative is zero, and at jumps an ordinary derivative is unavailable. We cannot Taylor-expand that random step function as if its derivative were the population density. Instead, write $E_n(u)=F_n(u)-F(u)$ for the empirical CDF error and $\Delta_n=E_n(\hat q)-E_n(q)$. The exact decomposition is</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>F_n(\hat q)-\tau=F_n(q)-\tau +<span class="sc">\{</span>F(\hat q)-F(q)<span class="sc">\}</span>+\Delta_n.</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>The three right-hand terms have different jobs: sampling fluctuation at the fixed $q$, a smooth population-CDF change, and an empirical increment caused by evaluating at a random argument.</span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="fu">### Establish consistency and the local rate</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>Use the uniform CDF consistency result $\sup_u|F_n(u)-F(u)|\xrightarrow{p}0$. For any sufficiently small fixed $\delta&gt;0$, positive density gives $F(q-\delta)&lt;\tau&lt;F(q+\delta)$. Once the empirical CDF is uniformly close enough, its crossing of $\tau$ lies between these two endpoints. This proves $\hat q\xrightarrow{p}q$.</span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>To obtain a rate, examine the deterministic thresholds $q\pm C/\sqrt n$ for fixed $C$. Their population CDF values differ from $\tau$ by approximately $\pm Cf(q)/\sqrt n$. The count of observations below either threshold is binomial. Its CLT shows that crossing beyond the threshold requires a fluctuation in a corresponding normal tail. Choosing $C$ large makes both tail probabilities small, giving $\hat q-q=O_p(n^{-1/2})$. This rate argument uses binomial fluctuations, rather than a derivative of the sample indicator.</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="fu">### Use the stated empirical-CDF lemma</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>We supply the additional probability result needed for the random argument. For every fixed $C&lt;\infty$,</span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>\sqrt n\sup_{|u-q|\le C/\sqrt n}</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>E_n(u)-E_n(q)<span class="pp">|</span>\xrightarrow{p}0.</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>This is **stochastic equicontinuity** over shrinking neighborhoods: on that local scale, changing the evaluation point changes the empirical error by less than root-$n$ fluctuation. The rate established above places $\hat q$ in such a neighborhood with arbitrarily high probability after choosing $C$ large. Consequently $\Delta_n=o_p(n^{-1/2})$.</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>The full empirical-process proof of this lemma is additional theory. The completion task uses it as a stated result, with its role and required neighborhood made explicit.</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="fu">### Invert the population slope</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>Taylor-expand only the population CDF. Its differentiability and the local rate give</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>F(\hat q)-F(q)=f(q)(\hat q-q) +o_p(n^{-1/2}).</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>In the exact decomposition, the sample-root error is $O(1/n)$ and the empirical increment is negligible. Move the fixed-point fluctuation to the other side and divide by the nonzero $f(q)$:</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>\hat q-q&amp;=P_n\phi_q+o_p(n^{-1/2}),<span class="sc">\\</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>\phi_q(Y)&amp;=\frac{\tau-1<span class="sc">\{</span>Y\le q<span class="sc">\}</span>}{f(q)}.</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>An observation below $q$ has negative influence, pulling the quantile downward; one above it has positive influence. The factor $1/f(q)$ translates CDF noise into outcome units. A flat population CDF near the quantile makes its location harder to determine precisely.</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## Derive the population path derivative separately</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>For a bounded, mean-zero-score path $dP_t=(1+ts)dP$, let $F_t$ be its CDF and $q_t$ its quantile. At a fixed endpoint $u$,</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>F_t(u)=F(u)+tE<span class="co">[</span><span class="ot">1\{Y\le u\}s(Y)</span><span class="co">]</span>.</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>The identity $F_t(q_t)=\tau$ changes both the distribution and the endpoint. Differentiating at zero gives</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>0=E<span class="co">[</span><span class="ot">1\{Y\le q\}s(Y)</span><span class="co">]</span>+f(q)\dot q.</span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>Solving and using $E<span class="co">[</span><span class="ot">s</span><span class="co">]</span>=0$ yields $\dot q=E<span class="co">[</span><span class="ot">\phi_q(Y)s(Y)</span><span class="co">]</span>$, with the same $\phi_q$ as the sample expansion. The path derivative is a deterministic sensitivity calculation for populations. The empirical-CDF lemma above was the extra step needed for the random sample quantile.</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="fu">## Obtain and interpret uncertainty</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>Because $1<span class="sc">\{</span>Y\le q<span class="sc">\}</span>$ is Bernoulli with probability $\tau$, $E<span class="co">[</span><span class="ot">\phi_q</span><span class="co">]</span>=0$ and</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}(\phi_q)&amp;=\frac{\tau(1-\tau)}{f(q)^2},<span class="sc">\\</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>\operatorname{Var}(\hat q)&amp;\approx\frac{\tau(1-\tau)}{nf(q)^2}.</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>The first is the limiting variance of the scaled error; the second is the estimator's first-order variance. A feasible SE can use $\sqrt{\tau(1-\tau)}/<span class="sc">\{</span>\sqrt n\,\hat f(\hat q)<span class="sc">\}</span>$ if the density estimate at the fitted quantile converges to $f(q)&gt;0$. Such consistency needs an appropriate density estimator and its own conditions; another justified quantile-uncertainty procedure is also possible.</span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>The influence contribution is bounded under the stated positive-density conditions, so this CLT does not require the raw outcome to have finite variance. If the density is zero at $q$, or the CDF has a jump there, the displayed inversion and regularity argument must be reconsidered. Nonsmoothness of the *sample equation* alone is therefore a different issue from failure of the population derivative or local empirical control.</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="fu">## Check the approximation in a simulation</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>For a standard-normal median, $f(0)=1/\sqrt{2\pi}$, giving limiting variance $\pi/2$ for $\sqrt n\hat q$. The code uses known density only to assess the theory in a known simulation, not as an available input in a real cohort.</span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-quantile-limit</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Synthetic normal medians, scaled by their theoretical asymptotic standard deviation. Increasing sample size is compared on a common N(0,1) scale."</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-alt: "Density curves for standardized sample medians at sample sizes 40, 160, and 640, compared with a standard normal density."</span></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">21</span>)</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>ns <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">40</span>, <span class="dv">160</span>, <span class="dv">640</span>); R <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">lapply</span>(ns, <span class="cf">function</span>(n) {</span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replicate</span>(R, <span class="fu">sqrt</span>(n) <span class="sc">*</span> <span class="fu">quantile</span>(<span class="fu">rnorm</span>(n), <span class="fl">0.5</span>, <span class="at">type =</span> <span class="dv">1</span>) <span class="sc">/</span> <span class="fu">sqrt</span>(pi <span class="sc">/</span> <span class="dv">2</span>))</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">density</span>(z[[<span class="dv">1</span>]]), <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">4</span>, <span class="dv">4</span>), <span class="at">ylim =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.5</span>),</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Scaled median error"</span>, <span class="at">main =</span> <span class="st">"Quantile normal approximation"</span>, <span class="at">col =</span> <span class="st">"#2F80C8"</span>)</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(z[[<span class="dv">2</span>]]), <span class="at">col =</span> <span class="st">"#D55E00"</span>)</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(<span class="fu">density</span>(z[[<span class="dv">3</span>]]), <span class="at">col =</span> <span class="st">"#009E73"</span>)</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a><span class="fu">curve</span>(<span class="fu">dnorm</span>(x), <span class="at">add =</span> <span class="cn">TRUE</span>, <span class="at">lty =</span> <span class="dv">2</span>)</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topright"</span>, <span class="fu">c</span>(<span class="fu">paste</span>(<span class="st">"n ="</span>, ns), <span class="st">"N(0,1)"</span>),</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">c</span>(<span class="st">"#2F80C8"</span>, <span class="st">"#D55E00"</span>, <span class="st">"#009E73"</span>, <span class="st">"black"</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">2</span>), <span class="at">bty =</span> <span class="st">"n"</span>)</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="fu">data.frame</span>(<span class="at">n =</span> ns, <span class="at">variance =</span> <span class="fu">sapply</span>(z, var),</span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>           <span class="at">coverage =</span> <span class="fu">sapply</span>(z, <span class="cf">function</span>(a) <span class="fu">mean</span>(<span class="fu">abs</span>(a) <span class="sc">&lt;=</span> <span class="fl">1.96</span>)))</span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>The reported variances concern the standardized errors and should approach 1; they are not variances of the unscaled medians. The coverage calculation uses the known density to assess an idealized normal interval in this simulation. A real-data procedure would need to estimate the required uncertainty or use another justified method.</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>Across 500 replications, coverage near 0.95 has Monte Carlo SE about 0.01. Both the numerical variances and coverages fluctuate. A familiar-looking density is evidence about this experiment, not a substitute for the assumptions and proof.</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>The checkpoint is this page’s completion target. Additional practice is optional.</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-sp-06 .checkpoint}</span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · SP-06 — Derive the quantile expansion and influence function {.unnumbered}</span></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation using a stated stochastic lemma.</span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a>Under the quantile conditions in this page, derive the expansion using the displayed CDF decomposition and stated stochastic-equicontinuity fact. Identify the influence function, its variance, and the additional requirement for a feasible standard error. Independently derive the path derivative by differentiating $F_t(q_t)=\tau$ along a valid bounded-score path. Explain why a pointwise derivative of the sample indicator cannot replace the argument.</span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can distinguish the population derivative from the stochastic increment and obtain both the expansion and pathwise representation.</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>**Transfer:** For the standard-normal median, compute the variance. Which step fails when the density is zero at the target?</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a>The approximate sample root has an error of order 1/n. Along a path, differentiating the CDF changes both its distribution and its endpoint.</span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>The approximate-root error and empirical-CDF increment are $o_p(n^{-1/2})$. The population change is $f(q)(\hat q-q)$ plus a negligible remainder, so inversion gives $\hat q-q=(\tau-F_n(q))/f(q)+o_p(n^{-1/2})$. The influence function is $(\tau-1<span class="sc">\{</span>Y\le q<span class="sc">\}</span>)/f(q)$ with variance $\tau(1-\tau)/f(q)^2$. For a score $s$, differentiation gives $0=E<span class="co">[</span><span class="ot">1\{Y\le q\}s</span><span class="co">]</span>+f(q)\dot q$; using $E<span class="co">[</span><span class="ot">s</span><span class="co">]</span>=0$ recovers $\dot q=E<span class="co">[</span><span class="ot">\phi_qs</span><span class="co">]</span>$. A feasible variance estimate needs density consistency at $q$ or another justified method. The sample CDF is discontinuous, so its pointwise derivative does not supply the population density. For a standard-normal median the influence variance is $\pi/2$, giving first-order estimator variance $\pi/(2n)$; a zero density prevents the displayed derivative inversion.</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Compare R quantile types 1 and 7 and explain why their first-order limits can agree.</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Identify the derivative step that fails when the density vanishes at the target.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+<script>var lightboxQuarto = GLightbox({"closeEffect":"zoom","descPosition":"bottom","loop":false,"openEffect":"zoom","selector":".lightbox"});
+(function() {
+  let previousOnload = window.onload;
+  window.onload = () => {
+    if (previousOnload) {
+      previousOnload();
+    }
+    lightboxQuarto.on('slide_before_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      const href = trigger.getAttribute('href');
+      if (href !== null) {
+        const imgEl = window.document.querySelector(`a[href="${href}"] img`);
+        if (imgEl !== null) {
+          const srcAttr = imgEl.getAttribute("src");
+          if (srcAttr && srcAttr.startsWith("data:")) {
+            slideConfig.href = srcAttr;
+          }
+        }
+      } 
+    });
+  
+    lightboxQuarto.on('slide_after_load', (data) => {
+      const { slideIndex, slideNode, slideConfig, player, trigger } = data;
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(slideNode);
+      }
+    });
+  
+  };
+  
+})();
+          </script>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

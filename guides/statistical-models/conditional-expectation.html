@@ -1,0 +1,1676 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Conditional expectation and L2 geometry – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/statistical-models/influence-functions.html" rel="next">
+<link href="../../guides/statistical-models/model-target-paths.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Conditional expectation and L2 geometry</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Statistical models, influence functions, and efficiency</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/model-target-paths.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Statistical models, targets, and paths</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/conditional-expectation.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Conditional expectation and L2 geometry</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/influence-functions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Influence functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/likelihood-and-information.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Likelihood, scores, and parametric efficiency</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/models-and-efficiency.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Model restrictions and efficiency</span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false">
+ <span class="menu-text">Extensions</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/quantiles-and-local-expansions.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Quantiles and local expansions</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/statistical-models/survival-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Survival models and efficiency (optional)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-one-idea" id="toc-the-one-idea" class="nav-link active" data-scroll-target="#the-one-idea"><span class="header-section-number">1</span> The one idea</a></li>
+  <li><a href="#expectations-as-averages-and-inner-products" id="toc-expectations-as-averages-and-inner-products" class="nav-link" data-scroll-target="#expectations-as-averages-and-inner-products"><span class="header-section-number">2</span> Expectations as averages and inner products</a></li>
+  <li><a href="#conditional-expectation-is-a-projection" id="toc-conditional-expectation-is-a-projection" class="nav-link" data-scroll-target="#conditional-expectation-is-a-projection"><span class="header-section-number">3</span> Conditional expectation is a projection</a>
+  <ul class="collapse">
+  <li><a href="#check-it-with-data" id="toc-check-it-with-data" class="nav-link" data-scroll-target="#check-it-with-data"><span class="header-section-number">3.1</span> Check it with data</a></li>
+  </ul></li>
+  <li><a href="#the-residual-is-orthogonal-to-every-function-of-z" id="toc-the-residual-is-orthogonal-to-every-function-of-z" class="nav-link" data-scroll-target="#the-residual-is-orthogonal-to-every-function-of-z"><span class="header-section-number">4</span> The residual is orthogonal to every function of <span class="math inline">Z</span></a></li>
+  <li><a href="#conditional-covariance-and-partialling-out" id="toc-conditional-covariance-and-partialling-out" class="nav-link" data-scroll-target="#conditional-covariance-and-partialling-out"><span class="header-section-number">5</span> Conditional covariance and partialling out</a></li>
+  <li><a href="#the-partially-linear-model" id="toc-the-partially-linear-model" class="nav-link" data-scroll-target="#the-partially-linear-model"><span class="header-section-number">6</span> The partially linear model</a></li>
+  <li><a href="#where-this-connects" id="toc-where-this-connects" class="nav-link" data-scroll-target="#where-this-connects"><span class="header-section-number">7</span> Where this connects</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">8</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-sp-02-prove-the-projection-property" id="toc-checkpoint-sp-02-prove-the-projection-property" class="nav-link" data-scroll-target="#checkpoint-sp-02-prove-the-projection-property">Checkpoint · SP-02 — Prove the projection property</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="header-section-number">9</span> Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Conditional expectation and L2 geometry</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Residuals, projections, and the calculation behind nuisance adjustment.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> Expectations, covariance, and basic regression; see the <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> page for the choice of adjustment.</p>
+<section id="the-one-idea" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="the-one-idea"><span class="header-section-number">1</span> The one idea</h2>
+<p>Much of semiparametric theory is a carefully organized version of a familiar move: remove from a variable the part another variable can predict, then work with what remains. In ordinary linear regression that means subtracting a fitted line. In the settings that matter later, the fitted object is allowed to be any function.</p>
+<p>Let <span class="math inline">X</span> be a measurement and <span class="math inline">Z</span> recorded covariates, and assume <span class="math inline">E[X^2]&lt;\infty</span>. The conditional expectation</p>
+<p><span class="math display">
+m_X(Z)=E[X\mid Z]
+</span></p>
+<p>is a random variable obtained by applying a population prediction function to <span class="math inline">Z</span>. At a particular covariate value <span class="math inline">z</span>, <span class="math inline">m_X(z)</span> is the conditional mean of <span class="math inline">X</span>. For continuous covariates, this is defined through a conditional distribution; it is not a literal average over observations with exactly the same covariate value in a finite dataset.</p>
+<p>For a discrete example, suppose half the people have <span class="math inline">Z=0</span> and half have <span class="math inline">Z=1</span>, with conditional means 1 and 3. Then <span class="math inline">m_X(Z)=1+2Z</span>. Subtracting 1 in the first stratum and 3 in the second leaves a residual whose mean is zero in each stratum, not just after pooling them.</p>
+<p>The residual <span class="math inline">X-m_X(Z)</span> has the following population property:</p>
+<p><span class="math display">
+E\left[\{X-m_X(Z)\}h(Z)\right]=0.
+</span></p>
+<p>This holds for every square-integrable function <span class="math inline">h(Z)</span>. It says that the residual is perpendicular to every allowed direction depending only on <span class="math inline">Z</span>. The meaning of “perpendicular” here comes from an expectation inner product, rather than angles in an observation-level scatterplot.</p>
+<div id="fig-residualization" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-residualization-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 780 370" role="img" aria-label="A right triangle in L2 space decomposes X into its conditional mean m and an orthogonal residual. An alternative prediction h lies on the same horizontal space; its squared error equals residual variance plus squared distance from h to m." style="display:block;width:100%;max-width:780px;height:auto;margin:0 auto">
+<rect x="1" y="1" width="778" height="368" rx="12" fill="currentColor" fill-opacity="0.025" stroke="currentColor" stroke-opacity="0.2"></rect>
+<g font-family="sans-serif"><text x="25" y="32" font-size="19" fill="currentColor" text-anchor="start" font-weight="bold">Conditional expectation is the closest prediction</text><text x="25" y="57" font-size="13" fill="currentColor" text-anchor="start" font-weight="normal">Schematic in L₂(P): lengths are root mean squared magnitudes.</text><line x1="75" y1="250" x2="355" y2="250" stroke="#2F80C8" stroke-width="4"></line><line x1="355" y1="250" x2="355" y2="95" stroke="#D55E00" stroke-width="4"></line><line x1="75" y1="250" x2="355" y2="95" stroke="currentColor" stroke-width="3"></line><path d="M339 250 V234 H355" fill="none" stroke="currentColor" stroke-width="2"></path><text x="66" y="274" font-size="15" fill="currentColor" text-anchor="start" font-weight="normal">0</text><text x="175" y="275" font-size="15" fill="#2F80C8" text-anchor="start" font-weight="normal">m(Z) = E[X | Z]</text><text x="365" y="172" font-size="15" fill="#D55E00" text-anchor="start" font-weight="normal">X − m(Z)</text><text x="365" y="92" font-size="18" fill="currentColor" text-anchor="start" font-weight="normal">X</text><line x1="95" y1="250" x2="355" y2="95" stroke="currentColor" stroke-width="1" stroke-dasharray="5 5"></line><text x="95" y="240" font-size="14" fill="#2F80C8" text-anchor="start" font-weight="normal">h(Z)</text><text x="450" y="112" font-size="16" fill="currentColor" text-anchor="start" font-weight="bold">Choose another prediction h(Z)</text><text x="450" y="145" font-size="14" fill="currentColor" text-anchor="start" font-weight="normal">Its error has two perpendicular pieces:</text><text x="450" y="184" font-size="15" fill="currentColor" text-anchor="start" font-weight="normal">X − h = (X − m) + (m − h)</text><text x="450" y="225" font-size="17" fill="currentColor" text-anchor="start" font-weight="normal">E[(X − h)²]</text><text x="450" y="254" font-size="16" fill="currentColor" text-anchor="start" font-weight="normal">= E[(X − m)²] + E[(m − h)²]</text><text x="450" y="288" font-size="13" fill="currentColor" text-anchor="start" font-weight="normal">irreducible error + prediction error</text><text x="25" y="335" font-size="14" fill="currentColor" text-anchor="start" font-weight="normal">The horizontal line represents directions in the space of functions of Z.</text></g>
+</svg>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-residualization-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Conditional expectation is an orthogonal projection. The horizontal line shows part of the space of functions of <span class="math inline">Z</span>; the residual is perpendicular to the entire space. Any alternative <span class="math inline">h(Z)</span> adds prediction error to the minimum possible mean squared error. The geometry is schematic, not a scatterplot of observations.
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="expectations-as-averages-and-inner-products" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="expectations-as-averages-and-inner-products"><span class="header-section-number">2</span> Expectations as averages and inner products</h2>
+<p>For a random variable <span class="math inline">U</span>, <span class="math inline">E[U]</span> is its population average. We usually cannot compute it exactly, so we replace it with the sample average</p>
+<p><span class="math display">
+P_n U = \frac{1}{n}\sum_{i=1}^n U_i.
+</span></p>
+<p>The notation <span class="math inline">P_n</span> says “take an average.” Under the appropriate LLN, this sample quantity approaches the population expectation for a fixed integrable function of i.i.d. observations. The distinction matters: a population identity involving <span class="math inline">E</span> need not be an exact identity after replacing the unknown function by a fitted one.</p>
+<p>If <span class="math inline">U</span> and <span class="math inline">V</span> have finite second moments, define</p>
+<p><span class="math display">
+\langle U,V\rangle = E[UV].
+</span></p>
+<p>This behaves like a dot product. Its associated squared length is <span class="math inline">\|U\|^2 = E[U^2]</span>. The collection of random variables with finite second moments is called <span class="math inline">L_2(P)</span>. You do not need functional analysis to use the notation. Keep three translations in mind:</p>
+<ul>
+<li><span class="math inline">\langle U,V\rangle = 0</span> means that <span class="math inline">U</span> and <span class="math inline">V</span> are orthogonal.</li>
+<li>Orthogonal random variables are uncorrelated if both have mean zero.</li>
+<li>A projection is the closest element of a set under squared-error loss.</li>
+</ul>
+<p>For centered variables, <span class="math inline">E[UV]</span> is their covariance. An orthogonal residual is therefore uncorrelated with a function of the covariates under the stated moment conditions. Zero covariance is a statement about one expected product; independence is a stronger statement about an entire joint distribution.</p>
+<p>Functions that agree with probability one have zero <span class="math inline">L_2</span> distance and are treated as the same element of this space. Thus a projection is unique up to equality almost surely. This concerns agreement on a population observation, rather than almost sure convergence of a sequence of estimates.</p>
+<p>The sample version is ordinary linear algebra. If <span class="math inline">u</span> and <span class="math inline">v</span> are vectors of observed values, <span class="math inline">n^{-1}u^\top v</span> estimates <span class="math inline">E[UV]</span>. Exact perpendicularity of two fitted data vectors and population orthogonality of two random variables are related, but distinct, statements.</p>
+</section>
+<section id="conditional-expectation-is-a-projection" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="conditional-expectation-is-a-projection"><span class="header-section-number">3</span> Conditional expectation is a projection</h2>
+<p>The conditional expectation <span class="math inline">E[X\mid Z]</span> is the best prediction of <span class="math inline">X</span> that can use <span class="math inline">Z</span>, where “best” means smallest population mean squared error. With <span class="math inline">E[X^2]&lt;\infty</span>, conditional Jensen’s inequality gives <span class="math inline">E[m_X(Z)^2]\le E[X^2]</span>, so the prediction itself is square-integrable. For every square-integrable candidate <span class="math inline">h(Z)</span>,</p>
+<p><span class="math display">
+E\left[\{X-E[X\mid Z]\}^2\right]
+\leq E\left[\{X-h(Z)\}^2\right].
+</span></p>
+<p>It is not necessary for <span class="math inline">E[X\mid Z]</span> to be linear, smooth, or easy to estimate. It is the population object that wins among all functions of <span class="math inline">Z</span>.</p>
+<p>The proof gives the fact we will use. Let <span class="math inline">m(Z)=E[X\mid Z]</span>. For any <span class="math inline">h(Z)</span>,</p>
+<p><span class="math display">
+\begin{aligned}
+E[(X-h)^2]&amp;=E[(X-m+m-h)^2]\\
+&amp;=E[(X-m)^2]+E[(m-h)^2]+2E[(X-m)(m-h)].
+\end{aligned}
+</span></p>
+<p>The final term is zero. First, conditioning on <span class="math inline">Z</span> gives</p>
+<p><span class="math display">
+\begin{aligned}
+E[X-m\mid Z]&amp;=E[X\mid Z]-m(Z)\\
+&amp;=0.
+\end{aligned}
+</span></p>
+<p>Next, <span class="math inline">(m-h)</span> is fixed once <span class="math inline">Z</span> is known, so it can be taken outside that conditional expectation. Finally, the law of total expectation averages the conditional result:</p>
+<p><span class="math display">
+\begin{aligned}
+E[(X-m)(m-h)]&amp;=E[(m-h)E[X-m\mid Z]]\\
+&amp;=0.
+\end{aligned}
+</span></p>
+<p>Finite second moments make this product integrable by Cauchy–Schwarz. The extra error from predicting with <span class="math inline">h</span> is therefore exactly <span class="math inline">E[(m-h)^2]\ge0</span>. Equality holds precisely when <span class="math inline">h(Z)=m(Z)</span> with probability one. This is the Pythagorean theorem in <span class="math inline">L_2(P)</span> and the uniqueness statement behind “best prediction.”</p>
+<section id="check-it-with-data" class="level3" data-number="3.1">
+<h3 data-number="3.1" class="anchored" data-anchor-id="check-it-with-data"><span class="header-section-number">3.1</span> Check it with data</h3>
+<p>Here <span class="math inline">X</span> has a nonlinear conditional mean. A straight line misses the curve; a spline gets closer. Neither fact changes the population definition of <span class="math inline">m_X</span>.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">800</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z) <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">0.45</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>fit_line <span class="ot">&lt;-</span> <span class="fu">lm</span>(x <span class="sc">~</span> z)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>fit_spline <span class="ot">&lt;-</span> <span class="fu">smooth.spline</span>(z, x, <span class="at">df =</span> <span class="dv">10</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>x_line <span class="ot">&lt;-</span> <span class="fu">fitted</span>(fit_line)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>x_spline <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_spline, z)<span class="sc">$</span>y</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">linear_MSE =</span> <span class="fu">mean</span>((x <span class="sc">-</span> x_line)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">spline_MSE =</span> <span class="fu">mean</span>((x <span class="sc">-</span> x_spline)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">no_adjustment_MSE =</span> <span class="fu">mean</span>((x <span class="sc">-</span> <span class="fu">mean</span>(x))<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>       linear_MSE        spline_MSE no_adjustment_MSE 
+        0.6541736         0.2248078         0.7259596 </code></pre>
+</div>
+</div>
+<p>Here the true conditional mean is <span class="math inline">\sin(2\pi Z)</span> and the irreducible conditional noise variance is <span class="math inline">0.45^2</span>. The reported MSEs are <strong>training errors</strong>, evaluated on the data used to fit each predictor. They illustrate how the chosen fits follow this sample; they do not estimate fresh-population risk without further justification. A sufficiently flexible fit could reduce training error while predicting poorly on new people.</p>
+<p>The population projection is defined before choosing an algorithm. To assess a learner’s approximation to it, evaluate prediction error on independent observations or use an appropriate validation scheme. The optional exercises include this comparison.</p>
+</section>
+</section>
+<section id="the-residual-is-orthogonal-to-every-function-of-z" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="the-residual-is-orthogonal-to-every-function-of-z"><span class="header-section-number">4</span> The residual is orthogonal to every function of <span class="math inline">Z</span></h2>
+<p>Set <span class="math inline">\widetilde X = X-m_X(Z)</span>. For any <span class="math inline">h(Z)</span>,</p>
+<p><span class="math display">
+\begin{aligned}
+E[\widetilde X h(Z)]&amp;=E\left[E\{\widetilde X h(Z)\mid Z\}\right]\\
+&amp;=E\left[h(Z)E\{X-m_X(Z)\mid Z\}\right]\\
+&amp;=0.
+\end{aligned}
+</span></p>
+<p>The first step is the law of total expectation; the second takes <span class="math inline">h(Z)</span> outside the conditional expectation and uses the conditional mean-zero residual. This is the residualization identity. It contains several familiar special cases, whenever the displayed functions have the required moments.</p>
+<ul>
+<li>Taking <span class="math inline">h(Z)=1</span> gives <span class="math inline">E[\widetilde X]=0</span>.</li>
+<li>Taking <span class="math inline">h(Z)=Z</span> gives <span class="math inline">\operatorname{Cov}(\widetilde X,Z)=0</span>.</li>
+<li>Taking <span class="math inline">h(Z)=Z^2</span>, <span class="math inline">\sin(Z)</span>, or an indicator of a subgroup gives the same result.</li>
+</ul>
+<p>In a finite-sample OLS fit, the normal equations make the fitted residual vector orthogonal to the included design columns. At the population level, a best linear predictor satisfies the corresponding finite set of moment equations. The true conditional-expectation residual satisfies the larger collection of equations for every square-integrable function of <span class="math inline">Z</span>. Estimating a flexible regression aims to approximate this population object; it does not grant all these identities automatically.</p>
+<p>Orthogonality also need not remove dependence. Let <span class="math inline">Z</span> be binary and <span class="math inline">U</span> an independent, mean-zero, unit-variance variable. For <span class="math inline">X=Z+(1+Z)U</span>, the conditional mean is <span class="math inline">Z</span> and the residual is <span class="math inline">(1+Z)U</span>. Its conditional mean is zero, yet its variance is 1 when <span class="math inline">Z=0</span> and 4 when <span class="math inline">Z=1</span>. The residual’s distribution still depends on <span class="math inline">Z</span>.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># The residual from a flexible fit is nearly orthogonal to several functions of z.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> x <span class="sc">-</span> x_spline</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(r),</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">z =</span> <span class="fu">mean</span>(r <span class="sc">*</span> z),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">z_squared =</span> <span class="fu">mean</span>(r <span class="sc">*</span> z<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">sine =</span> <span class="fu">mean</span>(r <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         mean             z     z_squared          sine 
+ 5.027173e-14  1.068541e-13 -6.825678e-06  2.476831e-02 </code></pre>
+</div>
+</div>
+<p>These are sample products using an estimated function on its own training data. They are a numerical illustration, not a proof of population orthogonality. If a square-integrable fitted function <span class="math inline">\hat m_X</span> is instead held fixed and evaluated on a fresh observation, conditioning on <span class="math inline">Z</span> gives</p>
+<p><span class="math display">
+E[(X-\hat m_X(Z))h(Z)]=E[(m_X(Z)-\hat m_X(Z))h(Z)].
+</span></p>
+<p>Its remaining population moment depends on regression error. <a href="../../guides/semiparametric-methods/orthogonality-and-cross-fitting.html">Orthogonality and cross-fitting</a> explains how training/evaluation separation and nuisance accuracy enter inference.</p>
+</section>
+<section id="conditional-covariance-and-partialling-out" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="conditional-covariance-and-partialling-out"><span class="header-section-number">5</span> Conditional covariance and partialling out</h2>
+<p>For two variables <span class="math inline">X</span> and <span class="math inline">Y</span> with finite second moments, write</p>
+<p><span class="math display">
+\psi_{XY}=E\big[\{X-m_X(Z)\} \times\{Y-m_Y(Z)\}\big].
+</span></p>
+<p>Condition on <span class="math inline">Z</span> and expand the product:</p>
+<p><span class="math display">
+\begin{aligned}
+E[(X-m_X)(Y-m_Y)\mid Z]&amp;=E[XY\mid Z]-m_X(Z)m_Y(Z)\\
+&amp;=\operatorname{Cov}(X,Y\mid Z).
+\end{aligned}
+</span></p>
+<p>The outer expectation therefore averages conditional covariance over the population’s covariate distribution. The analogous residual variances are <span class="math inline">\psi_{XX}=E[\operatorname{Var}(X\mid Z)]</span> and <span class="math inline">\psi_{YY}=E[\operatorname{Var}(Y\mid Z)]</span>. When both are finite and positive, their ratio gives a residual correlation:</p>
+<p><span class="math display">
+\rho_{XY\cdot Z} =
+\frac{\psi_{XY}}{\sqrt{\psi_{XX}\psi_{YY}}}.
+</span></p>
+<p>The expression is useful in network work: a marginal correlation can be large merely because two genes both change with cell composition, batch, or disease severity. Residualizing against a measured <span class="math inline">Z</span> asks about association left after that predictable structure is removed.</p>
+<p>The order of operations matters: averaging covariances and then standardizing generally differs from averaging within-stratum correlations. Also, positive and negative conditional covariances can cancel in the population average. A zero value does not even force every stratum’s covariance to be zero, much less establish conditional independence.</p>
+<p>These are associational targets. Whether adjusting for <span class="math inline">Z</span> is scientifically appropriate, or supports a causal interpretation, requires the argument in <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a>.</p>
+</section>
+<section id="the-partially-linear-model" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="the-partially-linear-model"><span class="header-section-number">6</span> The partially linear model</h2>
+<p>A later efficiency calculation uses the partially linear model:</p>
+<p><span class="math display">
+\begin{gathered}
+Y=\beta X+g(Z)+\varepsilon,\\
+E[\varepsilon\mid X,Z]=0.
+\end{gathered}
+</span></p>
+<p>Here <span class="math inline">\beta</span> is the quantity of interest and <span class="math inline">g</span> is an unknown nuisance function. Taking conditional expectations given <span class="math inline">Z</span> gives</p>
+<p><span class="math display">
+E[Y\mid Z] = \beta E[X\mid Z] + g(Z).
+</span></p>
+<p>Subtract this equation from the original one:</p>
+<p><span class="math display">
+Y-m_Y(Z) = \beta\{X-m_X(Z)\}+\varepsilon.
+</span></p>
+<p>The error term has mean zero conditional on <span class="math inline">(X,Z)</span>, so</p>
+<p><span class="math display">
+\begin{aligned}
+E[(X-m_X(Z))\varepsilon]&amp;=E[(X-m_X(Z))E[\varepsilon\mid X,Z]]\\
+&amp;=0.
+\end{aligned}
+</span></p>
+<p>Multiplying the residualized outcome equation by <span class="math inline">X-m_X(Z)</span> and taking expectations therefore gives the following ratio, provided its denominator is positive:</p>
+<p><span class="math display">
+\beta =
+\frac{E[\{X-m_X(Z)\}\{Y-m_Y(Z)\}]}
+     {E[\{X-m_X(Z)\}^2]}.
+</span></p>
+<p>This is Robinson’s partialling-out identity. The numerator is the residual cross moment and the denominator is residual exposure variation, just as in a regression slope. If <span class="math inline">X=m_X(Z)</span> almost surely, that denominator is zero: changing <span class="math inline">\beta</span> can be absorbed into the unrestricted function <span class="math inline">g(Z)</span>, so the coefficient cannot be separated from that nuisance. Positive residual variation is the identification condition. Efficiency and the cost of estimating the nuisance functions require the later model-specific arguments.</p>
+<div class="cell">
+<details open="" class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fl">1.5</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z) <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fl">0.6</span> <span class="sc">*</span> x <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z) <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>mx <span class="ot">&lt;-</span> <span class="fu">predict</span>(<span class="fu">smooth.spline</span>(z, x, <span class="at">df =</span> <span class="dv">12</span>), z)<span class="sc">$</span>y</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>my <span class="ot">&lt;-</span> <span class="fu">predict</span>(<span class="fu">smooth.spline</span>(z, y, <span class="at">df =</span> <span class="dv">12</span>), z)<span class="sc">$</span>y</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>x_res <span class="ot">&lt;-</span> x <span class="sc">-</span> mx; y_res <span class="ot">&lt;-</span> y <span class="sc">-</span> my</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">true_beta =</span> <span class="fl">0.6</span>,</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">naive_linear_adjustment =</span> <span class="fu">coef</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">+</span> z))[<span class="st">"x"</span>],</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">residual_slope =</span> <span class="fu">sum</span>(x_res <span class="sc">*</span> y_res) <span class="sc">/</span> <span class="fu">sum</span>(x_res<span class="sc">^</span><span class="dv">2</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>                true_beta naive_linear_adjustment.x            residual_slope 
+                0.6000000                 0.8203026                 0.6245794 </code></pre>
+</div>
+</div>
+<p>Here the shared sine component remains after linear adjustment for <span class="math inline">Z</span>, producing a population slope bias. Nonlinearity alone would not imply that bias: the omitted component must also be associated with the residual exposure. Spline residualization removes most of the shared nonlinear component in this example. In a real analysis we must still account for errors in <span class="math inline">\hat m_X</span> and <span class="math inline">\hat m_Y</span>; that is the later reason for orthogonal formulas and cross-fitting.</p>
+</section>
+<section id="where-this-connects" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="where-this-connects"><span class="header-section-number">7</span> Where this connects</h2>
+<ul>
+<li>The <a href="../../guides/questions-and-design/estimands-and-misspecification.html">What is your estimator actually estimating?</a> page asks whether adjustment for <span class="math inline">Z</span> answers the scientific question. This page shows the population calculation once the adjustment is justified.</li>
+<li>The <a href="../../guides/estimation-and-inference/estimating-equations.html">Estimating equations and asymptotic linearity</a> page treats the residual identity as an equation whose solution is an estimator.</li>
+<li>The <a href="../../guides/statistical-models/likelihood-and-information.html">Likelihood, scores, and parametric efficiency</a> page shows the same residualization as projection of a score away from a finite-dimensional nuisance.</li>
+<li>The <a href="../../guides/statistical-models/models-and-efficiency.html">Model restrictions and efficiency</a> page makes the nuisance space infinite-dimensional and derives the efficient influence function.</li>
+</ul>
+</section>
+<section id="exercises" class="level2" data-number="8">
+<h2 data-number="8" class="anchored" data-anchor-id="exercises"><span class="header-section-number">8</span> Exercises</h2>
+<p><strong>Checkpoints are completion targets for this page. Additional practice below is optional.</strong> Each checkpoint gives a completion standard, a hint, and a solution outline.</p>
+<div id="checkpoint-sp-02" class="checkpoint">
+<section id="checkpoint-sp-02-prove-the-projection-property" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-sp-02-prove-the-projection-property">Checkpoint · SP-02 — Prove the projection property</h3>
+<p><strong>Task type:</strong> Proof and interpretation.</p>
+<p>Assume <span class="math inline">E[X^2]&lt;\infty</span>, let <span class="math inline">m(Z)=E[X\mid Z]</span>, and let <span class="math inline">h(Z)</span> be square-integrable.</p>
+<ol type="1">
+<li>Prove <span class="math inline">E[(X-m(Z))h(Z)]=0</span> using conditional expectation.</li>
+<li>Derive <span class="math inline">E[(X-h)^2]=E[(X-m)^2]+E[(m-h)^2]</span>.</li>
+<li>Conclude that <span class="math inline">m</span> minimizes mean squared error and state exactly when equality holds.</li>
+<li>Explain why perpendicularity here refers to random variables in <span class="math inline">L_2(P)</span>, rather than a scatterplot of individual observations.</li>
+</ol>
+<p><strong>Ready to continue when:</strong> you can derive the decomposition, justify the vanishing cross term, and state uniqueness up to almost-sure equality.</p>
+<p><strong>Transfer:</strong> Use <span class="math inline">h(Z)=a+bZ</span> with population coefficients. Under what condition can this linear predictor achieve the population minimum over all functions of <span class="math inline">Z</span>? Distinguish that condition from estimating its coefficients in a finite sample.</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Write <span class="math inline">X-h=(X-m)+(m-h)</span> and condition the cross term on <span class="math inline">Z</span>.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>Because <span class="math inline">h</span> is a function of <span class="math inline">Z</span>, <span class="math inline">E[(X-m)h]=E[hE[X-m\mid Z]]=0</span>. The same argument applies to <span class="math inline">m-h</span>. Squaring <span class="math inline">X-h=(X-m)+(m-h)</span> and taking expectations therefore removes the cross term. The remaining extra term <span class="math inline">E[(m-h)^2]</span> is nonnegative and is zero exactly when <span class="math inline">h=m</span> almost surely. Finite second moments make the products integrable by Cauchy–Schwarz. This is orthogonality under the inner product <span class="math inline">E[UV]</span>.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<p>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</p>
+<ol type="1">
+<li>In the simulation above, replace <span class="math inline">1.5\sin(2\pi Z)</span> by a linear function of <span class="math inline">Z</span>. Compare linear adjustment and spline residualization. When is the simpler adjustment enough?</li>
+<li>Simulate <span class="math inline">X = Z + U</span> and <span class="math inline">Y = Z + U + V</span>, where <span class="math inline">Z,U,V</span> are independent standard normals. Compare the marginal correlation of <span class="math inline">X</span> and <span class="math inline">Y</span> with their residual correlation after adjusting for <span class="math inline">Z</span>. Explain both numbers.</li>
+<li>Evaluate the fitted line and spline from the first example on a fresh sample from the same generator. Compare training MSE, validation MSE, and the population noise variance <span class="math inline">0.45^2</span>.</li>
+</ol>
+</section>
+</section>
+<section id="reading" class="level2" data-number="9">
+<h2 data-number="9" class="anchored" data-anchor-id="reading"><span class="header-section-number">9</span> Reading</h2>
+<ul>
+<li>Tsiatis, A. A. (2006). <em>Semiparametric Theory and Missing Data</em>. Springer. Sections 3.1 to 3.3 for the geometry in full generality.</li>
+<li>van der Vaart, A. W. (1998). <em>Asymptotic Statistics</em>. Cambridge. Sections 25.1 and 25.2 for Hilbert-space notation used in semiparametric theory.</li>
+<li>Robinson, P. M. (1988). Root-<span class="math inline">N</span>-consistent semiparametric regression. <em>Econometrica</em>, 56(4), 931 to 954. The partialling-out construction.</li>
+<li>Buja, A., Brown, L., and Berk, R. (2019). Models as approximations, Part I. <em>Statistical Science</em>, 34(4), 523 to 544. A useful account of regression adjustment when a linear model is only an approximation.</li>
+</ul>
+<p><span id="continue-through-the-collection"></span></p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/statistical-models/model-target-paths.html" class="pagination-link" aria-label="Statistical models, targets, and paths">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Statistical models, targets, and paths</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/statistical-models/influence-functions.html" class="pagination-link" aria-label="Influence functions">
+        <span class="nav-page-text">Influence functions</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Conditional expectation and L2 geometry"</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Residuals, projections, and the calculation behind nuisance adjustment."</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="an">aliases:</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/estimation-and-inference/conditional-expectation.html"</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/statistical-background/11-conditional-expectation-geometry.html"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="an">guide-status:</span><span class="co"> "Available"</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>**Before reading:** Expectations, covariance, and basic regression; see the <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span> page for the choice of adjustment.</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">## The one idea</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>Much of semiparametric theory is a carefully organized version of a familiar move: remove from a variable the part another variable can predict, then work with what remains. In ordinary linear regression that means subtracting a fitted line. In the settings that matter later, the fitted object is allowed to be any function.</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>Let $X$ be a measurement and $Z$ recorded covariates, and assume $E<span class="co">[</span><span class="ot">X^2</span><span class="co">]</span>&lt;\infty$. The conditional expectation</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>m_X(Z)=E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>is a random variable obtained by applying a population prediction function to $Z$. At a particular covariate value $z$, $m_X(z)$ is the conditional mean of $X$. For continuous covariates, this is defined through a conditional distribution; it is not a literal average over observations with exactly the same covariate value in a finite dataset.</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>For a discrete example, suppose half the people have $Z=0$ and half have $Z=1$, with conditional means 1 and 3. Then $m_X(Z)=1+2Z$. Subtracting 1 in the first stratum and 3 in the second leaves a residual whose mean is zero in each stratum, not just after pooling them.</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>The residual $X-m_X(Z)$ has the following population property:</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>E\left<span class="co">[</span><span class="ot">\{X-m_X(Z)\}h(Z)\right</span><span class="co">]</span>=0.</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>This holds for every square-integrable function $h(Z)$. It says that the residual is perpendicular to every allowed direction depending only on $Z$. The meaning of “perpendicular” here comes from an expectation inner product, rather than angles in an observation-level scatterplot.</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>::: {#fig-residualization}</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{=html}</span></span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 370" role="img" aria-label="A right triangle in L2 space decomposes X into its conditional mean m and an orthogonal residual. An alternative prediction h lies on the same horizontal space; its squared error equals residual variance plus squared distance from h to m." style="display:block;width:100%;max-width:780px;height:auto;margin:0 auto"&gt;</span></span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;rect x="1" y="1" width="778" height="368" rx="12" fill="currentColor" fill-opacity="0.025" stroke="currentColor" stroke-opacity="0.2"/&gt;</span></span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;g font-family="sans-serif"&gt;&lt;text x="25" y="32" font-size="19" fill="currentColor" text-anchor="start" font-weight="bold"&gt;Conditional expectation is the closest prediction&lt;/text&gt;&lt;text x="25" y="57" font-size="13" fill="currentColor" text-anchor="start" font-weight="normal"&gt;Schematic in L₂(P): lengths are root mean squared magnitudes.&lt;/text&gt;&lt;line x1="75" y1="250" x2="355" y2="250" stroke="#2F80C8" stroke-width="4"/&gt;&lt;line x1="355" y1="250" x2="355" y2="95" stroke="#D55E00" stroke-width="4"/&gt;&lt;line x1="75" y1="250" x2="355" y2="95" stroke="currentColor" stroke-width="3"/&gt;&lt;path d="M339 250 V234 H355" fill="none" stroke="currentColor" stroke-width="2"/&gt;&lt;text x="66" y="274" font-size="15" fill="currentColor" text-anchor="start" font-weight="normal"&gt;0&lt;/text&gt;&lt;text x="175" y="275" font-size="15" fill="#2F80C8" text-anchor="start" font-weight="normal"&gt;m(Z) = E[X | Z]&lt;/text&gt;&lt;text x="365" y="172" font-size="15" fill="#D55E00" text-anchor="start" font-weight="normal"&gt;X − m(Z)&lt;/text&gt;&lt;text x="365" y="92" font-size="18" fill="currentColor" text-anchor="start" font-weight="normal"&gt;X&lt;/text&gt;&lt;line x1="95" y1="250" x2="355" y2="95" stroke="currentColor" stroke-width="1" stroke-dasharray="5 5"/&gt;&lt;text x="95" y="240" font-size="14" fill="#2F80C8" text-anchor="start" font-weight="normal"&gt;h(Z)&lt;/text&gt;&lt;text x="450" y="112" font-size="16" fill="currentColor" text-anchor="start" font-weight="bold"&gt;Choose another prediction h(Z)&lt;/text&gt;&lt;text x="450" y="145" font-size="14" fill="currentColor" text-anchor="start" font-weight="normal"&gt;Its error has two perpendicular pieces:&lt;/text&gt;&lt;text x="450" y="184" font-size="15" fill="currentColor" text-anchor="start" font-weight="normal"&gt;X − h = (X − m) + (m − h)&lt;/text&gt;&lt;text x="450" y="225" font-size="17" fill="currentColor" text-anchor="start" font-weight="normal"&gt;E[(X − h)²]&lt;/text&gt;&lt;text x="450" y="254" font-size="16" fill="currentColor" text-anchor="start" font-weight="normal"&gt;= E[(X − m)²] + E[(m − h)²]&lt;/text&gt;&lt;text x="450" y="288" font-size="13" fill="currentColor" text-anchor="start" font-weight="normal"&gt;irreducible error + prediction error&lt;/text&gt;&lt;text x="25" y="335" font-size="14" fill="currentColor" text-anchor="start" font-weight="normal"&gt;The horizontal line represents directions in the space of functions of Z.&lt;/text&gt;&lt;/g&gt;</span></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a><span class="in">&lt;/svg&gt;</span></span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>Conditional expectation is an orthogonal projection. The horizontal line shows part of the space of functions of $Z$; the residual is perpendicular to the entire space. Any alternative $h(Z)$ adds prediction error to the minimum possible mean squared error. The geometry is schematic, not a scatterplot of observations.</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a><span class="fu">## Expectations as averages and inner products</span></span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>For a random variable $U$, $E<span class="co">[</span><span class="ot">U</span><span class="co">]</span>$ is its population average. We usually cannot compute it exactly, so we replace it with the sample average</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>P_n U = \frac{1}{n}\sum_{i=1}^n U_i.</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>The notation $P_n$ says “take an average.” Under the appropriate LLN, this sample quantity approaches the population expectation for a fixed integrable function of i.i.d. observations. The distinction matters: a population identity involving $E$ need not be an exact identity after replacing the unknown function by a fitted one.</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>If $U$ and $V$ have finite second moments, define</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a>\langle U,V\rangle = E<span class="co">[</span><span class="ot">UV</span><span class="co">]</span>.</span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>This behaves like a dot product. Its associated squared length is $<span class="sc">\|</span>U<span class="sc">\|</span>^2 = E<span class="co">[</span><span class="ot">U^2</span><span class="co">]</span>$. The collection of random variables with finite second moments is called $L_2(P)$. You do not need functional analysis to use the notation. Keep three translations in mind:</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-66"><a href="#cb7-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>$\langle U,V\rangle = 0$ means that $U$ and $V$ are orthogonal.</span>
+<span id="cb7-67"><a href="#cb7-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Orthogonal random variables are uncorrelated if both have mean zero.</span>
+<span id="cb7-68"><a href="#cb7-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>A projection is the closest element of a set under squared-error loss.</span>
+<span id="cb7-69"><a href="#cb7-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-70"><a href="#cb7-70" aria-hidden="true" tabindex="-1"></a>For centered variables, $E<span class="co">[</span><span class="ot">UV</span><span class="co">]</span>$ is their covariance. An orthogonal residual is therefore uncorrelated with a function of the covariates under the stated moment conditions. Zero covariance is a statement about one expected product; independence is a stronger statement about an entire joint distribution.</span>
+<span id="cb7-71"><a href="#cb7-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-72"><a href="#cb7-72" aria-hidden="true" tabindex="-1"></a>Functions that agree with probability one have zero $L_2$ distance and are treated as the same element of this space. Thus a projection is unique up to equality almost surely. This concerns agreement on a population observation, rather than almost sure convergence of a sequence of estimates.</span>
+<span id="cb7-73"><a href="#cb7-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-74"><a href="#cb7-74" aria-hidden="true" tabindex="-1"></a>The sample version is ordinary linear algebra. If $u$ and $v$ are vectors of observed values, $n^{-1}u^\top v$ estimates $E<span class="co">[</span><span class="ot">UV</span><span class="co">]</span>$. Exact perpendicularity of two fitted data vectors and population orthogonality of two random variables are related, but distinct, statements.</span>
+<span id="cb7-75"><a href="#cb7-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-76"><a href="#cb7-76" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conditional expectation is a projection</span></span>
+<span id="cb7-77"><a href="#cb7-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a>The conditional expectation $E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span>$ is the best prediction of $X$ that can use $Z$, where “best” means smallest population mean squared error. With $E<span class="co">[</span><span class="ot">X^2</span><span class="co">]</span>&lt;\infty$, conditional Jensen's inequality gives $E<span class="co">[</span><span class="ot">m_X(Z)^2</span><span class="co">]</span>\le E<span class="co">[</span><span class="ot">X^2</span><span class="co">]</span>$, so the prediction itself is square-integrable. For every square-integrable candidate $h(Z)$,</span>
+<span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-80"><a href="#cb7-80" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-81"><a href="#cb7-81" aria-hidden="true" tabindex="-1"></a>E\left<span class="co">[</span><span class="ot">\{X-E[X\mid Z]\}^2\right</span><span class="co">]</span></span>
+<span id="cb7-82"><a href="#cb7-82" aria-hidden="true" tabindex="-1"></a>\leq E\left<span class="co">[</span><span class="ot">\{X-h(Z)\}^2\right</span><span class="co">]</span>.</span>
+<span id="cb7-83"><a href="#cb7-83" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-84"><a href="#cb7-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-85"><a href="#cb7-85" aria-hidden="true" tabindex="-1"></a>It is not necessary for $E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span>$ to be linear, smooth, or easy to estimate. It is the population object that wins among all functions of $Z$.</span>
+<span id="cb7-86"><a href="#cb7-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-87"><a href="#cb7-87" aria-hidden="true" tabindex="-1"></a>The proof gives the fact we will use. Let $m(Z)=E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span>$. For any $h(Z)$,</span>
+<span id="cb7-88"><a href="#cb7-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-89"><a href="#cb7-89" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-90"><a href="#cb7-90" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb7-91"><a href="#cb7-91" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">(X-h)^2</span><span class="co">]</span>&amp;=E<span class="co">[</span><span class="ot">(X-m+m-h)^2</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb7-92"><a href="#cb7-92" aria-hidden="true" tabindex="-1"></a>&amp;=E<span class="co">[</span><span class="ot">(X-m)^2</span><span class="co">]</span>+E<span class="co">[</span><span class="ot">(m-h)^2</span><span class="co">]</span>+2E<span class="co">[</span><span class="ot">(X-m)(m-h)</span><span class="co">]</span>.</span>
+<span id="cb7-93"><a href="#cb7-93" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb7-94"><a href="#cb7-94" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-95"><a href="#cb7-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-96"><a href="#cb7-96" aria-hidden="true" tabindex="-1"></a>The final term is zero. First, conditioning on $Z$ gives</span>
+<span id="cb7-97"><a href="#cb7-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-98"><a href="#cb7-98" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-99"><a href="#cb7-99" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb7-100"><a href="#cb7-100" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">X-m\mid Z</span><span class="co">]</span>&amp;=E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span>-m(Z)<span class="sc">\\</span></span>
+<span id="cb7-101"><a href="#cb7-101" aria-hidden="true" tabindex="-1"></a>&amp;=0.</span>
+<span id="cb7-102"><a href="#cb7-102" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb7-103"><a href="#cb7-103" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-104"><a href="#cb7-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-105"><a href="#cb7-105" aria-hidden="true" tabindex="-1"></a>Next, $(m-h)$ is fixed once $Z$ is known, so it can be taken outside that conditional expectation. Finally, the law of total expectation averages the conditional result:</span>
+<span id="cb7-106"><a href="#cb7-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-107"><a href="#cb7-107" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-108"><a href="#cb7-108" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb7-109"><a href="#cb7-109" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">(X-m)(m-h)</span><span class="co">]</span>&amp;=E<span class="co">[</span><span class="ot">(m-h)E[X-m\mid Z]</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb7-110"><a href="#cb7-110" aria-hidden="true" tabindex="-1"></a>&amp;=0.</span>
+<span id="cb7-111"><a href="#cb7-111" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb7-112"><a href="#cb7-112" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-113"><a href="#cb7-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-114"><a href="#cb7-114" aria-hidden="true" tabindex="-1"></a>Finite second moments make this product integrable by Cauchy–Schwarz. The extra error from predicting with $h$ is therefore exactly $E<span class="co">[</span><span class="ot">(m-h)^2</span><span class="co">]</span>\ge0$. Equality holds precisely when $h(Z)=m(Z)$ with probability one. This is the Pythagorean theorem in $L_2(P)$ and the uniqueness statement behind “best prediction.”</span>
+<span id="cb7-115"><a href="#cb7-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-116"><a href="#cb7-116" aria-hidden="true" tabindex="-1"></a><span class="fu">### Check it with data</span></span>
+<span id="cb7-117"><a href="#cb7-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-118"><a href="#cb7-118" aria-hidden="true" tabindex="-1"></a>Here $X$ has a nonlinear conditional mean. A straight line misses the curve; a spline gets closer. Neither fact changes the population definition of $m_X$.</span>
+<span id="cb7-119"><a href="#cb7-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-122"><a href="#cb7-122" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb7-123"><a href="#cb7-123" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1</span>)</span>
+<span id="cb7-124"><a href="#cb7-124" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">800</span></span>
+<span id="cb7-125"><a href="#cb7-125" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>)</span>
+<span id="cb7-126"><a href="#cb7-126" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z) <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="at">sd =</span> <span class="fl">0.45</span>)</span>
+<span id="cb7-127"><a href="#cb7-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-128"><a href="#cb7-128" aria-hidden="true" tabindex="-1"></a>fit_line <span class="ot">&lt;-</span> <span class="fu">lm</span>(x <span class="sc">~</span> z)</span>
+<span id="cb7-129"><a href="#cb7-129" aria-hidden="true" tabindex="-1"></a>fit_spline <span class="ot">&lt;-</span> <span class="fu">smooth.spline</span>(z, x, <span class="at">df =</span> <span class="dv">10</span>)</span>
+<span id="cb7-130"><a href="#cb7-130" aria-hidden="true" tabindex="-1"></a>x_line <span class="ot">&lt;-</span> <span class="fu">fitted</span>(fit_line)</span>
+<span id="cb7-131"><a href="#cb7-131" aria-hidden="true" tabindex="-1"></a>x_spline <span class="ot">&lt;-</span> <span class="fu">predict</span>(fit_spline, z)<span class="sc">$</span>y</span>
+<span id="cb7-132"><a href="#cb7-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-133"><a href="#cb7-133" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">linear_MSE =</span> <span class="fu">mean</span>((x <span class="sc">-</span> x_line)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb7-134"><a href="#cb7-134" aria-hidden="true" tabindex="-1"></a>  <span class="at">spline_MSE =</span> <span class="fu">mean</span>((x <span class="sc">-</span> x_spline)<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb7-135"><a href="#cb7-135" aria-hidden="true" tabindex="-1"></a>  <span class="at">no_adjustment_MSE =</span> <span class="fu">mean</span>((x <span class="sc">-</span> <span class="fu">mean</span>(x))<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb7-136"><a href="#cb7-136" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-137"><a href="#cb7-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-138"><a href="#cb7-138" aria-hidden="true" tabindex="-1"></a>Here the true conditional mean is $\sin(2\pi Z)$ and the irreducible conditional noise variance is $0.45^2$. The reported MSEs are **training errors**, evaluated on the data used to fit each predictor. They illustrate how the chosen fits follow this sample; they do not estimate fresh-population risk without further justification. A sufficiently flexible fit could reduce training error while predicting poorly on new people.</span>
+<span id="cb7-139"><a href="#cb7-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-140"><a href="#cb7-140" aria-hidden="true" tabindex="-1"></a>The population projection is defined before choosing an algorithm. To assess a learner's approximation to it, evaluate prediction error on independent observations or use an appropriate validation scheme. The optional exercises include this comparison.</span>
+<span id="cb7-141"><a href="#cb7-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-142"><a href="#cb7-142" aria-hidden="true" tabindex="-1"></a><span class="fu">## The residual is orthogonal to every function of $Z$</span></span>
+<span id="cb7-143"><a href="#cb7-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-144"><a href="#cb7-144" aria-hidden="true" tabindex="-1"></a>Set $\widetilde X = X-m_X(Z)$. For any $h(Z)$,</span>
+<span id="cb7-145"><a href="#cb7-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-146"><a href="#cb7-146" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-147"><a href="#cb7-147" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb7-148"><a href="#cb7-148" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">\widetilde X h(Z)</span><span class="co">]</span>&amp;=E\left<span class="co">[</span><span class="ot">E\{\widetilde X h(Z)\mid Z\}\right</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb7-149"><a href="#cb7-149" aria-hidden="true" tabindex="-1"></a>&amp;=E\left<span class="co">[</span><span class="ot">h(Z)E\{X-m_X(Z)\mid Z\}\right</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb7-150"><a href="#cb7-150" aria-hidden="true" tabindex="-1"></a>&amp;=0.</span>
+<span id="cb7-151"><a href="#cb7-151" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb7-152"><a href="#cb7-152" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-153"><a href="#cb7-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-154"><a href="#cb7-154" aria-hidden="true" tabindex="-1"></a>The first step is the law of total expectation; the second takes $h(Z)$ outside the conditional expectation and uses the conditional mean-zero residual. This is the residualization identity. It contains several familiar special cases, whenever the displayed functions have the required moments.</span>
+<span id="cb7-155"><a href="#cb7-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-156"><a href="#cb7-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Taking $h(Z)=1$ gives $E<span class="co">[</span><span class="ot">\widetilde X</span><span class="co">]</span>=0$.</span>
+<span id="cb7-157"><a href="#cb7-157" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Taking $h(Z)=Z$ gives $\operatorname{Cov}(\widetilde X,Z)=0$.</span>
+<span id="cb7-158"><a href="#cb7-158" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Taking $h(Z)=Z^2$, $\sin(Z)$, or an indicator of a subgroup gives the same result.</span>
+<span id="cb7-159"><a href="#cb7-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-160"><a href="#cb7-160" aria-hidden="true" tabindex="-1"></a>In a finite-sample OLS fit, the normal equations make the fitted residual vector orthogonal to the included design columns. At the population level, a best linear predictor satisfies the corresponding finite set of moment equations. The true conditional-expectation residual satisfies the larger collection of equations for every square-integrable function of $Z$. Estimating a flexible regression aims to approximate this population object; it does not grant all these identities automatically.</span>
+<span id="cb7-161"><a href="#cb7-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-162"><a href="#cb7-162" aria-hidden="true" tabindex="-1"></a>Orthogonality also need not remove dependence. Let $Z$ be binary and $U$ an independent, mean-zero, unit-variance variable. For $X=Z+(1+Z)U$, the conditional mean is $Z$ and the residual is $(1+Z)U$. Its conditional mean is zero, yet its variance is 1 when $Z=0$ and 4 when $Z=1$. The residual's distribution still depends on $Z$.</span>
+<span id="cb7-163"><a href="#cb7-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-166"><a href="#cb7-166" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb7-167"><a href="#cb7-167" aria-hidden="true" tabindex="-1"></a><span class="co"># The residual from a flexible fit is nearly orthogonal to several functions of z.</span></span>
+<span id="cb7-168"><a href="#cb7-168" aria-hidden="true" tabindex="-1"></a>r <span class="ot">&lt;-</span> x <span class="sc">-</span> x_spline</span>
+<span id="cb7-169"><a href="#cb7-169" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">mean =</span> <span class="fu">mean</span>(r),</span>
+<span id="cb7-170"><a href="#cb7-170" aria-hidden="true" tabindex="-1"></a>  <span class="at">z =</span> <span class="fu">mean</span>(r <span class="sc">*</span> z),</span>
+<span id="cb7-171"><a href="#cb7-171" aria-hidden="true" tabindex="-1"></a>  <span class="at">z_squared =</span> <span class="fu">mean</span>(r <span class="sc">*</span> z<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb7-172"><a href="#cb7-172" aria-hidden="true" tabindex="-1"></a>  <span class="at">sine =</span> <span class="fu">mean</span>(r <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z)))</span>
+<span id="cb7-173"><a href="#cb7-173" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-174"><a href="#cb7-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-175"><a href="#cb7-175" aria-hidden="true" tabindex="-1"></a>These are sample products using an estimated function on its own training data. They are a numerical illustration, not a proof of population orthogonality. If a square-integrable fitted function $\hat m_X$ is instead held fixed and evaluated on a fresh observation, conditioning on $Z$ gives</span>
+<span id="cb7-176"><a href="#cb7-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-177"><a href="#cb7-177" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-178"><a href="#cb7-178" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">(X-\hat m_X(Z))h(Z)</span><span class="co">]</span>=E<span class="co">[</span><span class="ot">(m_X(Z)-\hat m_X(Z))h(Z)</span><span class="co">]</span>.</span>
+<span id="cb7-179"><a href="#cb7-179" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-180"><a href="#cb7-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-181"><a href="#cb7-181" aria-hidden="true" tabindex="-1"></a>Its remaining population moment depends on regression error. <span class="co">[</span><span class="ot">Orthogonality and cross-fitting</span><span class="co">](../semiparametric-methods/orthogonality-and-cross-fitting.qmd)</span> explains how training/evaluation separation and nuisance accuracy enter inference.</span>
+<span id="cb7-182"><a href="#cb7-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-183"><a href="#cb7-183" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conditional covariance and partialling out</span></span>
+<span id="cb7-184"><a href="#cb7-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-185"><a href="#cb7-185" aria-hidden="true" tabindex="-1"></a>For two variables $X$ and $Y$ with finite second moments, write</span>
+<span id="cb7-186"><a href="#cb7-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-187"><a href="#cb7-187" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-188"><a href="#cb7-188" aria-hidden="true" tabindex="-1"></a>\psi_{XY}=E\big<span class="co">[</span><span class="ot">\{X-m_X(Z)\} \times\{Y-m_Y(Z)\}\big</span><span class="co">]</span>.</span>
+<span id="cb7-189"><a href="#cb7-189" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-190"><a href="#cb7-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-191"><a href="#cb7-191" aria-hidden="true" tabindex="-1"></a>Condition on $Z$ and expand the product:</span>
+<span id="cb7-192"><a href="#cb7-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-193"><a href="#cb7-193" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-194"><a href="#cb7-194" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb7-195"><a href="#cb7-195" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">(X-m_X)(Y-m_Y)\mid Z</span><span class="co">]</span>&amp;=E<span class="co">[</span><span class="ot">XY\mid Z</span><span class="co">]</span>-m_X(Z)m_Y(Z)<span class="sc">\\</span></span>
+<span id="cb7-196"><a href="#cb7-196" aria-hidden="true" tabindex="-1"></a>&amp;=\operatorname{Cov}(X,Y\mid Z).</span>
+<span id="cb7-197"><a href="#cb7-197" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb7-198"><a href="#cb7-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-199"><a href="#cb7-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-200"><a href="#cb7-200" aria-hidden="true" tabindex="-1"></a>The outer expectation therefore averages conditional covariance over the population's covariate distribution. The analogous residual variances are $\psi_{XX}=E<span class="co">[</span><span class="ot">\operatorname{Var}(X\mid Z)</span><span class="co">]</span>$ and $\psi_{YY}=E<span class="co">[</span><span class="ot">\operatorname{Var}(Y\mid Z)</span><span class="co">]</span>$. When both are finite and positive, their ratio gives a residual correlation:</span>
+<span id="cb7-201"><a href="#cb7-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-202"><a href="#cb7-202" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-203"><a href="#cb7-203" aria-hidden="true" tabindex="-1"></a>\rho_{XY\cdot Z} =</span>
+<span id="cb7-204"><a href="#cb7-204" aria-hidden="true" tabindex="-1"></a>\frac{\psi_{XY}}{\sqrt{\psi_{XX}\psi_{YY}}}.</span>
+<span id="cb7-205"><a href="#cb7-205" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-206"><a href="#cb7-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-207"><a href="#cb7-207" aria-hidden="true" tabindex="-1"></a>The expression is useful in network work: a marginal correlation can be large merely because two genes both change with cell composition, batch, or disease severity. Residualizing against a measured $Z$ asks about association left after that predictable structure is removed.</span>
+<span id="cb7-208"><a href="#cb7-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-209"><a href="#cb7-209" aria-hidden="true" tabindex="-1"></a>The order of operations matters: averaging covariances and then standardizing generally differs from averaging within-stratum correlations. Also, positive and negative conditional covariances can cancel in the population average. A zero value does not even force every stratum's covariance to be zero, much less establish conditional independence.</span>
+<span id="cb7-210"><a href="#cb7-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-211"><a href="#cb7-211" aria-hidden="true" tabindex="-1"></a>These are associational targets. Whether adjusting for $Z$ is scientifically appropriate, or supports a causal interpretation, requires the argument in <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span>.</span>
+<span id="cb7-212"><a href="#cb7-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-213"><a href="#cb7-213" aria-hidden="true" tabindex="-1"></a><span class="fu">## The partially linear model</span></span>
+<span id="cb7-214"><a href="#cb7-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-215"><a href="#cb7-215" aria-hidden="true" tabindex="-1"></a>A later efficiency calculation uses the partially linear model:</span>
+<span id="cb7-216"><a href="#cb7-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-217"><a href="#cb7-217" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-218"><a href="#cb7-218" aria-hidden="true" tabindex="-1"></a>\begin{gathered}</span>
+<span id="cb7-219"><a href="#cb7-219" aria-hidden="true" tabindex="-1"></a>Y=\beta X+g(Z)+\varepsilon,<span class="sc">\\</span></span>
+<span id="cb7-220"><a href="#cb7-220" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">\varepsilon\mid X,Z</span><span class="co">]</span>=0.</span>
+<span id="cb7-221"><a href="#cb7-221" aria-hidden="true" tabindex="-1"></a>\end{gathered}</span>
+<span id="cb7-222"><a href="#cb7-222" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-223"><a href="#cb7-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-224"><a href="#cb7-224" aria-hidden="true" tabindex="-1"></a>Here $\beta$ is the quantity of interest and $g$ is an unknown nuisance function. Taking conditional expectations given $Z$ gives</span>
+<span id="cb7-225"><a href="#cb7-225" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-226"><a href="#cb7-226" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-227"><a href="#cb7-227" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">Y\mid Z</span><span class="co">]</span> = \beta E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span> + g(Z).</span>
+<span id="cb7-228"><a href="#cb7-228" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-229"><a href="#cb7-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-230"><a href="#cb7-230" aria-hidden="true" tabindex="-1"></a>Subtract this equation from the original one:</span>
+<span id="cb7-231"><a href="#cb7-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-232"><a href="#cb7-232" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-233"><a href="#cb7-233" aria-hidden="true" tabindex="-1"></a>Y-m_Y(Z) = \beta<span class="sc">\{</span>X-m_X(Z)<span class="sc">\}</span>+\varepsilon.</span>
+<span id="cb7-234"><a href="#cb7-234" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-235"><a href="#cb7-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-236"><a href="#cb7-236" aria-hidden="true" tabindex="-1"></a>The error term has mean zero conditional on $(X,Z)$, so</span>
+<span id="cb7-237"><a href="#cb7-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-238"><a href="#cb7-238" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-239"><a href="#cb7-239" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb7-240"><a href="#cb7-240" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">(X-m_X(Z))\varepsilon</span><span class="co">]</span>&amp;=E<span class="co">[</span><span class="ot">(X-m_X(Z))E[\varepsilon\mid X,Z]</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb7-241"><a href="#cb7-241" aria-hidden="true" tabindex="-1"></a>&amp;=0.</span>
+<span id="cb7-242"><a href="#cb7-242" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb7-243"><a href="#cb7-243" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-244"><a href="#cb7-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-245"><a href="#cb7-245" aria-hidden="true" tabindex="-1"></a>Multiplying the residualized outcome equation by $X-m_X(Z)$ and taking expectations therefore gives the following ratio, provided its denominator is positive:</span>
+<span id="cb7-246"><a href="#cb7-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-247"><a href="#cb7-247" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-248"><a href="#cb7-248" aria-hidden="true" tabindex="-1"></a>\beta =</span>
+<span id="cb7-249"><a href="#cb7-249" aria-hidden="true" tabindex="-1"></a>\frac{E<span class="co">[</span><span class="ot">\{X-m_X(Z)\}\{Y-m_Y(Z)\}</span><span class="co">]</span>}</span>
+<span id="cb7-250"><a href="#cb7-250" aria-hidden="true" tabindex="-1"></a>     {E<span class="co">[</span><span class="ot">\{X-m_X(Z)\}^2</span><span class="co">]</span>}.</span>
+<span id="cb7-251"><a href="#cb7-251" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb7-252"><a href="#cb7-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-253"><a href="#cb7-253" aria-hidden="true" tabindex="-1"></a>This is Robinson's partialling-out identity. The numerator is the residual cross moment and the denominator is residual exposure variation, just as in a regression slope. If $X=m_X(Z)$ almost surely, that denominator is zero: changing $\beta$ can be absorbed into the unrestricted function $g(Z)$, so the coefficient cannot be separated from that nuisance. Positive residual variation is the identification condition. Efficiency and the cost of estimating the nuisance functions require the later model-specific arguments.</span>
+<span id="cb7-254"><a href="#cb7-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-257"><a href="#cb7-257" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb7-258"><a href="#cb7-258" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2</span>)</span>
+<span id="cb7-259"><a href="#cb7-259" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">1000</span></span>
+<span id="cb7-260"><a href="#cb7-260" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">runif</span>(n)</span>
+<span id="cb7-261"><a href="#cb7-261" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fl">1.5</span> <span class="sc">*</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z) <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb7-262"><a href="#cb7-262" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fl">0.6</span> <span class="sc">*</span> x <span class="sc">+</span> <span class="fu">sin</span>(<span class="dv">2</span> <span class="sc">*</span> pi <span class="sc">*</span> z) <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb7-263"><a href="#cb7-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-264"><a href="#cb7-264" aria-hidden="true" tabindex="-1"></a>mx <span class="ot">&lt;-</span> <span class="fu">predict</span>(<span class="fu">smooth.spline</span>(z, x, <span class="at">df =</span> <span class="dv">12</span>), z)<span class="sc">$</span>y</span>
+<span id="cb7-265"><a href="#cb7-265" aria-hidden="true" tabindex="-1"></a>my <span class="ot">&lt;-</span> <span class="fu">predict</span>(<span class="fu">smooth.spline</span>(z, y, <span class="at">df =</span> <span class="dv">12</span>), z)<span class="sc">$</span>y</span>
+<span id="cb7-266"><a href="#cb7-266" aria-hidden="true" tabindex="-1"></a>x_res <span class="ot">&lt;-</span> x <span class="sc">-</span> mx; y_res <span class="ot">&lt;-</span> y <span class="sc">-</span> my</span>
+<span id="cb7-267"><a href="#cb7-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-268"><a href="#cb7-268" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="at">true_beta =</span> <span class="fl">0.6</span>,</span>
+<span id="cb7-269"><a href="#cb7-269" aria-hidden="true" tabindex="-1"></a>  <span class="at">naive_linear_adjustment =</span> <span class="fu">coef</span>(<span class="fu">lm</span>(y <span class="sc">~</span> x <span class="sc">+</span> z))[<span class="st">"x"</span>],</span>
+<span id="cb7-270"><a href="#cb7-270" aria-hidden="true" tabindex="-1"></a>  <span class="at">residual_slope =</span> <span class="fu">sum</span>(x_res <span class="sc">*</span> y_res) <span class="sc">/</span> <span class="fu">sum</span>(x_res<span class="sc">^</span><span class="dv">2</span>))</span>
+<span id="cb7-271"><a href="#cb7-271" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb7-272"><a href="#cb7-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-273"><a href="#cb7-273" aria-hidden="true" tabindex="-1"></a>Here the shared sine component remains after linear adjustment for $Z$, producing a population slope bias. Nonlinearity alone would not imply that bias: the omitted component must also be associated with the residual exposure. Spline residualization removes most of the shared nonlinear component in this example. In a real analysis we must still account for errors in $\hat m_X$ and $\hat m_Y$; that is the later reason for orthogonal formulas and cross-fitting.</span>
+<span id="cb7-274"><a href="#cb7-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-275"><a href="#cb7-275" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where this connects</span></span>
+<span id="cb7-276"><a href="#cb7-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-277"><a href="#cb7-277" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">What is your estimator actually estimating?</span><span class="co">](../questions-and-design/estimands-and-misspecification.qmd)</span> page asks whether adjustment for $Z$ answers the scientific question. This page shows the population calculation once the adjustment is justified.</span>
+<span id="cb7-278"><a href="#cb7-278" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">Estimating equations and asymptotic linearity</span><span class="co">](../estimation-and-inference/estimating-equations.qmd)</span> page treats the residual identity as an equation whose solution is an estimator.</span>
+<span id="cb7-279"><a href="#cb7-279" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">Likelihood, scores, and parametric efficiency</span><span class="co">](likelihood-and-information.qmd)</span> page shows the same residualization as projection of a score away from a finite-dimensional nuisance.</span>
+<span id="cb7-280"><a href="#cb7-280" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>The <span class="co">[</span><span class="ot">Model restrictions and efficiency</span><span class="co">](models-and-efficiency.qmd)</span> page makes the nuisance space infinite-dimensional and derives the efficient influence function.</span>
+<span id="cb7-281"><a href="#cb7-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-282"><a href="#cb7-282" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb7-283"><a href="#cb7-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-284"><a href="#cb7-284" aria-hidden="true" tabindex="-1"></a>**Checkpoints are completion targets for this page. Additional practice below is optional.** Each checkpoint gives a completion standard, a hint, and a solution outline.</span>
+<span id="cb7-285"><a href="#cb7-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-286"><a href="#cb7-286" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-sp-02 .checkpoint}</span>
+<span id="cb7-287"><a href="#cb7-287" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · SP-02 — Prove the projection property {.unnumbered}</span></span>
+<span id="cb7-288"><a href="#cb7-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-289"><a href="#cb7-289" aria-hidden="true" tabindex="-1"></a>**Task type:** Proof and interpretation.</span>
+<span id="cb7-290"><a href="#cb7-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-291"><a href="#cb7-291" aria-hidden="true" tabindex="-1"></a>Assume $E<span class="co">[</span><span class="ot">X^2</span><span class="co">]</span>&lt;\infty$, let $m(Z)=E<span class="co">[</span><span class="ot">X\mid Z</span><span class="co">]</span>$, and let $h(Z)$ be square-integrable.</span>
+<span id="cb7-292"><a href="#cb7-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-293"><a href="#cb7-293" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Prove $E<span class="co">[</span><span class="ot">(X-m(Z))h(Z)</span><span class="co">]</span>=0$ using conditional expectation.</span>
+<span id="cb7-294"><a href="#cb7-294" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Derive $E<span class="co">[</span><span class="ot">(X-h)^2</span><span class="co">]</span>=E<span class="co">[</span><span class="ot">(X-m)^2</span><span class="co">]</span>+E<span class="co">[</span><span class="ot">(m-h)^2</span><span class="co">]</span>$.</span>
+<span id="cb7-295"><a href="#cb7-295" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Conclude that $m$ minimizes mean squared error and state exactly when equality holds.</span>
+<span id="cb7-296"><a href="#cb7-296" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Explain why perpendicularity here refers to random variables in $L_2(P)$, rather than a scatterplot of individual observations.</span>
+<span id="cb7-297"><a href="#cb7-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-298"><a href="#cb7-298" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can derive the decomposition, justify the vanishing cross term, and state uniqueness up to almost-sure equality.</span>
+<span id="cb7-299"><a href="#cb7-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-300"><a href="#cb7-300" aria-hidden="true" tabindex="-1"></a>**Transfer:** Use $h(Z)=a+bZ$ with population coefficients. Under what condition can this linear predictor achieve the population minimum over all functions of $Z$? Distinguish that condition from estimating its coefficients in a finite sample.</span>
+<span id="cb7-301"><a href="#cb7-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-302"><a href="#cb7-302" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb7-303"><a href="#cb7-303" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb7-304"><a href="#cb7-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-305"><a href="#cb7-305" aria-hidden="true" tabindex="-1"></a>Write $X-h=(X-m)+(m-h)$ and condition the cross term on $Z$.</span>
+<span id="cb7-306"><a href="#cb7-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-307"><a href="#cb7-307" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb7-308"><a href="#cb7-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-309"><a href="#cb7-309" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb7-310"><a href="#cb7-310" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb7-311"><a href="#cb7-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-312"><a href="#cb7-312" aria-hidden="true" tabindex="-1"></a>Because $h$ is a function of $Z$, $E<span class="co">[</span><span class="ot">(X-m)h</span><span class="co">]</span>=E<span class="co">[</span><span class="ot">hE[X-m\mid Z]</span><span class="co">]</span>=0$. The same argument applies to $m-h$. Squaring $X-h=(X-m)+(m-h)$ and taking expectations therefore removes the cross term. The remaining extra term $E<span class="co">[</span><span class="ot">(m-h)^2</span><span class="co">]</span>$ is nonnegative and is zero exactly when $h=m$ almost surely. Finite second moments make the products integrable by Cauchy–Schwarz. This is orthogonality under the inner product $E<span class="co">[</span><span class="ot">UV</span><span class="co">]</span>$.</span>
+<span id="cb7-313"><a href="#cb7-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-314"><a href="#cb7-314" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb7-315"><a href="#cb7-315" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb7-316"><a href="#cb7-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-317"><a href="#cb7-317" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb7-318"><a href="#cb7-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-319"><a href="#cb7-319" aria-hidden="true" tabindex="-1"></a>These exercises extend the ideas through further derivations, simulations, or applications. Choose those useful for your work.</span>
+<span id="cb7-320"><a href="#cb7-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-321"><a href="#cb7-321" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>In the simulation above, replace $1.5\sin(2\pi Z)$ by a linear function of $Z$. Compare linear adjustment and spline residualization. When is the simpler adjustment enough?</span>
+<span id="cb7-322"><a href="#cb7-322" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Simulate $X = Z + U$ and $Y = Z + U + V$, where $Z,U,V$ are independent standard normals. Compare the marginal correlation of $X$ and $Y$ with their residual correlation after adjusting for $Z$. Explain both numbers.</span>
+<span id="cb7-323"><a href="#cb7-323" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Evaluate the fitted line and spline from the first example on a fresh sample from the same generator. Compare training MSE, validation MSE, and the population noise variance $0.45^2$.</span>
+<span id="cb7-324"><a href="#cb7-324" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-325"><a href="#cb7-325" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reading</span></span>
+<span id="cb7-326"><a href="#cb7-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-327"><a href="#cb7-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Tsiatis, A. A. (2006). *Semiparametric Theory and Missing Data*. Springer. Sections 3.1 to 3.3 for the geometry in full generality.</span>
+<span id="cb7-328"><a href="#cb7-328" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>van der Vaart, A. W. (1998). *Asymptotic Statistics*. Cambridge. Sections 25.1 and 25.2 for Hilbert-space notation used in semiparametric theory.</span>
+<span id="cb7-329"><a href="#cb7-329" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Robinson, P. M. (1988). Root-$N$-consistent semiparametric regression. *Econometrica*, 56(4), 931 to 954. The partialling-out construction.</span>
+<span id="cb7-330"><a href="#cb7-330" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Buja, A., Brown, L., and Berk, R. (2019). Models as approximations, Part I. *Statistical Science*, 34(4), 523 to 544. A useful account of regression adjustment when a linear model is only an approximation.</span>
+<span id="cb7-331"><a href="#cb7-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-332"><a href="#cb7-332" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

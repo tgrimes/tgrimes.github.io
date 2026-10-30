@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Orthogonality and cross-fitting – Tyler Grimes</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<link href="../../guides/semiparametric-methods/nuisance-estimation.html" rel="next">
+<link href="../../guides/semiparametric-methods/index.html" rel="prev">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-c9066ddd77a36159617a5ce6287efe87.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-77aaa64a17f7b98a2a206aa2f14bfcaa.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script><script src="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.js"></script>
+  <script>document.addEventListener("DOMContentLoaded", function () {
+ var mathElements = document.getElementsByClassName("math");
+ var macros = [];
+ for (var i = 0; i < mathElements.length; i++) {
+  var texText = mathElements[i].firstChild;
+  if (mathElements[i].tagName == "SPAN") {
+   katex.render(texText.data, mathElements[i], {
+    displayMode: mathElements[i].classList.contains('display'),
+    throwOnError: false,
+    macros: macros,
+    fleqn: false
+   });
+}}});
+  </script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css">
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed guide-page quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const darkModeDefault = authorPrefersDark;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Tyler Grimes</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../people.html"> 
+<span class="menu-text">People</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../talks.html"> 
+<span class="menu-text">Talks</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../publications.html"> 
+<span class="menu-text">Publications</span></a>
+  </li>  
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-teaching" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Teaching</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-teaching">    
+        <li>
+    <a class="dropdown-item" href="../../teaching/sta3136/syllabus.html">
+ <span class="dropdown-text">STA3136 - Statistical Methods I</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-guides" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Guides</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-guides">    
+        <li>
+    <a class="dropdown-item" href="../../guides/questions-and-design/index.html">
+ <span class="dropdown-text">Research questions, study design, and estimands</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/estimation-and-inference/index.html">
+ <span class="dropdown-text">Estimation and uncertainty</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/statistical-models/index.html">
+ <span class="dropdown-text">Statistical models, influence functions, and efficiency</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/semiparametric-methods/index.html">
+ <span class="dropdown-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/data-and-measurement/index.html">
+ <span class="dropdown-text">Omics data and measurement</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/analysis-problems/index.html">
+ <span class="dropdown-text">Omics analysis problems</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/method-development/index.html">
+ <span class="dropdown-text">Developing and evaluating methods</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../guides/research-practice/index.html">
+ <span class="dropdown-text">Research practice and reproducibility</span></a>
+  </li>  
+    </ul>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link" href="../../notes.html"> 
+<span class="menu-text">Notes</span></a>
+  </li>  
+</ul>
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes"> <i class="bi bi-github" role="img">
+</i> 
+<span class="menu-text"></span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <a class="flex-grow-1 no-decor" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+          <h1 class="quarto-secondary-nav-title">Orthogonality and cross-fitting</h1>
+        </a>     
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/semiparametric-methods/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Semiparametric estimation with learned nuisance functions</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/semiparametric-methods/orthogonality-and-cross-fitting.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Orthogonality and cross-fitting</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/semiparametric-methods/nuisance-estimation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Estimating nuisance functions for inference</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../guides/semiparametric-methods/influence-function-to-estimator.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">From an influence function to an estimator</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#keep-the-target-fixed-while-learning-nuisances" id="toc-keep-the-target-fixed-while-learning-nuisances" class="nav-link active" data-scroll-target="#keep-the-target-fixed-while-learning-nuisances"><span class="header-section-number">1</span> Keep the target fixed while learning nuisances</a></li>
+  <li><a href="#orthogonality-concerns-the-supplied-nuisance-functions" id="toc-orthogonality-concerns-the-supplied-nuisance-functions" class="nav-link" data-scroll-target="#orthogonality-concerns-the-supplied-nuisance-functions"><span class="header-section-number">2</span> Orthogonality concerns the supplied nuisance functions</a></li>
+  <li><a href="#consistency-and-root-n-inference-are-different-claims" id="toc-consistency-and-root-n-inference-are-different-claims" class="nav-link" data-scroll-target="#consistency-and-root-n-inference-are-different-claims"><span class="header-section-number">3</span> Consistency and root-n inference are different claims</a></li>
+  <li><a href="#cross-fitting-controls-reuse-of-evaluation-noise" id="toc-cross-fitting-controls-reuse-of-evaluation-noise" class="nav-link" data-scroll-target="#cross-fitting-controls-reuse-of-evaluation-noise"><span class="header-section-number">4</span> Cross-fitting controls reuse of evaluation noise</a></li>
+  <li><a href="#locate-the-two-remainders" id="toc-locate-the-two-remainders" class="nav-link" data-scroll-target="#locate-the-two-remainders"><span class="header-section-number">5</span> Locate the two remainders</a></li>
+  <li><a href="#exercises" id="toc-exercises" class="nav-link" data-scroll-target="#exercises"><span class="header-section-number">6</span> Exercises</a>
+  <ul class="collapse">
+  <li><a href="#checkpoint-sp-11-bound-the-nuisance-bias-remainder" id="toc-checkpoint-sp-11-bound-the-nuisance-bias-remainder" class="nav-link" data-scroll-target="#checkpoint-sp-11-bound-the-nuisance-bias-remainder">Checkpoint · SP-11 — Bound the nuisance-bias remainder</a></li>
+  <li><a href="#additional-practice-optional" id="toc-additional-practice-optional" class="nav-link" data-scroll-target="#additional-practice-optional">Additional practice (optional)</a></li>
+  </ul></li>
+  <li><a href="#related-calculations" id="toc-related-calculations" class="nav-link" data-scroll-target="#related-calculations"><span class="header-section-number">7</span> Related calculations</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title d-none d-lg-block">Orthogonality and cross-fitting</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<p class="subtitle lead">Control two different errors while estimating the same missing-outcome mean</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><strong>Before reading:</strong> <a href="../../guides/questions-and-design/missingness-and-selection.html">Missingness, selection, and the observed-data target</a>, <a href="../../guides/statistical-models/influence-functions.html">Influence functions</a>, and stochastic orders from <a href="../../guides/estimation-and-inference/large-sample-reasoning.html">Large-sample reasoning for methods research</a>.</p>
+<section id="keep-the-target-fixed-while-learning-nuisances" class="level2" data-number="1">
+<h2 data-number="1" class="anchored" data-anchor-id="keep-the-target-fixed-while-learning-nuisances"><span class="header-section-number">1</span> Keep the target fixed while learning nuisances</h2>
+<p>The target is the eligible-population feature mean <span class="math inline">\mu=E[Y]</span>. We observe independent records <span class="math inline">W=(Z,R,RY)</span>: <span class="math inline">Z</span> is recorded for everyone, and <span class="math inline">R=1</span> means the outcome is observed. The product <span class="math inline">RY</span> encodes an unrecorded outcome when <span class="math inline">R=0</span>; it does not say that person’s outcome equals zero.</p>
+<p>Assume an integrable outcome, <strong>missing at random</strong> (MAR), <span class="math inline">R\perp Y\mid Z</span>, and positive observation probability over the target population. Then</p>
+<p><span class="math display">
+\begin{aligned}
+m_0(z)&amp;=E[Y\mid Z=z,R=1],\\
+\pi_0(z)&amp;=P(R=1\mid Z=z),\\
+\mu&amp;=E[m_0(Z)].
+\end{aligned}
+</span></p>
+<p>The subscript 0 marks the true population functions; hats will mark estimates. MAR connects the observed-outcome regression to the full-population conditional mean. The outer expectation uses the covariate distribution of all eligible people. Neither learning nor cross-fitting supplies this identifying assumption.</p>
+<p>Write <span class="math inline">Pf=E[f(W)]</span> and <span class="math inline">P_nf=n^{-1}\sum_i f(W_i)</span>. For a function of <span class="math inline">Z</span>, <span class="math inline">\|f\|_2=\sqrt{E[f(Z)^2]}</span>, averaging over the eligible population. A fitted function is random across training datasets; when we hold a fit fixed, <span class="math inline">P</span> averages over a fresh observation with that fit unchanged.</p>
+<p>Averaging fitted means alone can be sensitive to regression error. An augmented contribution combines a prediction with an observed residual:</p>
+<p><span class="math display">
+\begin{aligned}
+D_\eta(W)&amp;=m(Z)+\frac{R}{\pi(Z)}\{Y-m(Z)\},\\
+\eta&amp;=(m,\pi).
+\end{aligned}
+</span></p>
+<p>Every person contributes a prediction <span class="math inline">m(Z)</span>. A person with an observed outcome also contributes a residual, weighted by the inverse observation probability. At the true functions, <span class="math inline">E[R(Y-m_0)\mid Z]=0</span>, so <span class="math inline">PD_{\eta_0}=\mu</span>. If <span class="math inline">m=3</span>, <span class="math inline">\pi=1/2</span>, and an observed outcome is 5, the contribution is <span class="math inline">3+2(5-3)=7</span>; a person with the same covariates and a missing outcome contributes 3. These are estimation contributions, not imputed individual outcomes, so they need not stay within the outcome’s range.</p>
+<p>The centered function <span class="math inline">\phi_0=D_{\eta_0}-\mu</span> is the observed-data influence function derived in <a href="../../guides/semiparametric-methods/influence-function-to-estimator.html">From an influence function to an estimator</a>. The mean-zero equation <span class="math inline">D_\eta-\mu</span> is an estimating function; <span class="math inline">D_\eta</span> is not a likelihood score. This page explains why estimating its nuisance arguments requires both bias control and careful training/evaluation separation.</p>
+</section>
+<section id="orthogonality-concerns-the-supplied-nuisance-functions" class="level2" data-number="2">
+<h2 data-number="2" class="anchored" data-anchor-id="orthogonality-concerns-the-supplied-nuisance-functions"><span class="header-section-number">2</span> Orthogonality concerns the supplied nuisance functions</h2>
+<p>Hold the population law and target fixed. Change only the nuisance arguments supplied to <span class="math inline">M(\eta)=PD_\eta</span>. <strong>Neyman orthogonality</strong> means that the first derivative of this map is zero at the true nuisances along the permitted perturbations. This differs from a score-path derivative, where the distribution and target can change, and from independence of two random variables. Here it says that a small nuisance error has no first-order effect on the population estimating equation.</p>
+<p>To see the cancellation, fix fitted functions with <span class="math inline">\widehat\pi\ge c&gt;0</span>. Conditioning on <span class="math inline">Z</span> gives</p>
+<p><span class="math display">
+\begin{aligned}
+E[R(Y-\widehat m)\mid Z]&amp;=\pi_0(m_0-\widehat m),\\
+E[D_{\widehat\eta}\mid Z]-m_0&amp;=(\widehat m-m_0) \left(1-\frac{\pi_0}{\widehat\pi}\right).
+\end{aligned}
+</span></p>
+<p>The first term in the contribution introduces prediction error; the residual correction subtracts the part scaled by <span class="math inline">\pi_0/\widehat\pi</span>. Averaging the remaining difference gives the exact identity</p>
+<p><span class="math display">
+PD_{\widehat\eta}-\mu
+=E\left[\frac{\widehat\pi-\pi_0}{\widehat\pi}
+(\widehat m-m_0)\right].
+</span></p>
+<p>Write a perturbation as <span class="math inline">m_0+\varepsilon h_m</span>, <span class="math inline">\pi_0+\varepsilon h_\pi</span>, keeping probabilities admissible. Its bias is</p>
+<p><span class="math display">
+\varepsilon^2E\left[\frac{h_\pi h_m}{\pi_0+\varepsilon h_\pi}\right].
+</span></p>
+<p>Under the needed integrability and denominator bounds, dividing by <span class="math inline">\varepsilon</span> and taking <span class="math inline">\varepsilon\to0</span> gives derivative zero. The first surviving change is a product of the two perturbations. By comparison, the regression-only contribution has population change <span class="math inline">\varepsilon E[h_m]</span>, generally first order. Augmentation removes that term. The exact identity shows which product remains; a zero formal derivative alone is not a general rate theorem.</p>
+<p>For a numerical check, take <span class="math inline">\pi_0=0.5</span>, <span class="math inline">\widehat\pi=0.6</span>, and <span class="math inline">\widehat m-m_0=0.2</span> everywhere. The exact bias is <span class="math inline">(0.1/0.6)0.2=1/30</span>, compared with 0.2 for prediction alone. Halving both errors gives <span class="math inline">(0.05/0.55)0.1=1/110</span>, approximately a quarter as large. The denominator also changes, so the finite change need not be exactly quadratic.</p>
+</section>
+<section id="consistency-and-root-n-inference-are-different-claims" class="level2" data-number="3">
+<h2 data-number="3" class="anchored" data-anchor-id="consistency-and-root-n-inference-are-different-claims"><span class="header-section-number">3</span> Consistency and root-n inference are different claims</h2>
+<p>Cauchy–Schwarz yields</p>
+<p><span class="math display">
+\begin{aligned}
+|PD_{\widehat\eta}-\mu|
+&amp;\le E\left[\frac{|\widehat\pi-\pi_0|}{c}|\widehat m-m_0|\right]\\
+&amp;\le c^{-1}\|\widehat\pi-\pi_0\|_2\|\widehat m-m_0\|_2.
+\end{aligned}
+</span></p>
+<p>If either supplied function is exactly correct, this population bias is zero. For learned functions, one nuisance converging to truth can make the bias vanish if the other error stays bounded in the required norm and the denominator remains controlled. With a vanishing empirical error, this gives <strong>double-robust consistency</strong>. “Double” refers to two opportunities for this consistency property; it does not mean robustness to MAR failure or to arbitrary errors in both functions.</p>
+<p>Consistency asks only that the estimation error vanish. A centered root-<span class="math inline">n</span> limit asks for the nuisance bias to be negligible compared with the leading <span class="math inline">n^{-1/2}</span> sampling fluctuation. The efficient-inference argument using <span class="math inline">\phi_0</span> here assumes both nuisances converge, a product <span class="math inline">o_p(n^{-1/2})</span>, and the empirical and variance conditions below. These are sufficient conditions for this proof. A different limit with one incorrect nuisance needs its own expansion and variance analysis.</p>
+<p>If the two L2 errors are <span class="math inline">O_p(n^{-a})</span> and <span class="math inline">O_p(n^{-b})</span>, their product is <span class="math inline">O_p(n^{-(a+b)})</span>. Multiplication by <span class="math inline">\sqrt n</span> leaves order <span class="math inline">O_p(n^{1/2-a-b})</span>. Thus <span class="math inline">a+b&gt;1/2</span> is sufficient through this bound.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>L2 exponents <span class="math inline">(a,b)</span></th>
+<th>Product order</th>
+<th>Root-<span class="math inline">n</span> bias guarantee from the bound</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span class="math inline">(1/3,1/5)</span></td>
+<td><span class="math inline">O_p(n^{-8/15})</span></td>
+<td>Negligible: <span class="math inline">8/15&gt;1/2</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">(1/4,1/4)</span></td>
+<td><span class="math inline">O_p(n^{-1/2})</span></td>
+<td>Boundary: big-O alone is insufficient</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">(1/5,1/5)</span></td>
+<td><span class="math inline">O_p(n^{-2/5})</span></td>
+<td>No negligibility guarantee</td>
+</tr>
+</tbody>
+</table>
+<p>At the boundary, stronger little-o control of at least one factor can suffice. If the bound is too large, the actual signed expectation might still cancel; failing a sufficient condition is not itself proof of bias. Faster convergence of one nuisance can compensate for slower convergence of the other. <a href="../../guides/semiparametric-methods/nuisance-estimation.html">Estimating nuisance functions for inference</a> connects these exponents to regression learning.</p>
+</section>
+<section id="cross-fitting-controls-reuse-of-evaluation-noise" class="level2" data-number="4">
+<h2 data-number="4" class="anchored" data-anchor-id="cross-fitting-controls-reuse-of-evaluation-noise"><span class="header-section-number">4</span> Cross-fitting controls reuse of evaluation noise</h2>
+<p>Split independent people into a fixed number <span class="math inline">K</span> of folds, using a split independent of their measurements. Fit nuisance functions outside each validation fold and evaluate the contribution inside it. In a two-fold example:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Contributions being evaluated</th>
+<th>Data allowed to train those fits</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>People in fold A</td>
+<td>Fold B</td>
+</tr>
+<tr class="even">
+<td>People in fold B</td>
+<td>Fold A</td>
+</tr>
+</tbody>
+</table>
+<p>Every person is evaluated once and can help train the fit used for other people. Cross-fitting recovers use of the full sample for evaluation; it does not train any one fit on the full sample. Train learned preprocessing, selection, and tuning inside the relevant training set. For repeated specimens, keep an entire person together and adapt the variance argument to the independent unit.</p>
+<p>Let <span class="math inline">I_k</span> be validation fold <span class="math inline">k</span>, <span class="math inline">n_k</span> its size, <span class="math inline">P_{n,k}</span> its average, and <span class="math inline">\widehat\eta_k</span> the fit trained outside that fold. The subscript <span class="math inline">k</span> labels the held-out fold, not data used for training. The estimator is</p>
+<p><span class="math display">
+\widehat\mu=\sum_{k=1}^K\frac{n_k}{n}
+P_{n,k}D_{\widehat\eta_k}.
+</span></p>
+<p>Fold-size weights make this exactly the average of the <span class="math inline">n</span> held-out contributions. A simple unweighted average of fold estimates would generally give different person weights when fold sizes differ.</p>
+<p>For validation fold <span class="math inline">k</span>, condition on its training data. Its fitted functions are then fixed, while the validation observations are fresh independent draws. This permits a conditional-variance argument for the fitted-minus-true empirical term. Conditioning on all fitted functions simultaneously would be a different step: the fits use observations from other validation folds, so the full set of contributions is not jointly independent.</p>
+<p>Cross-fitting does not identify an unsupported target, make a bad learner consistent, or remove the product bias. For example, constant nuisance errors of order <span class="math inline">n^{-1/5}</span> can leave a bias of order <span class="math inline">n^{-2/5}</span>, which grows after root-n scaling. Separated folds do not change that population calculation.</p>
+</section>
+<section id="locate-the-two-remainders" class="level2" data-number="5">
+<h2 data-number="5" class="anchored" data-anchor-id="locate-the-two-remainders"><span class="header-section-number">5</span> Locate the two remainders</h2>
+<p>Let <span class="math inline">H_k=D_{\widehat\eta_k}-D_{\eta_0}</span> and <span class="math inline">w_k=n_k/n</span>. Add and subtract the true contribution, and then its population average. The error decomposes exactly as</p>
+<p><span class="math display">
+\widehat\mu-\mu=(P_n-P)\phi_0 +\sum_k w_k(P_{n,k}-P)H_k +\sum_k w_kPH_k.
+</span></p>
+<p>The first term averages the same fixed, mean-zero <span class="math inline">\phi_0</span> over everyone. With finite nonzero variance it has a CLT. The middle term is a <strong>centered empirical remainder</strong>: how much the evaluation sample’s average fitted error differs from its fresh-population average. Conditional on training, its scaled variance is at most <span class="math inline">PH_k^2</span>, so <span class="math inline">\|H_k\|_2=o_p(1)</span> makes it negligible. The last term is the <strong>population bias remainder</strong>, the exact product derived above. Cross-fitting does not shrink that product by itself.</p>
+<p>To obtain the usual limit, both remainders must be <span class="math inline">o_p(n^{-1/2})</span>. Then the leading contribution determines the limiting law. A feasible SE still needs consistent contribution-variance estimation and finite nonzero limiting variance; a small computed SE is not evidence that the bias remainder is small.</p>
+<p><a href="../../guides/semiparametric-methods/influence-function-to-estimator.html">From an influence function to an estimator</a> completes the derivation, conditional-Chebyshev proof, implementation, and uncertainty argument for this same target. <a href="../../guides/analysis-problems/residual-covariance-and-nuisance-error.html">Residual covariance and nuisance-estimation error</a> is a network-analysis transfer with its own gradient and remainder, rather than another name for the missing mean.</p>
+</section>
+<section id="exercises" class="level2" data-number="6">
+<h2 data-number="6" class="anchored" data-anchor-id="exercises"><span class="header-section-number">6</span> Exercises</h2>
+<p>The checkpoint is a completion target. Additional practice is optional.</p>
+<div id="checkpoint-sp-11" class="checkpoint">
+<section id="checkpoint-sp-11-bound-the-nuisance-bias-remainder" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="checkpoint-sp-11-bound-the-nuisance-bias-remainder">Checkpoint · SP-11 — Bound the nuisance-bias remainder</h3>
+<p><strong>Task type:</strong> Derivation and rate reasoning.</p>
+<p>Fix nuisance fits trained independently of a fresh observation. Under the missing-mean identification assumptions, derive <span class="math inline">PD_{\widehat\eta}-\mu</span>. Assume <span class="math inline">\widehat\pi\ge c&gt;0</span> and square-integrable nuisance errors. Bound the bias using Cauchy–Schwarz. If the L2 errors are <span class="math inline">O_p(n^{-a})</span> and <span class="math inline">O_p(n^{-b})</span>, give a sufficient condition for a negligible root-n bias. Check exponent pairs (1/3,1/5), (1/4,1/4), and (1/5,1/5). Explain which additional random term this calculation does not control.</p>
+<p><strong>Ready to continue when:</strong> you can derive the exact product remainder, distinguish big-O from little-o, and identify the additional empirical and variance arguments needed for inference.</p>
+<p><strong>Transfer:</strong> Compare this weighted product with the residual-covariance product in the application page. What role does the denominator bound play?</p>
+<details class="checkpoint-help">
+<summary>
+Hint
+</summary>
+<p>Condition on Z: <span class="math inline">E[R(Y-\widehat m)\mid Z]=\pi_0(m_0-\widehat m)</span>. Combine the prediction and residual terms before applying the norm bound.</p>
+</details>
+<details class="checkpoint-help">
+<summary>
+Solution outline — open after trying
+</summary>
+<p>The bias is <span class="math inline">E[(\widehat\pi-\pi_0)(\widehat m-m_0)/\widehat\pi]</span>, bounded by <span class="math inline">c^{-1}</span> times the two L2 errors. An exponent sum greater than 1/2 guarantees little-o through this bound. The first pair satisfies it, equality at (1/4,1/4) is insufficient from big-O alone, and (1/5,1/5) gives no negligible-bias guarantee. Failing a sufficient bound alone is not proof of actual failure, since a particular inner product may cancel. The fitted-function empirical remainder and variance consistency remain to be controlled. Cross-fitting addresses the former under its own conditions, not the population bias.</p>
+</details>
+</section>
+</div>
+<section id="additional-practice-optional" class="level3 unnumbered">
+<h3 class="unnumbered anchored" data-anchor-id="additional-practice-optional">Additional practice (optional)</h3>
+<ol type="1">
+<li>Set one nuisance equal to truth and derive the remaining population bias.</li>
+<li>Use bounded perturbation directions to verify the zero first derivative directly.</li>
+<li>Draw the fitting/evaluation scheme for repeated specimens from independent people.</li>
+</ol>
+</section>
+</section>
+<section id="related-calculations" class="level2" data-number="7">
+<h2 data-number="7" class="anchored" data-anchor-id="related-calculations"><span class="header-section-number">7</span> Related calculations</h2>
+<p><span id="a-counterexample-separated-folds-with-a-bad-nuisance-learner"></span><span id="conditions-connecting-the-formula-to-an-se"></span><span id="continue-through-the-collection"></span><span id="cross-fitting"></span><span id="neyman-orthogonality"></span><span id="putting-it-together-the-recipe-we-use"></span><span id="reading"></span><span id="the-conditional-covariance-two-ways"></span><span id="the-connection-to-the-efficient-influence-function"></span><span id="the-efficient-influence-function-briefly"></span><span id="the-fold-includes-the-fitting-pipeline"></span><span id="the-problem-this-guide-solves"></span><span id="words-you-will-meet"></span> <span id="fig-crossfit-counterexample"></span><span id="fig-orthogonal-sensitivity"></span> The relocated worked calculation is in <a href="../../guides/analysis-problems/residual-covariance-and-nuisance-error.html">Residual covariance and nuisance-estimation error</a>.</p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/tgrimes\.github\.io");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../guides/semiparametric-methods/index.html" class="pagination-link" aria-label="Semiparametric estimation with learned nuisance functions">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Semiparametric estimation with learned nuisance functions</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../../guides/semiparametric-methods/nuisance-estimation.html" class="pagination-link" aria-label="Estimating nuisance functions for inference">
+        <span class="nav-page-text">Estimating nuisance functions for inference</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Orthogonality and cross-fitting"</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Control two different errors while estimating the same missing-outcome mean"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="an">aliases:</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/statistical-background/05-semiparametric-orthogonality.html"</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">  - "/guides/statistical-background/06-semiparametric-orthogonality.html"</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>**Before reading:** <span class="co">[</span><span class="ot">Missingness, selection, and the observed-data target</span><span class="co">](../questions-and-design/missingness-and-selection.qmd)</span>, <span class="co">[</span><span class="ot">Influence functions</span><span class="co">](../statistical-models/influence-functions.qmd)</span>, and stochastic orders from <span class="co">[</span><span class="ot">Large-sample reasoning for methods research</span><span class="co">](../estimation-and-inference/large-sample-reasoning.qmd)</span>.</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Keep the target fixed while learning nuisances</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>The target is the eligible-population feature mean $\mu=E<span class="co">[</span><span class="ot">Y</span><span class="co">]</span>$. We observe independent records $W=(Z,R,RY)$: $Z$ is recorded for everyone, and $R=1$ means the outcome is observed. The product $RY$ encodes an unrecorded outcome when $R=0$; it does not say that person's outcome equals zero.</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>Assume an integrable outcome, **missing at random** (MAR), $R\perp Y\mid Z$, and positive observation probability over the target population. Then</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>m_0(z)&amp;=E<span class="co">[</span><span class="ot">Y\mid Z=z,R=1</span><span class="co">]</span>,<span class="sc">\\</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>\pi_0(z)&amp;=P(R=1\mid Z=z),<span class="sc">\\</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>\mu&amp;=E<span class="co">[</span><span class="ot">m_0(Z)</span><span class="co">]</span>.</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>The subscript 0 marks the true population functions; hats will mark estimates. MAR connects the observed-outcome regression to the full-population conditional mean. The outer expectation uses the covariate distribution of all eligible people. Neither learning nor cross-fitting supplies this identifying assumption.</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>Write $Pf=E<span class="co">[</span><span class="ot">f(W)</span><span class="co">]</span>$ and $P_nf=n^{-1}\sum_i f(W_i)$. For a function of $Z$, $<span class="sc">\|</span>f<span class="sc">\|</span>_2=\sqrt{E<span class="co">[</span><span class="ot">f(Z)^2</span><span class="co">]</span>}$, averaging over the eligible population. A fitted function is random across training datasets; when we hold a fit fixed, $P$ averages over a fresh observation with that fit unchanged.</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>Averaging fitted means alone can be sensitive to regression error. An augmented contribution combines a prediction with an observed residual:</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>D_\eta(W)&amp;=m(Z)+\frac{R}{\pi(Z)}<span class="sc">\{</span>Y-m(Z)<span class="sc">\}</span>,<span class="sc">\\</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>\eta&amp;=(m,\pi).</span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>Every person contributes a prediction $m(Z)$. A person with an observed outcome also contributes a residual, weighted by the inverse observation probability. At the true functions, $E<span class="co">[</span><span class="ot">R(Y-m_0)\mid Z</span><span class="co">]</span>=0$, so $PD_{\eta_0}=\mu$. If $m=3$, $\pi=1/2$, and an observed outcome is 5, the contribution is $3+2(5-3)=7$; a person with the same covariates and a missing outcome contributes 3. These are estimation contributions, not imputed individual outcomes, so they need not stay within the outcome's range.</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>The centered function $\phi_0=D_{\eta_0}-\mu$ is the observed-data influence function derived in <span class="co">[</span><span class="ot">From an influence function to an estimator</span><span class="co">](influence-function-to-estimator.qmd)</span>. The mean-zero equation $D_\eta-\mu$ is an estimating function; $D_\eta$ is not a likelihood score. This page explains why estimating its nuisance arguments requires both bias control and careful training/evaluation separation.</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="fu">## Orthogonality concerns the supplied nuisance functions</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>Hold the population law and target fixed. Change only the nuisance arguments supplied to $M(\eta)=PD_\eta$. **Neyman orthogonality** means that the first derivative of this map is zero at the true nuisances along the permitted perturbations. This differs from a score-path derivative, where the distribution and target can change, and from independence of two random variables. Here it says that a small nuisance error has no first-order effect on the population estimating equation.</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>To see the cancellation, fix fitted functions with $\widehat\pi\ge c&gt;0$. Conditioning on $Z$ gives</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">R(Y-\widehat m)\mid Z</span><span class="co">]</span>&amp;=\pi_0(m_0-\widehat m),<span class="sc">\\</span></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>E<span class="co">[</span><span class="ot">D_{\widehat\eta}\mid Z</span><span class="co">]</span>-m_0&amp;=(\widehat m-m_0) \left(1-\frac{\pi_0}{\widehat\pi}\right).</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>The first term in the contribution introduces prediction error; the residual correction subtracts the part scaled by $\pi_0/\widehat\pi$. Averaging the remaining difference gives the exact identity</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>PD_{\widehat\eta}-\mu</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>=E\left[\frac{\widehat\pi-\pi_0}{\widehat\pi}</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>(\widehat m-m_0)\right].</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>Write a perturbation as $m_0+\varepsilon h_m$, $\pi_0+\varepsilon h_\pi$, keeping probabilities admissible. Its bias is</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>\varepsilon^2E\left<span class="co">[</span><span class="ot">\frac{h_\pi h_m}{\pi_0+\varepsilon h_\pi}\right</span><span class="co">]</span>.</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>Under the needed integrability and denominator bounds, dividing by $\varepsilon$ and taking $\varepsilon\to0$ gives derivative zero. The first surviving change is a product of the two perturbations. By comparison, the regression-only contribution has population change $\varepsilon E<span class="co">[</span><span class="ot">h_m</span><span class="co">]</span>$, generally first order. Augmentation removes that term. The exact identity shows which product remains; a zero formal derivative alone is not a general rate theorem.</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>For a numerical check, take $\pi_0=0.5$, $\widehat\pi=0.6$, and $\widehat m-m_0=0.2$ everywhere. The exact bias is $(0.1/0.6)0.2=1/30$, compared with 0.2 for prediction alone. Halving both errors gives $(0.05/0.55)0.1=1/110$, approximately a quarter as large. The denominator also changes, so the finite change need not be exactly quadratic.</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="fu">## Consistency and root-n inference are different claims</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>Cauchy–Schwarz yields</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>\begin{aligned}</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span>PD_{\widehat\eta}-\mu<span class="pp">|</span></span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>&amp;\le E\left<span class="co">[</span><span class="ot">\frac{|\widehat\pi-\pi_0|}{c}|\widehat m-m_0|\right</span><span class="co">]</span><span class="sc">\\</span></span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>&amp;\le c^{-1}<span class="sc">\|</span>\widehat\pi-\pi_0<span class="sc">\|</span>_2<span class="sc">\|</span>\widehat m-m_0<span class="sc">\|</span>_2.</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>\end{aligned}</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>If either supplied function is exactly correct, this population bias is zero. For learned functions, one nuisance converging to truth can make the bias vanish if the other error stays bounded in the required norm and the denominator remains controlled. With a vanishing empirical error, this gives **double-robust consistency**. “Double” refers to two opportunities for this consistency property; it does not mean robustness to MAR failure or to arbitrary errors in both functions.</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>Consistency asks only that the estimation error vanish. A centered root-$n$ limit asks for the nuisance bias to be negligible compared with the leading $n^{-1/2}$ sampling fluctuation. The efficient-inference argument using $\phi_0$ here assumes both nuisances converge, a product $o_p(n^{-1/2})$, and the empirical and variance conditions below. These are sufficient conditions for this proof. A different limit with one incorrect nuisance needs its own expansion and variance analysis.</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>If the two L2 errors are $O_p(n^{-a})$ and $O_p(n^{-b})$, their product is $O_p(n^{-(a+b)})$. Multiplication by $\sqrt n$ leaves order $O_p(n^{1/2-a-b})$. Thus $a+b&gt;1/2$ is sufficient through this bound.</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> L2 exponents $(a,b)$ <span class="pp">|</span> Product order <span class="pp">|</span> Root-$n$ bias guarantee from the bound <span class="pp">|</span></span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $(1/3,1/5)$ <span class="pp">|</span> $O_p(n^{-8/15})$ <span class="pp">|</span> Negligible: $8/15&gt;1/2$ <span class="pp">|</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $(1/4,1/4)$ <span class="pp">|</span> $O_p(n^{-1/2})$ <span class="pp">|</span> Boundary: big-O alone is insufficient <span class="pp">|</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> $(1/5,1/5)$ <span class="pp">|</span> $O_p(n^{-2/5})$ <span class="pp">|</span> No negligibility guarantee <span class="pp">|</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>At the boundary, stronger little-o control of at least one factor can suffice. If the bound is too large, the actual signed expectation might still cancel; failing a sufficient condition is not itself proof of bias. Faster convergence of one nuisance can compensate for slower convergence of the other. <span class="co">[</span><span class="ot">Estimating nuisance functions for inference</span><span class="co">](nuisance-estimation.qmd)</span> connects these exponents to regression learning.</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a><span class="fu">## Cross-fitting controls reuse of evaluation noise</span></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>Split independent people into a fixed number $K$ of folds, using a split independent of their measurements. Fit nuisance functions outside each validation fold and evaluate the contribution inside it. In a two-fold example:</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Contributions being evaluated <span class="pp">|</span> Data allowed to train those fits <span class="pp">|</span></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> People in fold A <span class="pp">|</span> Fold B <span class="pp">|</span></span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> People in fold B <span class="pp">|</span> Fold A <span class="pp">|</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>Every person is evaluated once and can help train the fit used for other people. Cross-fitting recovers use of the full sample for evaluation; it does not train any one fit on the full sample. Train learned preprocessing, selection, and tuning inside the relevant training set. For repeated specimens, keep an entire person together and adapt the variance argument to the independent unit.</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>Let $I_k$ be validation fold $k$, $n_k$ its size, $P_{n,k}$ its average, and $\widehat\eta_k$ the fit trained outside that fold. The subscript $k$ labels the held-out fold, not data used for training. The estimator is</span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>\widehat\mu=\sum_{k=1}^K\frac{n_k}{n}</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>P_{n,k}D_{\widehat\eta_k}.</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>Fold-size weights make this exactly the average of the $n$ held-out contributions. A simple unweighted average of fold estimates would generally give different person weights when fold sizes differ.</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>For validation fold $k$, condition on its training data. Its fitted functions are then fixed, while the validation observations are fresh independent draws. This permits a conditional-variance argument for the fitted-minus-true empirical term. Conditioning on all fitted functions simultaneously would be a different step: the fits use observations from other validation folds, so the full set of contributions is not jointly independent.</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>Cross-fitting does not identify an unsupported target, make a bad learner consistent, or remove the product bias. For example, constant nuisance errors of order $n^{-1/5}$ can leave a bias of order $n^{-2/5}$, which grows after root-n scaling. Separated folds do not change that population calculation.</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="fu">## Locate the two remainders</span></span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>Let $H_k=D_{\widehat\eta_k}-D_{\eta_0}$ and $w_k=n_k/n$. Add and subtract the true contribution, and then its population average. The error decomposes exactly as</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a>\widehat\mu-\mu=(P_n-P)\phi_0 +\sum_k w_k(P_{n,k}-P)H_k +\sum_k w_kPH_k.</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>The first term averages the same fixed, mean-zero $\phi_0$ over everyone. With finite nonzero variance it has a CLT. The middle term is a **centered empirical remainder**: how much the evaluation sample's average fitted error differs from its fresh-population average. Conditional on training, its scaled variance is at most $PH_k^2$, so $\|H_k\|_2=o_p(1)$ makes it negligible. The last term is the **population bias remainder**, the exact product derived above. Cross-fitting does not shrink that product by itself.</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a>To obtain the usual limit, both remainders must be $o_p(n^{-1/2})$. Then the leading contribution determines the limiting law. A feasible SE still needs consistent contribution-variance estimation and finite nonzero limiting variance; a small computed SE is not evidence that the bias remainder is small.</span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">From an influence function to an estimator</span><span class="co">](influence-function-to-estimator.qmd)</span> completes the derivation, conditional-Chebyshev proof, implementation, and uncertainty argument for this same target. <span class="co">[</span><span class="ot">Residual covariance and nuisance-estimation error</span><span class="co">](../analysis-problems/residual-covariance-and-nuisance-error.qmd)</span> is a network-analysis transfer with its own gradient and remainder, rather than another name for the missing mean.</span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a><span class="fu">## Exercises</span></span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a>The checkpoint is a completion target. Additional practice is optional.</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a>::: {#checkpoint-sp-11 .checkpoint}</span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="fu">### Checkpoint · SP-11 — Bound the nuisance-bias remainder {.unnumbered}</span></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a>**Task type:** Derivation and rate reasoning.</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a>Fix nuisance fits trained independently of a fresh observation. Under the missing-mean identification assumptions, derive $PD_{\widehat\eta}-\mu$. Assume $\widehat\pi\ge c&gt;0$ and square-integrable nuisance errors. Bound the bias using Cauchy–Schwarz. If the L2 errors are $O_p(n^{-a})$ and $O_p(n^{-b})$, give a sufficient condition for a negligible root-n bias. Check exponent pairs (1/3,1/5), (1/4,1/4), and (1/5,1/5). Explain which additional random term this calculation does not control.</span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a>**Ready to continue when:** you can derive the exact product remainder, distinguish big-O from little-o, and identify the additional empirical and variance arguments needed for inference.</span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a>**Transfer:** Compare this weighted product with the residual-covariance product in the application page. What role does the denominator bound play?</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Hint<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a>Condition on Z: $E<span class="co">[</span><span class="ot">R(Y-\widehat m)\mid Z</span><span class="co">]</span>=\pi_0(m_0-\widehat m)$. Combine the prediction and residual terms before applying the norm bound.</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">details</span><span class="ot"> class</span><span class="op">=</span><span class="st">"checkpoint-help"</span><span class="dt">&gt;</span></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">summary</span><span class="dt">&gt;</span>Solution outline — open after trying<span class="dt">&lt;/</span><span class="kw">summary</span><span class="dt">&gt;</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a>The bias is $E<span class="co">[</span><span class="ot">(\widehat\pi-\pi_0)(\widehat m-m_0)/\widehat\pi</span><span class="co">]</span>$, bounded by $c^{-1}$ times the two L2 errors. An exponent sum greater than 1/2 guarantees little-o through this bound. The first pair satisfies it, equality at (1/4,1/4) is insufficient from big-O alone, and (1/5,1/5) gives no negligible-bias guarantee. Failing a sufficient bound alone is not proof of actual failure, since a particular inner product may cancel. The fitted-function empirical remainder and variance consistency remain to be controlled. Cross-fitting addresses the former under its own conditions, not the population bias.</span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">details</span><span class="dt">&gt;</span></span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="fu">### Additional practice (optional) {.unnumbered}</span></span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Set one nuisance equal to truth and derive the remaining population bias.</span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Use bounded perturbation directions to verify the zero first derivative directly.</span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Draw the fitting/evaluation scheme for repeated specimens from independent people.</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a><span class="fu">## Related calculations</span></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"a-counterexample-separated-folds-with-a-bad-nuisance-learner"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"conditions-connecting-the-formula-to-an-se"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"continue-through-the-collection"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"cross-fitting"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"neyman-orthogonality"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"putting-it-together-the-recipe-we-use"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"reading"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"the-conditional-covariance-two-ways"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"the-connection-to-the-efficient-influence-function"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"the-efficient-influence-function-briefly"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"the-fold-includes-the-fitting-pipeline"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"the-problem-this-guide-solves"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"words-you-will-meet"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"fig-crossfit-counterexample"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;&lt;</span><span class="kw">span</span><span class="ot"> id</span><span class="op">=</span><span class="st">"fig-orthogonal-sensitivity"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span></span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a>The relocated worked calculation is in <span class="co">[</span><span class="ot">Residual covariance and nuisance-estimation error</span><span class="co">](../analysis-problems/residual-covariance-and-nuisance-error.qmd)</span>.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">
+      &nbsp;
+    </div>   
+    <div class="nav-footer-center">
+<p>Site made with <a href="https://quarto.org/">Quarto</a>. Tyler Grimes (2026). License: <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.en">CC BY-SA 4.0</a></p>
+</div>
+    <div class="nav-footer-right">
+      <ul class="footer-items list-unstyled">
+    <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com//tgrimes">
+      <i class="bi bi-github" role="img">
+</i> 
+    </a>
+  </li>  
+</ul>
+    </div>
+  </div>
+</footer>
+
+
+
+
+<script src="../../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>
